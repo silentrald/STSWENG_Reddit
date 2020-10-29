@@ -80,13 +80,17 @@ jobs:
           ${{ runner.os }}-yarn-
 
     - name: Install Packages
-      run: npm i
+      run: yarn
       working-directory: ./server
 
-    - name: Build
-      run: npm run build --if-present
-      working-directory: ./server
+    # - name: Build
+    #   run: yarn build --if-present
+    #   working-directory: ./server
 
-    - name: Test with Jest
-      run: npm test
+    - name: Linter
+      run: yarn lint
+      working-directory: ./server
+    
+    - name: Jest
+      run: yarn test
       working-directory: ./server
