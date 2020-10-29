@@ -5,7 +5,7 @@ const indexAPI = {
      * Sends the index page
      */
     index: (req, res) => {
-        res.send('Hello World')
+        res.send('Hello World');
     },
 };
 
