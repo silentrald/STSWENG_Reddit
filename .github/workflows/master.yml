@@ -1,12 +1,12 @@
-name: Development
+name: Production
 
 on:
   push:
     branches:
-      - dev
+      - master
   pull_request:
     branches:
-      - dev
+      - master
 
 jobs:
   nuxt_client:
