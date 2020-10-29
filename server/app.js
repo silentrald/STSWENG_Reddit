@@ -1,7 +1,8 @@
 // MODULES
-const express = require('express');
+const express       = require('express');
 
-const bodyParser = require('body-parser');
+const bodyParser    = require('body-parser');
+const cors          = require('cors');
 
 require('dotenv').config();
 
@@ -14,6 +15,7 @@ if (process.env.NODE_ENV === 'development') {
     app.use(require('morgan')('dev')); // import morgan
 }
 
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
