@@ -23,6 +23,8 @@ app.use(bodyParser.json());
 const indexRtr = require('./routers/indexRtr');
 app.use('/api/index', indexRtr);
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Listening to port ${PORT}`);
 });
+
+module.exports = server;
