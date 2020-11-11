@@ -7,7 +7,8 @@
     "dev": "npx nodemon app --exec \"npm run lint && node\"",
     "build": "npm run lint && npm run test && node app",
     "lint": "eslint .",
-    "test": "jest"
+    "test": "jest --color --coverage",
+    "stest": "jest --color --coverage --silent"
   },
   "repository": {
     "type": "git",
@@ -20,10 +21,12 @@
   },
   "homepage": "https://github.com/silentrald/STSWENG#readme",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "pg": "^8.4.2"
   },
   "devDependencies": {

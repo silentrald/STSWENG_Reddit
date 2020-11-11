@@ -20,8 +20,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // API ROUTERS
-const indexRtr = require('./routers/indexRtr');
-app.use('/api/index', indexRtr);
+const userRtr = require('./routers/userRtr');
+
+app.use('/api/user', userRtr);
 
 const server = app.listen(PORT, () => {
     console.log(`Listening to port ${PORT}`);
