@@ -83,11 +83,16 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Get yarn cache directory path 🛠
+    - name: Postgres CLI
+      run: |
+        apt-get update
+        apt-get install --yes --no-install-recommends docker
+
+    - name: Get yarn cache directory path
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
 
-    - name: Cache node_modules 📦
+    - name: Cache node_modules
       uses: actions/cache@v2
       id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
       with:
@@ -107,18 +112,17 @@ jobs:
     - name: Linter
       run: yarn lint
       working-directory: ./server
-    
-    - name: Postgres CLI
-      run: |
-        apt-get update
-        apt-get install --yes --no-install-recommends postgresql-client
 
-    - name: Run migrate schema
-      run: |
-        psql -h postgres -U stsweng_user -f /db/db.sql
-        password
-      working-directory: ./server
+    # - name: Run migrate schema
+    #   run: |
+    #     psql -h postgres -U stsweng_user -f /db/db.sql
+    #     password
+    #   working-directory: ./server
     
+    - name: Run migrate schema
+      run: docker run -e PGPASSWORD="password" --rm node psql -h postgres -U stsweng_user -f ./db/db.sql
+      working-directory: ./server
+
     - name: Jest
       run: yarn test
       env:
