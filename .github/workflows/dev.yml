@@ -108,8 +108,13 @@ jobs:
       run: yarn lint
       working-directory: ./server
     
+    - name: Postgres CLI
+      run: |
+        apt-get update
+        apt-get install --yes --no-install-recommends postgresql-client
+
     - name: Run migrate schema
-      run: psql -U stsweng_user -f /db/db.sql
+      run: psql -h postgres -U stsweng_user -f /db/db.sql
       working-directory: ./server
     
     - name: Jest
@@ -118,6 +123,6 @@ jobs:
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
+        POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
