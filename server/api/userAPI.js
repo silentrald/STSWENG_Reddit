@@ -15,6 +15,7 @@ const userAPI = {
             email,
             fname,
             lname,
+            gender,
             birthday,
             bio
         } = req.body;
@@ -26,8 +27,8 @@ const userAPI = {
             // Insert query to users table
             const queryInsUser = {
                 text: `
-                    INSERT INTO users(username, password, email, fname, lname, birthday, bio)
-                        VALUES($1, $2, $3, $4, $5, $6, $7)
+                    INSERT INTO users(username, password, email, fname, lname, gender, birthday, bio)
+                        VALUES($1, $2, $3, $4, $5, $6, $7, $8)
                     RETURNING *;
                 `,
                 values: [
@@ -36,6 +37,7 @@ const userAPI = {
                     email,
                     fname,
                     lname,
+                    gender,
                     birthday,
                     bio
                 ]
@@ -57,11 +59,11 @@ const userAPI = {
                 if (err.constraint === 'users_pkey') {
                     return res.status(401).send({ error: `User ${username} is already used` });
                 } else if (err.constraint === 'users_email_key') {
-                    return res.status(401).send({ error: `Email ${username} is already used` });
+                    return res.status(401).send({ error: `Email ${email} is already used` });
                 }
             }
 
-            return res.status(500).send({ error: 'Something wrong happened' });
+            return res.status(500).send();
         }
     },
 

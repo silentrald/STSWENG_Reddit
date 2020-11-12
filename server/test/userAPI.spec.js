@@ -9,31 +9,37 @@ const JWT_REGEX = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
 
 const user = {
     username: 'test-user',
-    password: 'hello',
+    password: 'Hello-p4ssword',
     email: 'test@gmail.com',
     fname: 'Test',
     lname: 'User',
-    birthday: new Date('1999-12-16'),
+    gender: 'm',
+    birthday: '1999-12-16',
     bio: 'I like math'
 };
 
-let failUser = {
-    username: 'sample',
-    password: 'hello',
-    email: 'sample@gmail.com',
-    fname: 'Sample',
-    lname: 'User',
-    birthday: new Date('1999-12-17'),
-    bio: 'I like english'
-};
+let failUser;
 
 describe('User API', () => {
-    describe(`Route: ${url}/register`, () => {
+    describe(`Route: ${url}/create`, () => {
+        beforeEach(() => {
+            failUser = {
+                username: 'sample-user',
+                password: 'Hello-p4ssword',
+                email: 'sample@gmail.com',
+                fname: 'Sample',
+                lname: 'User',
+                gender: 'f',
+                birthday: '1999-12-17',
+                bio: 'I like english'
+            };
+        });
+
         test('GOOD: Register', async () => {
             const { 
                 statusCode,
                 body
-            } = await request(server).post(`${url}/register`)
+            } = await request(server).post(`${url}/create`)
                 .send(user);
 
             expect(statusCode).toEqual(201);
@@ -43,62 +49,342 @@ describe('User API', () => {
                 })
             );
         });
+        
+        describe('ERROR: username field', () => {
+            test('Register with an existing username', async () => {
+                failUser.username = user.username;
+                
+                const { 
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
     
-        test('ERROR: Register with an existing username', async () => {
-            const { 
-                statusCode,
-                body
-            } = await request(server).post(`${url}/register`)
-                .send(user);
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        error: `User ${user.username} is already used`
+                    })
+                );
+            });
+            
+            test('Register with an invalid username format (long string)', async () => {
+                failUser.username = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'; // 65 chars
+    
+                const { 
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: expect.arrayContaining([{
+                            field: 'username',
+                            keyword: 'maxLength'
+                        }])
+                    })
+                );
+            });
+    
+            test('Register with an invalid username format (short string)', async () => {
+                failUser.username = 'aaaaaaa'; // < 8 chars
+    
+                const {
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: expect.arrayContaining([
+                            expect.objectContaining({
+                                field: 'username',
+                                keyword: 'minLength'
+                            })
+                        ])
+                    })
+                );
+            });
+    
+            test('Register with no username property', async () => {
+                delete failUser.username;
+    
+                const {
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: expect.arrayContaining([
+                            expect.objectContaining({
+                                field: 'username',
+                                keyword: 'required'
+                            })
+                        ])
+                    })
+                );
+            });
+        });
+        
+        describe('ERROR: password field', () => {
+            test('Register with short password', async () => {
+                failUser.password = '$h0rt';
 
-            expect(statusCode).toEqual(401);
-            expect(body).toEqual(
-                expect.objectContaining({
-                    error: `User ${user.username} is already used`
-                })
-            );
+                const {
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: expect.arrayContaining([
+                            expect.objectContaining({
+                                field: 'password',
+                                keyword: 'minLength'
+                            })
+                        ])
+                    })
+                );
+            });
+
+            describe('Weak Password Check', () => {
+                test('Register with only lowercase password', async () => {
+                    failUser.password = 'justanormalpassword';
+
+                    const {
+                        statusCode,
+                        body
+                    } = await request(server).post(`${url}/create`)
+                        .send(failUser);
+        
+                    expect(statusCode).toEqual(401);
+                    expect(body).toEqual(
+                        expect.objectContaining({
+                            errors: expect.arrayContaining([
+                                expect.objectContaining({
+                                    field: 'password',
+                                    keyword: 'pattern'
+                                })
+                            ])
+                        })
+                    );
+                });
+
+                test('Register with only uppercase password', async () => {
+                    failUser.password = 'JUSTANORMALPASSWORD';
+        
+                    const {
+                        statusCode,
+                        body
+                    } = await request(server).post(`${url}/create`)
+                        .send(failUser);
+        
+                    expect(statusCode).toEqual(401);
+                    expect(body).toEqual(
+                        expect.objectContaining({
+                            errors: expect.arrayContaining([
+                                expect.objectContaining({
+                                    field: 'password',
+                                    keyword: 'pattern'
+                                })
+                            ])
+                        })
+                    );
+                });
+
+                test('Register with only numbers password', async () => {
+                    failUser.password = '1234567890';
+        
+                    const {
+                        statusCode,
+                        body
+                    } = await request(server).post(`${url}/create`)
+                        .send(failUser);
+        
+                    expect(statusCode).toEqual(401);
+                    expect(body).toEqual(
+                        expect.objectContaining({
+                            errors: expect.arrayContaining([
+                                expect.objectContaining({
+                                    field: 'password',
+                                    keyword: 'pattern'
+                                })
+                            ])
+                        })
+                    );
+                });
+
+                test('Register with only lower and uppercase password', async () => {
+                    failUser.password = 'helloPASSWORD';
+        
+                    const {
+                        statusCode,
+                        body
+                    } = await request(server).post(`${url}/create`)
+                        .send(failUser);
+        
+                    expect(statusCode).toEqual(401);
+                    expect(body).toEqual(
+                        expect.objectContaining({
+                            errors: expect.arrayContaining([
+                                expect.objectContaining({
+                                    field: 'password',
+                                    keyword: 'pattern'
+                                })
+                            ])
+                        })
+                    );
+                });
+
+                test('Register with only lowercase and numbers password', async () => {
+                    failUser.password = 'hello12345678';
+        
+                    const {
+                        statusCode,
+                        body
+                    } = await request(server).post(`${url}/create`)
+                        .send(failUser);
+        
+                    expect(statusCode).toEqual(401);
+                    expect(body).toEqual(
+                        expect.objectContaining({
+                            errors: expect.arrayContaining([
+                                expect.objectContaining({
+                                    field: 'password',
+                                    keyword: 'pattern'
+                                })
+                            ])
+                        })
+                    );
+                });
+
+                test('Register with only uppercase and numbers password', async () => {
+                    failUser.password = 'HELLO12345678';
+        
+                    const {
+                        statusCode,
+                        body
+                    } = await request(server).post(`${url}/create`)
+                        .send(failUser);
+        
+                    expect(statusCode).toEqual(401);
+                    expect(body).toEqual(
+                        expect.objectContaining({
+                            errors: expect.arrayContaining([
+                                expect.objectContaining({
+                                    field: 'password',
+                                    keyword: 'pattern'
+                                })
+                            ])
+                        })
+                    );
+                });
+            });
+
+            test('Register with no password property', async () => {
+                delete failUser.password;
+    
+                const {
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: expect.arrayContaining([
+                            expect.objectContaining({
+                                field: 'password',
+                                keyword: 'required'
+                            })
+                        ])
+                    })
+                );
+            });
         });
 
-        test('ERROR: Register with an existing email', async () => {
-            let new_user = user;
-            new_user.username = 'new-user';
+        describe('ERROR: email field', () => {
+            test('Register with an existing email', async () => {
+                failUser.email = user.email;
 
-            const { 
-                statusCode,
-                body
-            } = await request(server).post(`${url}/register`)
-                .send(new_user);
+                const { 
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        error: `Email ${user.email} is already used`
+                    })
+                );
+            });
 
-            expect(statusCode).toEqual(401);
-            expect(body).toEqual(
-                expect.objectContaining({
-                    error: `Email ${user.username} is already used`
-                })
-            );
+            test('Register with an invalid email', async () => {
+                failUser.email = 'invalidemail';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: expect.arrayContaining([
+                            expect.objectContaining({
+                                field: 'email',
+                                keyword: 'format'
+                            })
+                        ])
+                    })
+                );
+            });
+        
+            test('Register with a long email', async () => {
+                // 256 characters
+                failUser.email = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@gmail.com';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: expect.arrayContaining([
+                            expect.objectContaining({
+                                field: 'email',
+                                keyword: 'maxLength'
+                            })
+                        ])
+                    })
+                );
+            });
         });
 
-        test('ERROR: Register with an invalid username format (long string)', async () => {
-            let new_user = failUser;
-            new_user.username = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'; // 51 chars
-
-            const { 
-                statusCode,
-                body
-            } = await request(server).post(`${url}/register`)
-                .send(new_user);
-
-            expect(statusCode).toEqual(401);
-            expect(body).toEqual(
-                expect.objectContaining({
-                    error: 'Username is too long'
-                })
-            );
-        });
     });
 });
 
 afterAll(async () => {
-    await db.query('DELETE FROM users');
+    await db.query({ 
+        text: 'DELETE FROM users WHERE username=$1',
+        values: [ user.username ]
+    });
     await db.end();
 
     await server.close();

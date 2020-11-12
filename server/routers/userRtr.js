@@ -1,11 +1,13 @@
 const router = require('express')();
 const api = require('../api/userAPI');
-// const mw = require('../middlewares/userMw');
+const mw = require('../middlewares/userMw');
 
 // GET
 
 // POST
-router.post('/register', api.postRegisterUser);
+router.post('/create',
+    mw.validateRegisterUser,
+    api.postRegisterUser);
 
 // PATCH
 

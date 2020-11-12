@@ -5,10 +5,10 @@
   "main": "app.js",
   "scripts": {
     "dev": "npx nodemon app --exec \"npm run lint && node\"",
+    "devtest": "npx nodemon app --exec \"npm run lint && jest --color --silent && node\"",
     "build": "npm run lint && npm run test && node app",
     "lint": "eslint .",
-    "test": "jest --color --coverage",
-    "stest": "jest --color --coverage --silent"
+    "test": "jest --color --coverage"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/silentrald/STSWENG#readme",
   "dependencies": {
+    "ajv-errors": "^1.0.1",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
