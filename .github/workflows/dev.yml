@@ -61,20 +61,20 @@ jobs:
         os: [ubuntu-latest]
         node-version: [14.x]
 
-    # services:
-    #   postgres:
-    #     image: postgres
-    #     env:
-    #       POSTGRES_USER: stsweng_user
-    #       POSTGRES_PASSWORD: password
-    #       POSTGRES_DB: stsweng_db
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
-    #     ports:
-    #       - 5432:5432
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
     - uses: actions/checkout@v2
@@ -108,9 +108,9 @@ jobs:
       run: yarn lint
       working-directory: ./server
     
-    # - name: Run migrate schema
-    #   run: docker exec -it node psql -U stsweng_user -f /db/db.sql
-    #   working-directory: ./server
+    - name: Run migrate schema
+      run: psql -U stsweng_user -f /db/db.sql
+      working-directory: ./server
     
     - name: Jest
       run: yarn test
