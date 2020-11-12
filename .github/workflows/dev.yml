@@ -113,12 +113,19 @@ jobs:
     - name: Migrate Up 🔺
       run: yarn migrate-up
       env:
+        POSTGRES_USER: stsweng_user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: stsweng_db
+        POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
 
     - name: Tests (Jest) 🧪
       run: yarn test
       env:
+        POSTGRES_USER: stsweng_user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: stsweng_db
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
@@ -126,6 +133,9 @@ jobs:
     - name: Migrate Down 🔻
       run: yarn migrate-down
       env:
+        POSTGRES_USER: stsweng_user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: stsweng_db
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
