@@ -8,7 +8,9 @@
     "devtest": "npx nodemon app --exec \"npm run lint && jest --color --silent && node\"",
     "build": "npm run lint && npm run test && node app",
     "lint": "eslint .",
-    "test": "jest --color --coverage"
+    "test": "jest --color --coverage",
+    "migrate-up": "node migrations/up",
+    "migrate-down": "node migrations/down"
   },
   "repository": {
     "type": "git",

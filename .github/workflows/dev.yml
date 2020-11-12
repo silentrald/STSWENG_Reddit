@@ -77,22 +77,17 @@ jobs:
           - 5432:5432
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2 😊
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Postgres CLI
-      run: |
-        apt-get update
-        apt-get install --yes --no-install-recommends docker
-
-    - name: Get yarn cache directory path
+    - name: Get yarn cache directory path 🛠
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
 
-    - name: Cache node_modules
+    - name: Cache node_modules 📦
       uses: actions/cache@v2
       id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
       with:
@@ -101,7 +96,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
 
-    - name: Install Packages
+    - name: Install Packages 📦
       run: yarn
       working-directory: ./server
 
@@ -109,21 +104,15 @@ jobs:
     #   run: npm run build --if-present
     #   working-directory: ./server
 
-    - name: Linter
+    - name: Linter 👌
       run: yarn lint
       working-directory: ./server
 
-    # - name: Run migrate schema
-    #   run: |
-    #     psql -h postgres -U stsweng_user -f /db/db.sql
-    #     password
-    #   working-directory: ./server
-    
-    - name: Run migrate schema
-      run: docker run -e PGPASSWORD="password" --rm node psql -h postgres -U stsweng_user -f ./db/db.sql
+    - name: Migrate Up 🔺
+      run: yarn migrate-up
       working-directory: ./server
 
-    - name: Jest
+    - name: Tests (Jest) 🧪
       run: yarn test
       env:
         POSTGRES_USER: stsweng_user
@@ -131,4 +120,8 @@ jobs:
         POSTGRES_DB: stsweng_db
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
+      working-directory: ./server
+    
+    - name: Migrate Down 🔻
+      run: yarn migrate-down
       working-directory: ./server
