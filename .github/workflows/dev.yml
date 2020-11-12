@@ -114,7 +114,9 @@ jobs:
         apt-get install --yes --no-install-recommends postgresql-client
 
     - name: Run migrate schema
-      run: psql -h postgres -U stsweng_user -f /db/db.sql
+      run: |
+        psql -h postgres -U stsweng_user -f /db/db.sql
+        password
       working-directory: ./server
     
     - name: Jest
