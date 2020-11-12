@@ -108,9 +108,9 @@ jobs:
       run: yarn lint
       working-directory: ./server
     
-    - name: Run migrate schema
-      run: docker exec -it node psql -U stsweng_user -f /db/db.sql
-      working-directory: ./server
+    # - name: Run migrate schema
+    #   run: docker exec -it node psql -U stsweng_user -f /db/db.sql
+    #   working-directory: ./server
     
     - name: Jest
       run: yarn test
