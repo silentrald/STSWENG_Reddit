@@ -1,9 +1,10 @@
-require('dotenv').config();
+if (!process.env.CI) {
+    require('dotenv').config();
+}
+
 const fs = require('fs').promises;
 const path = require('path');
 const { Pool } = require('pg');
-
-console.log();
 
 const config = {
     user:       process.env.POSTGRES_USER,
