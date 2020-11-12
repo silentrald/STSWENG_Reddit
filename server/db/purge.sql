@@ -1,0 +1,50 @@
+/* DELETE */
+DELETE FROM user_reports;
+DELETE FROM station_reports;
+DELETE FROM comment_reports;
+DELETE FROM post_reports;
+DELETE FROM reports;
+DELETE FROM comment_votes;
+DELETE FROM post_votes;
+DELETE FROM votes;
+DELETE FROM subposts;
+DELETE FROM subcomments;
+DELETE FROM comments;
+DELETE FROM posts;
+DELETE FROM crewmates;
+DELETE FROM captains;
+DELETE FROM passengers;
+DELETE FROM stations;
+DELETE FROM users;
+DELETE FROM admins;
+
+/* PURGE */
+DROP TABLE user_reports;
+DROP TABLE station_reports;
+DROP TABLE comment_reports;
+DROP TABLE post_reports;
+DROP TABLE reports;
+DROP TABLE comment_votes;
+DROP TABLE post_votes;
+DROP TABLE votes;
+DROP TABLE subposts;
+DROP TABLE subcomments;
+DROP TABLE comments;
+DROP TABLE posts;
+DROP TABLE crewmates;
+DROP TABLE captains;
+DROP TABLE passengers;
+DROP TABLE stations;
+DROP TABLE users;
+DROP TABLE admins;
+
+DROP FUNCTION comment_id;
+DROP SEQUENCE comment_id_seq;
+DROP FUNCTION post_id;
+DROP SEQUENCE post_id_seq;
+
+DROP TYPE report_status_enum;
+DROP TYPE gender_enum;
+
+DROP FUNCTION stringify_bigint;
+DROP FUNCTION pseudo_encrypt;
