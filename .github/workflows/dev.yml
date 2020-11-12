@@ -96,7 +96,7 @@ jobs:
     #   working-directory: ./server
     
     - name: Run migrate schema
-      run: docker exec -it demo psql -U stsweng_user -f /db/db.sql
+      run: docker exec -it postgres psql -U stsweng_user -f /db/db.sql
       working-directory: ./server
     
     - name: Jest
