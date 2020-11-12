@@ -54,6 +54,8 @@ jobs:
   express_server:
     runs-on: ${{ matrix.os }}
 
+    container: node:10.18-jessie
+
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -71,6 +73,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
     - uses: actions/checkout@v2
@@ -96,7 +100,7 @@ jobs:
     #   working-directory: ./server
     
     - name: Run migrate schema
-      run: docker exec -it postgres psql -U stsweng_user -f /db/db.sql
+      run: docker exec -it node:10.18-jessie psql -U stsweng_user -f /db/db.sql
       working-directory: ./server
     
     - name: Jest
@@ -105,4 +109,6 @@ jobs:
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
       working-directory: ./server
