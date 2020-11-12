@@ -22,5 +22,6 @@ const client = new Pool({
         console.log('Migration Down Done');
     } catch (err) {
         console.log(err);
+        throw err;
     }
 })();
