@@ -114,6 +114,7 @@ jobs:
       run: yarn migrate-up
       env:
         POSTGRES_USER: stsweng_user
+        POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
@@ -123,6 +124,7 @@ jobs:
       run: yarn test
       env:
         POSTGRES_USER: stsweng_user
+        POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
@@ -132,6 +134,7 @@ jobs:
       run: yarn migrate-down
       env:
         POSTGRES_USER: stsweng_user
+        POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
