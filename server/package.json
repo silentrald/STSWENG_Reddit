@@ -1,5 +1,5 @@
 {
-  "name": "stsweng_reddit",
+  "name": "stsweng-reddit",
   "version": "1.0.0",
   "description": "A reddit clone",
   "main": "app.js",
