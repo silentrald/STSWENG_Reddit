@@ -52,12 +52,13 @@ jobs:
         working-directory: ./client
 
   express_server:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     container: node
 
     strategy:
       matrix:
+        os: [ubuntu-latest]
         node-version: [14.x]
 
     services:
