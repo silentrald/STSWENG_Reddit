@@ -80,10 +80,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([{
-                            field: 'username',
-                            keyword: 'minLength'
-                        }])
+                        errors: expect.objectContaining({
+                            username: 'minLength'
+                        })
                     })
                 );
             });
@@ -100,10 +99,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([{
-                            field: 'username',
-                            keyword: 'maxLength'
-                        }])
+                        errors: expect.objectContaining({
+                            username: 'maxLength'
+                        })
                     })
                 );
             });
@@ -120,12 +118,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'username',
-                                keyword: 'minLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            username: 'minLength'
+                        })
                     })
                 );
             });
@@ -142,12 +137,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'username',
-                                keyword: 'required'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            username: 'required'
+                        })
                     })
                 );
             });
@@ -155,7 +147,7 @@ describe('User API', () => {
         
         describe('ERROR: password field', () => {
             test('Register with short password', async () => {
-                failUser.password = '$h0rt';
+                failUser.password = 'Sh0r+';
 
                 const {
                     statusCode,
@@ -166,12 +158,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'password',
-                                keyword: 'minLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            password: 'minLength'
+                        })
                     })
                 );
             });
@@ -189,12 +178,9 @@ describe('User API', () => {
                     expect(statusCode).toEqual(401);
                     expect(body).toEqual(
                         expect.objectContaining({
-                            errors: expect.arrayContaining([
-                                expect.objectContaining({
-                                    field: 'password',
-                                    keyword: 'pattern'
-                                })
-                            ])
+                            errors: expect.objectContaining({
+                                password: 'pattern'
+                            })
                         })
                     );
                 });
@@ -211,12 +197,9 @@ describe('User API', () => {
                     expect(statusCode).toEqual(401);
                     expect(body).toEqual(
                         expect.objectContaining({
-                            errors: expect.arrayContaining([
-                                expect.objectContaining({
-                                    field: 'password',
-                                    keyword: 'pattern'
-                                })
-                            ])
+                            errors: expect.objectContaining({
+                                password: 'pattern'
+                            })
                         })
                     );
                 });
@@ -233,12 +216,9 @@ describe('User API', () => {
                     expect(statusCode).toEqual(401);
                     expect(body).toEqual(
                         expect.objectContaining({
-                            errors: expect.arrayContaining([
-                                expect.objectContaining({
-                                    field: 'password',
-                                    keyword: 'pattern'
-                                })
-                            ])
+                            errors: expect.objectContaining({
+                                password: 'pattern'
+                            })
                         })
                     );
                 });
@@ -255,12 +235,9 @@ describe('User API', () => {
                     expect(statusCode).toEqual(401);
                     expect(body).toEqual(
                         expect.objectContaining({
-                            errors: expect.arrayContaining([
-                                expect.objectContaining({
-                                    field: 'password',
-                                    keyword: 'pattern'
-                                })
-                            ])
+                            errors: expect.objectContaining({
+                                password: 'pattern'
+                            })
                         })
                     );
                 });
@@ -277,12 +254,9 @@ describe('User API', () => {
                     expect(statusCode).toEqual(401);
                     expect(body).toEqual(
                         expect.objectContaining({
-                            errors: expect.arrayContaining([
-                                expect.objectContaining({
-                                    field: 'password',
-                                    keyword: 'pattern'
-                                })
-                            ])
+                            errors: expect.objectContaining({
+                                password: 'pattern'
+                            })
                         })
                     );
                 });
@@ -299,12 +273,9 @@ describe('User API', () => {
                     expect(statusCode).toEqual(401);
                     expect(body).toEqual(
                         expect.objectContaining({
-                            errors: expect.arrayContaining([
-                                expect.objectContaining({
-                                    field: 'password',
-                                    keyword: 'pattern'
-                                })
-                            ])
+                            errors: expect.objectContaining({
+                                password: 'pattern'
+                            })
                         })
                     );
                 });
@@ -322,12 +293,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'password',
-                                keyword: 'required'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            password: 'required'
+                        })
                     })
                 );
             });
@@ -363,12 +331,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'email',
-                                keyword: 'format'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            email: 'format'
+                        })
                     })
                 );
             });
@@ -386,12 +351,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'email',
-                                keyword: 'maxLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            email: 'maxLength'
+                        })
                     })
                 );
             });
@@ -408,12 +370,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'email',
-                                keyword: 'required'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            email: 'required'
+                        })
                     })
                 );
             });
@@ -432,12 +391,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'fname',
-                                keyword: 'minLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            fname: 'minLength'
+                        })
                     })
                 );
             });
@@ -454,12 +410,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'fname',
-                                keyword: 'minLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            fname: 'minLength'
+                        })
                     })
                 );
             });
@@ -477,12 +430,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'fname',
-                                keyword: 'maxLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            fname: 'maxLength'
+                        })
                     })
                 );
             });
@@ -500,12 +450,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'fname',
-                                keyword: 'required'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            fname: 'required'
+                        })
                     })
                 );
             });
@@ -524,12 +471,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'lname',
-                                keyword: 'minLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            lname: 'minLength'
+                        })
                     })
                 );
             });
@@ -546,12 +490,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'lname',
-                                keyword: 'minLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            lname: 'minLength'
+                        })
                     })
                 );
             });
@@ -569,12 +510,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'lname',
-                                keyword: 'maxLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            lname: 'maxLength'
+                        })
                     })
                 );
             });
@@ -592,12 +530,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'lname',
-                                keyword: 'required'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            lname: 'required'
+                        })
                     })
                 );
             });
@@ -616,12 +551,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'gender',
-                                keyword: 'pattern'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            gender: 'pattern'
+                        })
                     })
                 );
             });
@@ -638,12 +570,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'gender',
-                                keyword: 'pattern'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            gender: 'pattern'
+                        })
                     })
                 );
             });
@@ -660,12 +589,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'gender',
-                                keyword: 'required'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            gender: 'required'
+                        })
                     })
                 );
             });
@@ -684,12 +610,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'birthday',
-                                keyword: 'format'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            birthday: 'format'
+                        })
                     })
                 );
             });
@@ -706,12 +629,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'birthday',
-                                keyword: 'format'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            birthday: 'format'
+                        })
                     })
                 );
             });
@@ -728,12 +648,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'birthday',
-                                keyword: 'required'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            birthday: 'required'
+                        })
                     })
                 );
             });
@@ -752,12 +669,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'bio',
-                                keyword: 'minLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            bio: 'minLength'
+                        })
                     })
                 );
             });
@@ -774,12 +688,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'bio',
-                                keyword: 'minLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            bio: 'minLength'
+                        })
                     })
                 );
             });
@@ -802,12 +713,9 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'bio',
-                                keyword: 'maxLength'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            bio: 'maxLength'
+                        })
                     })
                 );
             });
@@ -824,12 +732,9 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        errors: expect.arrayContaining([
-                            expect.objectContaining({
-                                field: 'bio',
-                                keyword: 'required'
-                            })
-                        ])
+                        errors: expect.objectContaining({
+                            bio: 'required'
+                        })
                     })
                 );
             });

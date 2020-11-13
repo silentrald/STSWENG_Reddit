@@ -1,12 +1,13 @@
 const ajvHelper = {
     ajvErrors: (ajv) => {
-        const errors = ajv.errors.map(({ keyword, dataPath, params }) => {
+        const errors = ajv.errors.reduce((obj, { keyword, dataPath, params }) => {
             if (keyword === 'required') {
-                return { field: params.missingProperty, keyword };
+                obj[ params.missingProperty ] = keyword;
             } else {
-                return { field: dataPath.substr(1), keyword};
+                obj[ dataPath.substr(1) ] = keyword;
             }
-        });
+            return obj;
+        }, {});
 
         console.log(`ajv.errorsText: ${ajv.errorsText()}`);
         console.log(`ajv.errors: ${ajv.errors}`);

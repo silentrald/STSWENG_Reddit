@@ -27,10 +27,10 @@ describe('UNIT TEST: ajvErrors Function', () => {
         const errors = ajvErrors(ajv);
         
         expect(errors).toEqual(
-            expect.arrayContaining([
-                { field: 'int', keyword: 'type' },
-                { field: 'string', keyword: 'maxLength' }
-            ])
+            expect.objectContaining({
+                int: 'type',
+                string: 'maxLength'
+            })
         );
     });
 
@@ -42,9 +42,9 @@ describe('UNIT TEST: ajvErrors Function', () => {
         const errors = ajvErrors(ajv);
         
         expect(errors).toEqual(
-            expect.arrayContaining([
-                { field: 'int', keyword: 'required' },
-            ])
+            expect.objectContaining({
+                int: 'required'
+            })
         );
     });
 });

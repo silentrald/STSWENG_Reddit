@@ -35,9 +35,9 @@ ajv.addSchema({
         },
         password: {
             type: 'string',
-            minLength: 10,
+            minLength: 8,
             maxLength: 256,
-            pattern: '^(?=.{10,}$)(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).*$'
+            pattern: '^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).*$'
         },
         email: {
             type: 'string',

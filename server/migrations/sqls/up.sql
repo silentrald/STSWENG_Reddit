@@ -42,16 +42,16 @@ CREATE TABLE admins (
     password    VARCHAR(60)     NOT NULL
 );
 
-CREATE TYPE gender_enum AS ENUM ('f', 'm');
+CREATE TYPE gender_enum AS ENUM ('f', 'm', 'o', 'p');
 CREATE TABLE users (
     username    VARCHAR(64)     PRIMARY KEY,
     password    VARCHAR(60)     NOT NULL,
     email       VARCHAR(256)    NOT NULL UNIQUE,
-    fname       VARCHAR(50)     NOT NULL,
-    lname       VARCHAR(50)     NOT NULL,
-    gender      gender_enum     NOT NULL,
-    birthday    DATE            NOT NULL,
-    bio         VARCHAR(200)    NOT NULL,
+    fname       VARCHAR(50)     DEFAULT '' NOT NULL,
+    lname       VARCHAR(50)     DEFAULT '' NOT NULL,
+    gender      gender_enum,
+    birthday    DATE,
+    bio         VARCHAR(200)    DEFAULT '' NOT NULL,
     fame        INT             DEFAULT 0 NOT NULL,
     banned      BOOLEAN         DEFAULT false NOT NULL
 );
