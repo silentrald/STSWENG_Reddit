@@ -19,9 +19,10 @@ const user = {
 };
 
 let failUser;
+let token;
 
 describe('User API', () => {
-    describe(`Route: ${url}/create`, () => {
+    describe(`POST: ${url}/create`, () => {
         beforeEach(() => {
             failUser = {
                 username: 'sample-user',
@@ -46,6 +47,28 @@ describe('User API', () => {
             expect(body).toEqual(
                 expect.objectContaining({
                     token: expect.stringMatching(JWT_REGEX)
+                })
+            );
+
+            token = body.token;
+        });
+
+        test('There is already a user login', async () => {
+            let loginUser = {};
+            loginUser.username = user.username;
+            loginUser.password = user.password;
+
+            const {
+                statusCode,
+                body
+            } = await request(server).post(`${url}/create`)
+                .send(loginUser)
+                .set('Authorization', `Bearer ${token}`);
+            
+            expect(statusCode).toEqual(302);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    route: '/'
                 })
             );
         });
@@ -744,6 +767,166 @@ describe('User API', () => {
         //             });
         //         });
     
+    });
+    
+    describe(`POST: ${url}/login`, () => {
+        let loginUser = {};
+        beforeEach(() => {
+            loginUser.username = user.username;
+            loginUser.password = user.password;
+        });
+
+        test('GOOD: Login', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).post(`${url}/login`)
+                .send(loginUser);
+
+            expect(statusCode).toEqual(200);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    token: expect.stringMatching(JWT_REGEX)
+                })
+            );
+
+            token = body.token;
+        });
+
+        test('There is already a user login', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).post(`${url}/login`)
+                .send(loginUser)
+                .set('Authorization', `Bearer ${token}`);
+            
+            expect(statusCode).toEqual(302);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    route: '/'
+                })
+            );
+        });
+
+        test('GOOD: Username exist with whitespace', async () => {
+            loginUser.username += '   ';
+
+            const {
+                statusCode,
+                body
+            } = await request(server).post(`${url}/login`)
+                .send(loginUser);
+            
+            expect(statusCode).toEqual(200);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    token: expect.stringMatching(JWT_REGEX)
+                })
+            );
+        });
+
+        describe('ERROR: username field', () => {
+            test('Username does not exist', async () => {
+                loginUser.username = 'sample-username';
+    
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+
+            test('Username too long', async () => {
+                // 70 chars
+                loginUser.username = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+    
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+
+            test('Username too short', async () => {
+                // 4 chars
+                loginUser.username = 'aaaa';
+    
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+
+            test('No username property', async () => {
+                delete loginUser.username;
+    
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+        });
+        
+        describe('ERROR: password field', () => {
+            test('Wrong Password', async () => {
+                loginUser.password = 'Not-his-password';
+                
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+
+            test('Password too long', async () => {
+                // ~300 chars
+                loginUser.password = `
+                    Asdf1234
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                `;
+    
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+
+            test('Password too short', async () => {
+                loginUser.password = '$hoRt';
+    
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+
+            test('No password property', async () => {
+                delete loginUser.username;
+    
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+        });
     });
 });
 

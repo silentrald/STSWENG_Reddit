@@ -21,6 +21,11 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// CUSTOM MIDDLEWARES
+const loginMw = require('./middlewares/loginMw');
+
+app.use(loginMw.smartLogin);
+
 // API ROUTERS
 const userRtr = require('./routers/userRtr');
 
