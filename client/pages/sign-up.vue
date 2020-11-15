@@ -1,168 +1,29 @@
 <template>
   <div>
-    <div class="container">
+    <div class="form-container">
       <form @submit.prevent>
+        <h1>Sign Up</h1>
+        Create your account
+        <br>
+        <img id="image" src="https://picsum.photos/100/100" width="100" height="100">
+        <br>
         <div class="form-group">
-          <label for="username">Username</label>
           <input id="username" v-model="user.username" type="text" class="form-control" placeholder="Username">
         </div>
         <div class="form-group">
-          <label for="email">Email Address</label>
           <input id="email" v-model="user.email" type="email" class="form-control" placeholder="Email Address">
         </div>
         <div class="form-group">
-          <label for="password">Password</label>
-          <input id="password" v-model="user.password" type="password" class="form-control">
+          <input id="password" v-model="user.password" type="password" class="form-control" placeholder="Password">
         </div>
         <div class="form-group">
-          <label for="cpassword">Confirm Password</label>
-          <input id="cpassword" v-model="user.cpassword" type="password" class="form-control">
+          <input id="cpassword" v-model="user.cpassword" type="password" class="form-control" placeholder="Confirm Password">
         </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="inputEmail4">Email</label>
-            <input id="inputEmail4" type="email" class="form-control">
-          </div>
-          <div class="form-group col-md-6">
-            <label for="inputPassword4">Password</label>
-            <input id="inputPassword4" type="password" class="form-control">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="inputCity">City</label>
-            <input id="inputCity" type="text" class="form-control">
-          </div>
-          <div class="form-group col-md-4">
-            <label for="inputState">State</label>
-            <select id="inputState" class="form-control">
-              <option selected>
-                Choose...
-              </option>
-              <option>...</option>
-            </select>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputZip">Zip</label>
-            <input id="inputZip" type="text" class="form-control">
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary">
-          Sign in
+        <button id="submit" @click="submit()">
+          SIGN UP
         </button>
       </form>
     </div>
-    <!-- <form @submit.prevent>
-      <span v-if="errors.username" class="error">
-        {{ errors.username }}
-      </span>
-      <label for="username">Username</label>
-      <input
-        v-model="user.username"
-        type="text"
-        @keydown="removeError('username')"
-      >
-
-      <br>
-
-      <span v-if="errors.fname" class="error">
-        {{ errors.fname }}
-      </span>
-      <label for="fname">First Name</label>
-      <input
-        v-model="user.fname"
-        type="text"
-        @keydown="removeError('fname')"
-      >
-
-      <span v-if="errors.lname" class="error">
-        {{ errors.lname }}
-      </span>
-      <label for="lname">Last Name</label>
-      <input
-        v-model="user.lname"
-        type="text"
-        @keydown="removeError('lname')"
-      >
-
-      <br>
-
-      <span v-if="errors.email" class="error">
-        {{ errors.email }}
-      </span>
-      <label for="email">Email</label>
-      <input
-        v-model="user.email"
-        type="email"
-        @keydown="removeError('email')"
-      >
-
-      <br>
-
-      <span v-if="errors.password" class="error">
-        {{ errors.password }}
-      </span>
-      <label for="password">Password</label>
-      <input
-        v-model="user.password"
-        type="password"
-        @keydown="removeError('password')"
-      >
-
-      <span v-if="errors.cpassword" class="error">
-        {{ errors.cpassword }}
-      </span>
-      <label for="cpassword">Confirm Password</label>
-      <input
-        id="cpassword"
-        v-model="user.cpassword"
-        type="password"
-        @keydown="removeError('cpassword')"
-      >
-
-      <span v-if="errors.gender" class="error">
-        {{ errors.gender }}
-      </span>
-      <label for="gender">Gender</label>
-      <select
-        id="gender"
-        v-model="user.gender"
-        @keydown="removeError('gender')"
-      >
-        <option value="f">
-          Female
-        </option>
-        <option value="m">
-          Male
-        </option>
-        <option value="o">
-          Other
-        </option>
-      </select>
-
-      <span v-if="errors.birthday" class="error">
-        {{ errors.birthday }}
-      </span>
-      <label for="birthday">Birthday</label>
-      <input
-        v-model="user.birthday"
-        type="date"
-        @keydown="removeError('bio')"
-      >
-
-      <span v-if="errors.bio" class="error">
-        {{ errors.bio }}
-      </span>
-      <label for="bio">Bio</label>
-      <textarea
-        id="bio"
-        v-model="user.bio"
-        @keydown="removeError('bio')"
-      />
-      <button @click="validate()">
-        REGISTER
-      </button>
-    </form> -->
   </div>
 </template>
 
@@ -184,13 +45,7 @@ ajv.addSchema({
     username: {
       transform: ['trim']
     },
-    fname: {
-      transform: ['trim']
-    },
-    lname: {
-      transform: ['trim']
-    },
-    bio: {
+    email: {
       transform: ['trim']
     }
   }
@@ -214,40 +69,12 @@ ajv.addSchema({
       type: 'string',
       maxLength: 256,
       format: 'email'
-    },
-    fname: {
-      type: 'string',
-      minLength: 1,
-      maxLength: 50
-    },
-    lname: {
-      type: 'string',
-      minLength: 1,
-      maxLength: 50
-    },
-    gender: {
-      type: 'string',
-      pattern: '^(m|f)$'
-    },
-    birthday: {
-      type: 'string',
-      format: 'date'
-    },
-    bio: {
-      type: 'string',
-      minLength: 1,
-      maxLength: 200
     }
   },
   required: [
     'username',
     'password',
-    'email',
-    'fname',
-    'lname',
-    'gender',
-    'birthday',
-    'bio'
+    'email'
   ]
 }, USER_V_SCHEMA)
 
@@ -258,12 +85,7 @@ export default {
         username: 'username',
         password: 'Asdf1234',
         cpassword: 'Asdf1234',
-        email: 'username@gmail.com',
-        fname: 'User',
-        lname: 'Name',
-        gender: 'f',
-        birthday: '1999-12-16',
-        bio: 'My name Jeff'
+        email: 'username@gmail.com'
       },
       errors: {}
     }
@@ -276,49 +98,49 @@ export default {
 
     validate () {
       ajv.validate(USER_S_SCHEMA, this.user)
-      const validate = ajv.validate(USER_V_SCHEMA, this.user)
+      let validate = ajv.validate(USER_V_SCHEMA, this.user)
 
       if (!validate) {
         this.errors = ajvErrors(ajv)
-        if (this.password !== this.cpassword) { this.errors.cpassword = 'Passwords are not the same' }
-        return
       }
 
       if (this.password !== this.cpassword) {
         this.errors.cpassword = 'Passwords are not the same'
-        return
+        validate = false
       }
 
-      this.submit()
+      return validate
     },
 
     submit () {
       // Get values from form
-      const user = this.user
-      delete user.cpassword
+      if (this.validate) {
+        const user = this.user
+        delete user.cpassword
 
-      axios.post('http://localhost:5000/api/user/create', {
-        ...this.user
-      })
-        .then((res) => {
-          if (res.status !== 201) {
-            throw new Error('Error')
-          }
-
-          const { token } = res.data
-
-          this.$store.commit('user/setToken', token)
-
-          delete user.password
-          user.fame = 0
-          this.$store.commit('user/setUser', user)
-
-          // FIXME:
-          this.$router.push('/')
+        axios.post('http://localhost:5000/api/user/create', {
+          ...this.user
         })
-        .catch((_err) => {
-          alert('User not added')
-        })
+          .then((res) => {
+            if (res.status !== 201) {
+              throw new Error('Error')
+            }
+
+            const { token } = res.data
+
+            this.$store.commit('user/setToken', token)
+
+            delete user.password
+            user.fame = 0
+            this.$store.commit('user/setUser', user)
+
+            // FIXME:
+            this.$router.push('/')
+          })
+          .catch((_err) => {
+            alert('User not added')
+          })
+      }
     }
   },
 
@@ -331,5 +153,40 @@ export default {
 <style scoped>
 .error {
   color: red;
+}
+
+.form-container {
+  margin: 10vh auto 0 auto;
+  width: 450px;
+}
+
+::placeholder {
+  color: #C4C4C4;
+}
+
+input, input:focus {
+  background: transparent;
+  color: #FFF;
+  border: 2px solid #C4C4C4;
+  border-radius: 0.5rem;
+}
+
+input:focus {
+  box-shadow: none;
+}
+
+#image {
+  margin: 16px 0;
+  border-radius: 50%;
+}
+
+#submit {
+  float: right;
+  background: transparent;
+  color: #00C0FF;
+
+  padding: 0.25rem 1rem;
+  border: 2px solid #00C0FF;
+  border-radius: 1rem;
 }
 </style>

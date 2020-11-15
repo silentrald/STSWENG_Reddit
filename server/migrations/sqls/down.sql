@@ -1,23 +1,3 @@
-/* DELETE */
-DELETE FROM user_reports;
-DELETE FROM station_reports;
-DELETE FROM comment_reports;
-DELETE FROM post_reports;
-DELETE FROM reports;
-DELETE FROM comment_votes;
-DELETE FROM post_votes;
-DELETE FROM votes;
-DELETE FROM subposts;
-DELETE FROM subcomments;
-DELETE FROM comments;
-DELETE FROM posts;
-DELETE FROM crewmates;
-DELETE FROM captains;
-DELETE FROM passengers;
-DELETE FROM stations;
-DELETE FROM users;
-DELETE FROM admins;
-
 /* PURGE */
 DROP TABLE user_reports;
 DROP TABLE station_reports;

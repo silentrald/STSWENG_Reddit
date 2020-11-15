@@ -1,9 +1,9 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+  <nav class="navbar navbar-expand-lg static-top">
     <div class="container">
-      <nuxt-link class="navbar-brand" to="/">
+      <nuxt-link id="rocket" class="navbar-brand" to="/">
         <!-- TODO: Logo Here -->
-        R O C K E T
+        <b>R O C K E T</b>
       </nuxt-link>
       <button
         class="navbar-toggler"
@@ -16,21 +16,18 @@
       >
         <span class="navbar-toggler-icon" />
       </button>
+
       <div id="navbarResponsive" class="collapse navbar-collapse">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <nuxt-link class="nav-link" to="/login">
-              <button type="button" class="btn btn-danger">
-                Login
-                <span class="sr-only">(current)</span>
-              </button>
+            <nuxt-link id="signup" class="nav-link" to="/sign-up">
+              Sign Up
+              <span class="sr-only">(current)</span>
             </nuxt-link>
           </li>
-          <li class="nav-item">
-            <nuxt-link class="nav-link" to="/sign-up">
-              <button type="button" class="btn btn-danger">
-                Sign Up
-              </button>
+          <li id="login" class="nav-item">
+            <nuxt-link class="nav-link" to="/login">
+              Login
             </nuxt-link>
           </li>
         </ul>
@@ -45,6 +42,17 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.navbar {
+  background-color: #01021E;
+  box-shadow: 0 1px 5px #000;
+}
 
+#rocket, #signup {
+  color: #FF3232;
+}
+
+#login {
+  color: #00C0FF;
+}
 </style>

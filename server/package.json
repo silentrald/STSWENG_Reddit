@@ -11,7 +11,8 @@
     "test": "jest --color --coverage",
     "stest": "jest --color --coverage --silent",
     "migrate-up": "node migrations/up",
-    "migrate-down": "node migrations/down"
+    "migrate-down": "node migrations/down",
+    "db-delete": "node migrations/delete"
   },
   "repository": {
     "type": "git",

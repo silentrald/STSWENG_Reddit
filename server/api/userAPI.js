@@ -12,12 +12,7 @@ const userAPI = {
         const {
             username,
             password,
-            email,
-            fname,
-            lname,
-            gender,
-            birthday,
-            bio
+            email
         } = req.body;
 
         try {
@@ -27,19 +22,14 @@ const userAPI = {
             // Insert query to users table
             const queryInsUser = {
                 text: `
-                    INSERT INTO users(username, password, email, fname, lname, gender, birthday, bio)
-                        VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+                    INSERT INTO users(username, password, email)
+                        VALUES($1, $2, $3)
                     RETURNING *;
                 `,
                 values: [
                     username,
                     hash,
-                    email,
-                    fname,
-                    lname,
-                    gender,
-                    birthday,
-                    bio
+                    email
                 ]
             };
 

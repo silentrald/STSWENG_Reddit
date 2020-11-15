@@ -13,13 +13,7 @@ ajv.addSchema({
         username: {
             transform: [ 'trim' ]
         },
-        fname: {
-            transform: [ 'trim' ]
-        },
-        lname: {
-            transform: [ 'trim' ]
-        },
-        bio: {
+        email: {
             transform: [ 'trim' ]
         }
     }
@@ -43,40 +37,12 @@ ajv.addSchema({
             type: 'string',
             maxLength: 256,
             format: 'email'
-        },
-        fname: {
-            type: 'string',
-            minLength: 1,
-            maxLength: 50
-        },
-        lname: {
-            type: 'string',
-            minLength: 1,
-            maxLength: 50
-        },
-        gender: {
-            type: 'string',
-            pattern: '^(m|f)$'
-        },
-        birthday: {
-            type: 'string',
-            format: 'date'
-        },
-        bio: {
-            type: 'string',
-            minLength: 1,
-            maxLength: 200
         }
     },
     required: [
         'username',
         'password',
-        'email',
-        'fname',
-        'lname',
-        'gender',
-        'birthday',
-        'bio'
+        'email'
     ]
 }, USER_V_SCHEMA);
 
