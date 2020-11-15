@@ -5,22 +5,6 @@
   </div>
 </template>
 
-<script>
-export default {
-  head: {
-    link: [
-      {
-        rel: 'preconnect',
-        href: 'https://fonts.gstatic.com'
-      }, {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap'
-      }
-    ]
-  }
-}
-</script>
-
 <style>
 body {
   font-family: 'Lato', sans-serif;
@@ -40,7 +24,7 @@ button {
   border-radius: 1rem;
 }
 
-input, input:focus {
+/* input, input:focus {
   background: transparent;
   color: #FFF;
   border: 2px solid #C4C4C4;
@@ -49,7 +33,7 @@ input, input:focus {
 
 input:focus {
   box-shadow: none;
-}
+} */
 
 ::placeholder {
   color: #C4C4C4;
