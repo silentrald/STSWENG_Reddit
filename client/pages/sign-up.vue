@@ -8,16 +8,53 @@
         <img id="image" src="https://picsum.photos/100/100" width="100" height="100">
         <br>
         <div class="form-group">
-          <input id="username" v-model="user.username" type="text" class="form-control" placeholder="Username">
+          <div v-if="errors.username" class="error">
+            {{ errors.username }}
+          </div>
+          <input
+            id="username"
+            v-model="user.username"
+            type="text"
+            class="form-control"
+            placeholder="Username"
+            @keydown="removeError('username')"
+          >
         </div>
         <div class="form-group">
-          <input id="email" v-model="user.email" type="email" class="form-control" placeholder="Email Address">
+          <div v-if="errors.email" class="error">
+            {{ errors.email }}
+          </div>
+          <input
+            id="email"
+            v-model="user.email"
+            type="email"
+            class="form-control"
+            placeholder="Email Address"
+            @keydown="removeError('email')"
+          >
         </div>
         <div class="form-group">
-          <input id="password" v-model="user.password" type="password" class="form-control" placeholder="Password">
+          <div class="error">
+            {{ errors.password }}
+          </div>
+          <input
+            id="password"
+            v-model="user.password"
+            type="password"
+            class="form-control"
+            placeholder="Password"
+            @keydown="removeError('password')"
+          >
         </div>
         <div class="form-group">
-          <input id="cpassword" v-model="user.cpassword" type="password" class="form-control" placeholder="Confirm Password">
+          <input
+            id="cpassword"
+            v-model="user.cpassword"
+            type="password"
+            class="form-control"
+            placeholder="Confirm Password"
+            @keydown="removeError('password')"
+          >
         </div>
         <button id="submit" @click="submit()">
           SIGN UP
@@ -29,9 +66,9 @@
 
 <script>
 import Ajv from 'ajv'
-import axios from 'axios'
 
-import ajvErrors from '@/middleware/ajvErrors'
+import ajvErrors from '@/helpers/ajvErrors'
+import customErrors from '@/helpers/customErrors'
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 require('ajv-keywords')(ajv, ['transform'])
@@ -78,6 +115,25 @@ ajv.addSchema({
   ]
 }, USER_V_SCHEMA)
 
+const customErrorMsg = {
+  username: {
+    maxLength: 'Username is too long (max 64)',
+    minLength: 'Username is too short (min 8)',
+    used: 'Username is already used'
+  },
+  email: {
+    maxLength: 'Email is too long (max 256)',
+    minLength: 'Email is too short (min 8)',
+    format: 'Email is invalid',
+    used: 'Username is already used'
+  },
+  password: {
+    maxLength: 'Password is too long (max 256)',
+    minLength: 'Password is too short (min 8)',
+    pattern: 'Password is too weak'
+  }
+}
+
 export default {
   data () {
     return {
@@ -87,7 +143,7 @@ export default {
         cpassword: 'Asdf1234',
         email: 'username@gmail.com'
       },
-      errors: {}
+      errors: { }
     }
   },
 
@@ -98,27 +154,28 @@ export default {
 
     validate () {
       ajv.validate(USER_S_SCHEMA, this.user)
-      let validate = ajv.validate(USER_V_SCHEMA, this.user)
+      const validate = ajv.validate(USER_V_SCHEMA, this.user)
 
       if (!validate) {
-        this.errors = ajvErrors(ajv)
+        this.errors = customErrors(ajvErrors(ajv), customErrorMsg)
+        return false
       }
 
-      if (this.password !== this.cpassword) {
-        this.errors.cpassword = 'Passwords are not the same'
-        validate = false
+      if (this.user.password !== this.user.cpassword) {
+        this.errors = { password: 'Passwords are not the same' }
+        return false
       }
 
-      return validate
+      return true
     },
 
     submit () {
       // Get values from form
-      if (this.validate) {
-        const user = this.user
+      if (this.validate()) {
+        const user = { ...this.user } // Deep clone
         delete user.cpassword
 
-        axios.post('http://localhost:5000/api/user/create', {
+        this.$axios.post('/api/user/create', {
           ...this.user
         })
           .then((res) => {
@@ -134,11 +191,10 @@ export default {
             user.fame = 0
             this.$store.commit('user/setUser', user)
 
-            // FIXME:
-            this.$router.push('/')
+            this.$router.push('/success')
           })
-          .catch((_err) => {
-            alert('User not added')
+          .catch((err) => {
+            this.errors = customErrors(err.response.data.errors, customErrorMsg)
           })
       }
     }
@@ -151,28 +207,9 @@ export default {
 </script>
 
 <style scoped>
-.error {
-  color: red;
-}
-
 .form-container {
   margin: 10vh auto 0 auto;
   width: 450px;
-}
-
-::placeholder {
-  color: #C4C4C4;
-}
-
-input, input:focus {
-  background: transparent;
-  color: #FFF;
-  border: 2px solid #C4C4C4;
-  border-radius: 0.5rem;
-}
-
-input:focus {
-  box-shadow: none;
 }
 
 #image {
@@ -182,11 +219,5 @@ input:focus {
 
 #submit {
   float: right;
-  background: transparent;
-  color: #00C0FF;
-
-  padding: 0.25rem 1rem;
-  border: 2px solid #00C0FF;
-  border-radius: 1rem;
 }
 </style>

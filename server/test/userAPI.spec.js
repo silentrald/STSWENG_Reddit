@@ -63,7 +63,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        error: `User ${user.username} is already used`
+                        error: expect.objectContaining({
+                            username: 'used'
+                        })
                     })
                 );
             });
@@ -314,7 +316,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        error: `Email ${user.email} is already used`
+                        errors: expect.objectContaining({
+                            email: 'used'
+                        })
                     })
                 );
             });

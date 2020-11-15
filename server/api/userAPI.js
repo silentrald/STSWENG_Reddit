@@ -47,9 +47,17 @@ const userAPI = {
 
             if (err.code === '23505') {
                 if (err.constraint === 'users_pkey') {
-                    return res.status(401).send({ error: `User ${username} is already used` });
+                    return res.status(401).send({ 
+                        errors: {
+                            username: 'used' // User is used
+                        }
+                    });
                 } else if (err.constraint === 'users_email_key') {
-                    return res.status(401).send({ error: `Email ${email} is already used` });
+                    return res.status(401).send({ 
+                        errors: {
+                            email: 'used' // Email is used
+                        }
+                    });
                 }
             }
 
