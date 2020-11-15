@@ -11,6 +11,12 @@
   </div>
 </template>
 
+<script>
+export default {
+  middleware: ['notAuth']
+}
+</script>
+
 <style scoped>
 .success {
   display: flex;

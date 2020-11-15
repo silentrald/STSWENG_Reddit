@@ -46,12 +46,15 @@ const loginMw = {
         const { authorization } = req.headers;
         if (authorization) {
             const token = authorization.split(' ')[1];
-            
-            const user = await jwt.verifyPromise(token);
-    
-            if (user) {
-                req.user = user;
-            }           
+
+            try {
+                const user = await jwt.verifyPromise(token);
+                if (user) {
+                    req.user = user;
+                }
+            } catch (err) {
+                console.log(err);
+            }
         }
 
         next();

@@ -103,6 +103,7 @@ const userAPI = {
 
             // JWT Token
             delete user.password;
+            delete user.banned;
             const token = await jwt.signPromise(user);
 
             return res.status(200).send({ token });

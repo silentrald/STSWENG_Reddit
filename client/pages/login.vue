@@ -84,6 +84,8 @@ export default {
     }
   },
 
+  middleware: ['notAuth'],
+
   methods: {
     validate () {
       ajv.validate(LOGIN_S_SCHEMA, this.user)

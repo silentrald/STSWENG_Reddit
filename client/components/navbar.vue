@@ -24,6 +24,7 @@
               <div class="nav-link">
                 <img id="image" src="https://picsum.photos/24/24" width="24" height="24">
                 /{{ $auth.user.username }}
+                <span class="sr-only">(current)</span>
               </div>
             </li>
             <li class="nav-item">

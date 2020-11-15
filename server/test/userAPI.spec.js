@@ -928,6 +928,42 @@ describe('User API', () => {
             });
         });
     });
+
+    describe(`POST: ${url}/auth`, () => {
+        test('GOOD: Valid token', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).get(`${url}/auth`)
+                .set('Authorization', `Bearer ${token}`);
+            
+            expect(statusCode).toEqual(200);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    user: expect.objectContaining({
+                        username: user.username,
+                        email: user.email,
+                        // fname: expect.any(String),
+                        // lname: expect.any(String),
+                        // gender: expect.any(String),
+                        // birthday: expect.any(String),
+                        // bio: expect.any(String),
+                        fame: expect.any(Number),
+                        iat: expect.any(Number)
+                    })
+                })
+            );
+        });
+
+        test('ERROR: Invalid token', async () => {
+            const {
+                statusCode
+            } = await request(server).get(`${url}/auth`)
+                .set('Authorization', 'Bearer just-a-random-token');
+            
+            expect(statusCode).toEqual(403);
+        });
+    });
 });
 
 afterAll(async () => {

@@ -147,7 +147,7 @@ export default {
     }
   },
 
-  auth: 'guest',
+  middleware: ['notAuth'],
 
   methods: {
     removeError (field) {
