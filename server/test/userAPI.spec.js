@@ -63,7 +63,7 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        error: expect.objectContaining({
+                        errors: expect.objectContaining({
                             username: 'used'
                         })
                     })
