@@ -56,12 +56,6 @@
   </nav>
 </template>
 
-<script>
-export default {
-
-}
-</script>
-
 <style scoped>
 .navbar {
   background-color: #01021E;

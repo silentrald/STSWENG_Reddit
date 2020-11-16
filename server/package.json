@@ -10,6 +10,8 @@
     "lint": "eslint .",
     "test": "jest --color --coverage",
     "stest": "jest --color --coverage --silent",
+    "test-unit": "jest --color --coverage --silent --testPathPattern=test/unit",
+    "test-int": "jest --color --coverage --silent --testPathPattern=test/integration",
     "migrate-up": "node migrations/up",
     "migrate-down": "node migrations/down",
     "db-delete": "node migrations/delete"

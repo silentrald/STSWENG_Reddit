@@ -38,8 +38,9 @@ ajv.addSchema({
 
 const loginMw = {
     /**
-     * 
-     * 
+     * Verifies to token passed in the 'Authorization'
+     * header and if verification happened, then the
+     * user credentials will be set to `res.user`
      */
     smartLogin: async (req, _res, next) => {
         // Get the token from the Authorization header
@@ -60,22 +61,36 @@ const loginMw = {
         next();
     },
 
-    isLogin: (req, res, next) => {
+    /**
+     * Checks whether if the user is authenticated
+     * before continuing to next callback else 
+     * return a 403 Forbidden error
+     */
+    isAuth: (req, res, next) => {
         if (!req.user) {
-            return res.status(302).send({ route: '/' });
+            return res.status(403).send();
         }
 
         next();
     },
 
-    isNotLogin: (req, res, next) => {
+    /**
+     * Checks whether if the user is not authenticated
+     * before continuing to next callback else 
+     * return a 403 Forbidden error
+     */
+    isNotAuth: (req, res, next) => {
         if (req.user) {
-            return res.status(302).send({ route: '/' });
+            return res.status(403).send();
         }
 
         next();
     },
 
+    /**
+     * Validates the object for login.
+     * Properties: username, password
+     */
     validateLogin: (req, res, next) => {
         ajv.validate(LOGIN_S_SCHEMA, req.body);
         const validate = ajv.validate(LOGIN_V_SCHEMA, req.body);

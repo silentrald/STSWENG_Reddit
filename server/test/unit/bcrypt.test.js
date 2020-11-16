@@ -1,4 +1,4 @@
-const { hashSalt, compare } = require('../modules/bcrypt');
+const { hashSalt, compare } = require('../../modules/bcrypt');
 
 const password = 'somepassword';
 let hashed;
