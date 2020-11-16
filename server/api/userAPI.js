@@ -5,6 +5,13 @@ const db = require('../db');
 
 const userAPI = {
     // GET
+    getAuth: (req, res) => {
+        // console.log(req.user);
+        
+        return req.user 
+            ? res.status(200).send({user: req.user})
+            : res.status(403).send();
+    },
 
     // POST
     postRegisterUser: async (req, res) => {
@@ -64,6 +71,48 @@ const userAPI = {
             return res.status(500).send();
         }
     },
+
+    postLogin: async(req, res) => {
+        const { username, password } = req.body;
+
+        try {
+            // Query the username from the user table
+            const queryUser = {
+                text: `
+                    SELECT  *
+                    FROM    users
+                    WHERE   username=$1;
+                `,
+                values: [ username ]
+            };
+
+            const { rows } = await db.query(queryUser);
+            const user = rows[0];
+
+            // No user was queried
+            if (!user) {
+                return res.status(401).send();
+            }
+
+            const compare = await bcrypt.compare(password, user.password);
+
+            // Passwords are not the same
+            if (!compare) {
+                return res.status(401).send();
+            }
+
+            // JWT Token
+            delete user.password;
+            delete user.banned;
+            const token = await jwt.signPromise(user);
+
+            return res.status(200).send({ token });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    }
 
     // PATCH
 

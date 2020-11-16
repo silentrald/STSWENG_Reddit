@@ -2,30 +2,36 @@
   <div>
     <div class="success">
       Account has been registered
-      <nuxt-link to="/">
-        <button id="home">
-          H O M E
+      <nuxt-link to="/login">
+        <button id="login">
+          L O G I N
         </button>
       </nuxt-link>
     </div>
   </div>
 </template>
 
+<script>
+export default {
+  middleware: ['notAuth']
+}
+</script>
+
 <style scoped>
 .success {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    align-items: baseline;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  align-items: baseline;
 
-    width: 50%;
-    margin: 10vh auto 0 auto;
-    font-size: 64px;
+  width: 50%;
+  margin: 10vh auto 0 auto;
+  font-size: 64px;
 }
 
-#home {
-    margin-top: 16px;
-    width: 100px;
-    font-size: medium;
+#login {
+  margin-top: 16px;
+  width: 100px;
+  font-size: medium;
 }
 </style>

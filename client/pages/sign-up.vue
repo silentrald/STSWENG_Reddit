@@ -147,6 +147,8 @@ export default {
     }
   },
 
+  middleware: ['notAuth'],
+
   methods: {
     removeError (field) {
       delete this.errors[field]
@@ -180,21 +182,17 @@ export default {
         })
           .then((res) => {
             if (res.status !== 201) {
-              throw new Error('Error')
+              return
             }
-
-            const { token } = res.data
-
-            this.$store.commit('user/setToken', token)
-
-            delete user.password
-            user.fame = 0
-            this.$store.commit('user/setUser', user)
 
             this.$router.push('/success')
           })
           .catch((err) => {
-            this.errors = customErrors(err.response.data.errors, customErrorMsg)
+            const { status, data } = err.response
+
+            if (status === 401) {
+              this.errors = customErrors(data.errors, customErrorMsg)
+            }
           })
       }
     }
