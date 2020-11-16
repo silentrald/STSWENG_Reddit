@@ -9,9 +9,8 @@
     "generate": "nuxt generate",
     "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "lint": "yarn lint:js",
-    "test-unit": "jest --testPathPattern=test/unit/",
-    "test-spec": "jest --testPathPattern=test/spec/",
-    "test-e2e": "jest --testPathPattern=test/e2e/"
+    "test-spec": "jest --silent --testPathPattern=test/spec/",
+    "test-e2e": "jest --silent --testPathPattern=test/e2e/"
   },
   "dependencies": {
     "@nuxtjs/auth": "^4.9.1",

@@ -1,39 +1,63 @@
-import { resolve } from 'path'
-import { Nuxt, Builder } from 'nuxt'
-import { JSDOM } from 'jsdom'
+import { mount } from '@vue/test-utils'
+// import sinon from 'sinon'
+import signUpPage from '@/pages/sign-up.vue'
 
-// We keep the nuxt and server instance
-// So we can close them at the end of the test
-let nuxt = null
+describe('Sign-up Page', () => {
+  test('Can Mount?', () => {
+    const wrapper = mount(signUpPage)
+    expect(wrapper.vm).toBeTruthy()
+  })
 
-// Init Nuxt.js and create a server listening on localhost:4000
-beforeAll(async () => {
-  const config = {
-    dev: false,
-    rootDir: resolve(__dirname, '../..')
-  }
-  nuxt = new Nuxt(config)
-  await new Builder(nuxt).build()
-  await nuxt.server.listen(4000, 'localhost')
-}, 30000)
+  describe('Fields Error Text', () => {
+    test('Username error', () => {
+      const wrapper = mount(signUpPage, {
+        data () {
+          return {
+            errors: {
+              username: 'Username is too long'
+            }
+          }
+        }
+      })
 
-// Example of testing only generated html
-test('Route / exits and render HTML', async () => {
-  const context = {}
-  const { html } = await nuxt.server.renderRoute('/', context)
-  console.log(html)
-})
+      const error = wrapper.find('.error')
 
-// Example of testing via dom checking
-test('Route / exits and render HTML with CSS applied', async () => {
-  const context = {}
-  const { html } = await nuxt.server.renderRoute('/', context)
-  const { window } = new JSDOM(html).window
-  // const element = window.document.querySelector('.red')
-  console.log(window)
-})
+      expect(error.exists()).toBe(true)
+      expect(error.text()).toEqual('Username is too long')
+    })
 
-// Close server and ask nuxt to stop listening to file changes
-afterAll(() => {
-  nuxt.close()
+    test('Password error', () => {
+      const wrapper = mount(signUpPage, {
+        data () {
+          return {
+            errors: {
+              password: 'Passwords do not match'
+            }
+          }
+        }
+      })
+
+      const error = wrapper.find('.error')
+
+      expect(error.exists()).toBe(true)
+      expect(error.text()).toEqual('Passwords do not match')
+    })
+
+    test('Email error', () => {
+      const wrapper = mount(signUpPage, {
+        data () {
+          return {
+            errors: {
+              email: 'Email is invalid'
+            }
+          }
+        }
+      })
+
+      const error = wrapper.find('.error')
+
+      expect(error.exists()).toBe(true)
+      expect(error.text()).toEqual('Email is invalid')
+    })
+  })
 })
