@@ -5,6 +5,13 @@ const db = require('../db');
 
 const userAPI = {
     // GET
+    getAuth: (req, res) => {
+        // console.log(req.user);
+        
+        return req.user 
+            ? res.status(200).send({user: req.user})
+            : res.status(403).send();
+    },
 
     // POST
     postRegisterUser: async (req, res) => {
@@ -12,12 +19,7 @@ const userAPI = {
         const {
             username,
             password,
-            email,
-            fname,
-            lname,
-            gender,
-            birthday,
-            bio
+            email
         } = req.body;
 
         try {
@@ -27,19 +29,14 @@ const userAPI = {
             // Insert query to users table
             const queryInsUser = {
                 text: `
-                    INSERT INTO users(username, password, email, fname, lname, gender, birthday, bio)
-                        VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+                    INSERT INTO users(username, password, email)
+                        VALUES($1, $2, $3)
                     RETURNING *;
                 `,
                 values: [
                     username,
                     hash,
-                    email,
-                    fname,
-                    lname,
-                    gender,
-                    birthday,
-                    bio
+                    email
                 ]
             };
 
@@ -57,15 +54,65 @@ const userAPI = {
 
             if (err.code === '23505') {
                 if (err.constraint === 'users_pkey') {
-                    return res.status(401).send({ error: `User ${username} is already used` });
+                    return res.status(401).send({ 
+                        errors: {
+                            username: 'used' // User is used
+                        }
+                    });
                 } else if (err.constraint === 'users_email_key') {
-                    return res.status(401).send({ error: `Email ${email} is already used` });
+                    return res.status(401).send({ 
+                        errors: {
+                            email: 'used' // Email is used
+                        }
+                    });
                 }
             }
 
             return res.status(500).send();
         }
     },
+
+    postLogin: async(req, res) => {
+        const { username, password } = req.body;
+
+        try {
+            // Query the username from the user table
+            const queryUser = {
+                text: `
+                    SELECT  *
+                    FROM    users
+                    WHERE   username=$1;
+                `,
+                values: [ username ]
+            };
+
+            const { rows } = await db.query(queryUser);
+            const user = rows[0];
+
+            // No user was queried
+            if (!user) {
+                return res.status(401).send();
+            }
+
+            const compare = await bcrypt.compare(password, user.password);
+
+            // Passwords are not the same
+            if (!compare) {
+                return res.status(401).send();
+            }
+
+            // JWT Token
+            delete user.password;
+            delete user.banned;
+            const token = await jwt.signPromise(user);
+
+            return res.status(200).send({ token });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    }
 
     // PATCH
 

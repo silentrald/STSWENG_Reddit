@@ -19,9 +19,10 @@ const user = {
 };
 
 let failUser;
+let token;
 
 describe('User API', () => {
-    describe(`Route: ${url}/create`, () => {
+    describe(`POST: ${url}/create`, () => {
         beforeEach(() => {
             failUser = {
                 username: 'sample-user',
@@ -48,6 +49,28 @@ describe('User API', () => {
                     token: expect.stringMatching(JWT_REGEX)
                 })
             );
+
+            token = body.token;
+        });
+
+        test('There is already a user login', async () => {
+            let loginUser = {};
+            loginUser.username = user.username;
+            loginUser.password = user.password;
+
+            const {
+                statusCode,
+                body
+            } = await request(server).post(`${url}/create`)
+                .send(loginUser)
+                .set('Authorization', `Bearer ${token}`);
+            
+            expect(statusCode).toEqual(302);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    route: '/'
+                })
+            );
         });
         
         describe('ERROR: username field', () => {
@@ -63,7 +86,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        error: `User ${user.username} is already used`
+                        errors: expect.objectContaining({
+                            username: 'used'
+                        })
                     })
                 );
             });
@@ -314,7 +339,9 @@ describe('User API', () => {
                 expect(statusCode).toEqual(401);
                 expect(body).toEqual(
                     expect.objectContaining({
-                        error: `Email ${user.email} is already used`
+                        errors: expect.objectContaining({
+                            email: 'used'
+                        })
                     })
                 );
             });
@@ -378,366 +405,563 @@ describe('User API', () => {
             });
         });
 
-        describe('ERROR: fname field', () => {
-            test('Register with empty fname', async () => {
-                failUser.fname = '';
+        //         describe('ERROR: fname field', () => {
+        //             test('Register with empty fname', async () => {
+        //                 failUser.fname = '';
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            fname: 'minLength'
-                        })
-                    })
-                );
-            });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             fname: 'minLength'
+        //                         })
+        //                     })
+        //                 );
+        //             });
 
-            test('Register with whitespace fname', async () => {
-                failUser.fname = '      ';
+        //             test('Register with whitespace fname', async () => {
+        //                 failUser.fname = '      ';
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            fname: 'minLength'
-                        })
-                    })
-                );
-            });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             fname: 'minLength'
+        //                         })
+        //                     })
+        //                 );
+        //             });
 
-            test('Register with long fname', async () => {
-                // 60 chars
-                failUser.fname = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+        //             test('Register with long fname', async () => {
+        //                 // 60 chars
+        //                 failUser.fname = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            fname: 'maxLength'
-                        })
-                    })
-                );
-            });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             fname: 'maxLength'
+        //                         })
+        //                     })
+        //                 );
+        //             });
 
 
-            test('Register with no fname property', async () => {
-                delete failUser.fname;
+        //             test('Register with no fname property', async () => {
+        //                 delete failUser.fname;
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            fname: 'required'
-                        })
-                    })
-                );
-            });
-        });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             fname: 'required'
+        //                         })
+        //                     })
+        //                 );
+        //             });
+        //         });
     
-        describe('ERROR: lname field', () => {
-            test('Register with empty lname', async () => {
-                failUser.lname = '';
+        //         describe('ERROR: lname field', () => {
+        //             test('Register with empty lname', async () => {
+        //                 failUser.lname = '';
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            lname: 'minLength'
-                        })
-                    })
-                );
-            });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             lname: 'minLength'
+        //                         })
+        //                     })
+        //                 );
+        //             });
 
-            test('Register with whitespace lname', async () => {
-                failUser.lname = '      ';
+        //             test('Register with whitespace lname', async () => {
+        //                 failUser.lname = '      ';
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            lname: 'minLength'
-                        })
-                    })
-                );
-            });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             lname: 'minLength'
+        //                         })
+        //                     })
+        //                 );
+        //             });
 
-            test('Register with long lname', async () => {
-                // 60 chars
-                failUser.lname = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+        //             test('Register with long lname', async () => {
+        //                 // 60 chars
+        //                 failUser.lname = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            lname: 'maxLength'
-                        })
-                    })
-                );
-            });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             lname: 'maxLength'
+        //                         })
+        //                     })
+        //                 );
+        //             });
 
 
-            test('Register with no lname property', async () => {
-                delete failUser.lname;
+        //             test('Register with no lname property', async () => {
+        //                 delete failUser.lname;
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            lname: 'required'
-                        })
-                    })
-                );
-            });
-        });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             lname: 'required'
+        //                         })
+        //                     })
+        //                 );
+        //             });
+        //         });
     
-        describe('ERROR: gender field', () => {
-            test('Register with empty gender', async () => {
-                failUser.gender = '';
+        //         describe('ERROR: gender field', () => {
+        //             test('Register with empty gender', async () => {
+        //                 failUser.gender = '';
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            gender: 'pattern'
-                        })
-                    })
-                );
-            });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             gender: 'pattern'
+        //                         })
+        //                     })
+        //                 );
+        //             });
 
-            test('Register with invalid gender (pattern check of m/f)', async () => {
-                failUser.gender = 'x';
+        //             test('Register with invalid gender (pattern check of m/f)', async () => {
+        //                 failUser.gender = 'x';
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            gender: 'pattern'
-                        })
-                    })
-                );
-            });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             gender: 'pattern'
+        //                         })
+        //                     })
+        //                 );
+        //             });
         
-            test('Register with no gender property', async () => {
-                delete failUser.gender;
+        //             test('Register with no gender property', async () => {
+        //                 delete failUser.gender;
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            gender: 'required'
-                        })
-                    })
-                );
-            });
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             gender: 'required'
+        //                         })
+        //                     })
+        //                 );
+        //             });
+        //         });
+
+        //         describe('ERROR: birthday field', () => {
+        //             test('Register with empty birthday', async () => {
+        //                 failUser.birthday = '';
+
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
+    
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             birthday: 'format'
+        //                         })
+        //                     })
+        //                 );
+        //             });
+
+        //             test('Register with invalid birthday', async () => {
+        //                 failUser.birthday = 'not-birtday';
+
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
+    
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             birthday: 'format'
+        //                         })
+        //                     })
+        //                 );
+        //             });
+
+        //             test('Register with no birthday property', async () => {
+        //                 delete failUser.birthday;
+
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
+    
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             birthday: 'required'
+        //                         })
+        //                     })
+        //                 );
+        //             });
+        //         });
+
+        //         describe('ERROR: bio field', () => {
+        //             test('Register with empty bio', async () => {
+        //                 failUser.bio = '';
+
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
+    
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             bio: 'minLength'
+        //                         })
+        //                     })
+        //                 );
+        //             });
+
+        //             test('Register with whitespace bio', async () => {
+        //                 failUser.bio = '      ';
+
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
+    
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             bio: 'minLength'
+        //                         })
+        //                     })
+        //                 );
+        //             });
+
+        //             test('Register with long bio', async () => {
+        //                 // 240 chars + 3
+        //                 failUser.bio = `
+        // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        //                 `;
+
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
+    
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             bio: 'maxLength'
+        //                         })
+        //                     })
+        //                 );
+        //             });
+
+        //             test('Register with no bio property', async () => {
+        //                 delete failUser.bio;
+
+        //                 const {
+        //                     statusCode,
+        //                     body
+        //                 } = await request(server).post(`${url}/create`)
+        //                     .send(failUser);
+    
+        //                 expect(statusCode).toEqual(401);
+        //                 expect(body).toEqual(
+        //                     expect.objectContaining({
+        //                         errors: expect.objectContaining({
+        //                             bio: 'required'
+        //                         })
+        //                     })
+        //                 );
+        //             });
+        //         });
+    
+    });
+    
+    describe(`POST: ${url}/login`, () => {
+        let loginUser = {};
+        beforeEach(() => {
+            loginUser.username = user.username;
+            loginUser.password = user.password;
         });
 
-        describe('ERROR: birthday field', () => {
-            test('Register with empty birthday', async () => {
-                failUser.birthday = '';
+        test('GOOD: Login', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).post(`${url}/login`)
+                .send(loginUser);
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
-    
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            birthday: 'format'
-                        })
-                    })
-                );
-            });
+            expect(statusCode).toEqual(200);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    token: expect.stringMatching(JWT_REGEX)
+                })
+            );
 
-            test('Register with invalid birthday', async () => {
-                failUser.birthday = 'not-birtday';
-
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
-    
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            birthday: 'format'
-                        })
-                    })
-                );
-            });
-
-            test('Register with no birthday property', async () => {
-                delete failUser.birthday;
-
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
-    
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            birthday: 'required'
-                        })
-                    })
-                );
-            });
+            token = body.token;
         });
 
-        describe('ERROR: bio field', () => {
-            test('Register with empty bio', async () => {
-                failUser.bio = '';
+        test('There is already a user login', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).post(`${url}/login`)
+                .send(loginUser)
+                .set('Authorization', `Bearer ${token}`);
+            
+            expect(statusCode).toEqual(302);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    route: '/'
+                })
+            );
+        });
 
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+        test('GOOD: Username exist with whitespace', async () => {
+            loginUser.username += '   ';
+
+            const {
+                statusCode,
+                body
+            } = await request(server).post(`${url}/login`)
+                .send(loginUser);
+            
+            expect(statusCode).toEqual(200);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    token: expect.stringMatching(JWT_REGEX)
+                })
+            );
+        });
+
+        describe('ERROR: username field', () => {
+            test('Username does not exist', async () => {
+                loginUser.username = 'sample-username';
     
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
                 expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            bio: 'minLength'
-                        })
-                    })
-                );
             });
 
-            test('Register with whitespace bio', async () => {
-                failUser.bio = '      ';
-
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+            test('Username too long', async () => {
+                // 70 chars
+                loginUser.username = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
     
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
                 expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            bio: 'minLength'
-                        })
-                    })
-                );
             });
 
-            test('Register with long bio', async () => {
-                // 240 chars + 3
-                failUser.bio = `
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+            test('Username too short', async () => {
+                // 4 chars
+                loginUser.username = 'aaaa';
+    
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+
+            test('No username property', async () => {
+                delete loginUser.username;
+    
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+        });
+        
+        describe('ERROR: password field', () => {
+            test('Wrong Password', async () => {
+                loginUser.password = 'Not-his-password';
+                
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+
+            test('Password too long', async () => {
+                // ~300 chars
+                loginUser.password = `
+                    Asdf1234
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                 `;
-
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
     
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
                 expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            bio: 'maxLength'
-                        })
-                    })
-                );
             });
 
-            test('Register with no bio property', async () => {
-                delete failUser.bio;
-
-                const {
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+            test('Password too short', async () => {
+                loginUser.password = '$hoRt';
     
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
                 expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            bio: 'required'
-                        })
-                    })
-                );
             });
+
+            test('No password property', async () => {
+                delete loginUser.username;
+    
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/login`)
+                    .send(loginUser);
+                
+                expect(statusCode).toEqual(401);
+            });
+        });
+    });
+
+    describe(`POST: ${url}/auth`, () => {
+        test('GOOD: Valid token', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).get(`${url}/auth`)
+                .set('Authorization', `Bearer ${token}`);
+            
+            expect(statusCode).toEqual(200);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    user: expect.objectContaining({
+                        username: user.username,
+                        email: user.email,
+                        // fname: expect.any(String),
+                        // lname: expect.any(String),
+                        // gender: expect.any(String),
+                        // birthday: expect.any(String),
+                        // bio: expect.any(String),
+                        fame: expect.any(Number),
+                        iat: expect.any(Number)
+                    })
+                })
+            );
+        });
+
+        test('ERROR: Invalid token', async () => {
+            const {
+                statusCode
+            } = await request(server).get(`${url}/auth`)
+                .set('Authorization', 'Bearer just-a-random-token');
+            
+            expect(statusCode).toEqual(403);
         });
     });
 });
