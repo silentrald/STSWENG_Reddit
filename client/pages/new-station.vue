@@ -1,7 +1,11 @@
 <template>
   <div>
-    <div class="container">
+    <div class="form-container">
       <form @submit.prevent>
+        <h1>Create station</h1>
+        Create your very own community
+        <br>
+        <br>
         <div class="form-group">
           <label for="name">Name</label>
           <input id="name" v-model="station.name" type="text" class="form-control" placeholder="Name of station">
@@ -14,8 +18,8 @@
           <label for="rules">Rules</label>
           <textarea id="rules" v-model="station.rules" class="form-control" placeholder="Write down the rules of your station. Markdown syntax required." />
         </div>
-        <button type="submit" class="btn btn-primary">
-          Create Station
+        <button id="create">
+          CREATE
         </button>
       </form>
     </div>
@@ -85,7 +89,7 @@ export default {
     }
   },
 
-  middleware: ['notAuth'],
+  /* middleware: ['notAuth'], */
 
   methods: {
     removeError (field) {
@@ -132,6 +136,26 @@ export default {
 </script>
 
 <style scoped>
+.form-container {
+  margin: 10vh auto 0 auto;
+  width: 450px;
+}
+
+input, input:focus, textarea {
+  background: transparent;
+  color: #FFF;
+  border: 2px solid #C4C4C4;
+  border-radius: 0.5rem;
+}
+
+input:focus {
+  box-shadow: none;
+}
+
+#create {
+  float: right;
+}
+
 .error {
   color: red;
 }
