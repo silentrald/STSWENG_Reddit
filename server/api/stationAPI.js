@@ -2,6 +2,28 @@ const db = require('../db');
 
 const stationAPI = {
     // GET
+    getStation: async (req, res) => {
+        const { name } = req.params;
+
+        try {
+            const querySelStation = {
+                text: 'SELECT * FROM stations WHERE name = $1',
+                values: [ name ]
+            };
+
+            const { rows } = await db.query(querySelStation);
+            if (rows && rows[0]) {
+                const station = rows[0];
+                return res.status(200).send({ station });
+            } else {
+                return res.status(404).send();
+            }
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
 
     // POST
     postCreateStation: async (req, res) => {
@@ -14,7 +36,7 @@ const stationAPI = {
 
         try {
             // Insert query to users table
-            const queryInsUser = {
+            const queryInsStation = {
                 text: `
                     INSERT INTO stations(name, description, rules, date_created)
                         VALUES($1, $2, $3, $4)
@@ -28,7 +50,7 @@ const stationAPI = {
                 ]
             };
 
-            const { rows } = await db.query(queryInsUser);
+            const { rows } = await db.query(queryInsStation);
             // Get the returned station
             const station = rows[0];
 

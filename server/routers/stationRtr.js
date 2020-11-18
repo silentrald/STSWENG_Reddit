@@ -4,9 +4,12 @@ const loginMw = require('../middlewares/loginMw');
 
 // GET
 
+router.get('/id/:name',
+    api.getStation);
+
 // POST
 
-router.post('/create',
+router.post('/new',
     loginMw.isLogin,
     api.postCreateStation);
 
