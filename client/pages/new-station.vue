@@ -141,14 +141,14 @@ export default {
   width: 450px;
 }
 
-input, input:focus, textarea {
+input, input:focus, textarea, textarea:focus {
   background: transparent;
   color: #FFF;
   border: 2px solid #C4C4C4;
   border-radius: 0.5rem;
 }
 
-input:focus {
+input:focus, textarea:focus {
   box-shadow: none;
 }
 
