@@ -112,7 +112,7 @@ export default {
       // Get values from form
       const station = this.station
 
-      axios.post('http://localhost:5000/api/station/create', {
+      axios.post('http://localhost:5000/api/station/new', {
         ...station
       })
         .then((res) => {
@@ -121,7 +121,7 @@ export default {
           }
 
           // TODO: redirect to newly created station
-          this.$router.push('/')
+          this.$router.push(`/s/${res.station.name}`)
         })
         .catch((_err) => {
           alert('Station not created')
