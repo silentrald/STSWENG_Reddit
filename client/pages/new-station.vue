@@ -8,11 +8,11 @@
         </div>
         <div class="form-group">
           <label for="description">Description</label>
-          <textarea id="description" v-model="station.description" class="form-control" placeholder="Write a brief, but concise description for your station.">
+          <textarea id="description" v-model="station.description" class="form-control" placeholder="Write a brief, but concise description for your station." />
         </div>
         <div class="form-group">
           <label for="rules">Rules</label>
-          <textarea id="rules" v-model="station.rules" class="form-control" placeholder="Write down the rules of your station. Markdown syntax required.">
+          <textarea id="rules" v-model="station.rules" class="form-control" placeholder="Write down the rules of your station. Markdown syntax required." />
         </div>
         <button type="submit" class="btn btn-primary">
           Create Station
@@ -26,7 +26,7 @@
 import Ajv from 'ajv'
 import axios from 'axios'
 
-import ajvErrors from '@/middleware/ajvErrors'
+import ajvErrors from '@/helpers/ajvErrors'
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 require('ajv-keywords')(ajv, ['transform'])
@@ -85,6 +85,8 @@ export default {
     }
   },
 
+  middleware: ['notAuth'],
+
   methods: {
     removeError (field) {
       delete this.errors[field]
@@ -107,7 +109,7 @@ export default {
       const station = this.station
 
       axios.post('http://localhost:5000/api/station/create', {
-        ...this.station
+        ...station
       })
         .then((res) => {
           if (res.status !== 201) {
