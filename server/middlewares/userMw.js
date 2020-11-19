@@ -1,23 +1,12 @@
 const Ajv = require('ajv');
 const { ajvErrors } = require('./ajvHelper');
 
-const ajv = new Ajv({ allErrors: true, jsonPointers: true, ownProperties: true });
-require('ajv-keywords')(ajv, [ 'transform' ]);
+const PASSWORD_REGEX = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).*$/;
 
-const USER_S_SCHEMA = 'us';
+
+const ajv = new Ajv({ allErrors: true, jsonPointers: true });
+
 const USER_V_SCHEMA = 'uv';
-
-ajv.addSchema({
-    type: 'object',
-    properties: {
-        username: {
-            transform: [ 'trim' ]
-        },
-        email: {
-            transform: [ 'trim' ]
-        }
-    }
-}, USER_S_SCHEMA);
 
 ajv.addSchema({
     type: 'object',
@@ -45,15 +34,20 @@ ajv.addSchema({
     ]
 }, USER_V_SCHEMA);
 
-const PASSWORD_REGEX = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).*$/;
-
 const userMw = {
     /**
      * Validates the object for user registration.
      * Properties: username, password, email
      */
     validateRegisterUser: (req, res, next) => {
-        ajv.validate(USER_S_SCHEMA, req.body); // sanitize
+        // sanitize
+        if (typeof(req.body.username) === 'string')
+            req.body.username = req.body.username.trim();
+        
+        if (typeof(req.body.email) === 'string')
+            req.body.email = req.body.email.trim();
+
+        // validate
         const validate = ajv.validate(USER_V_SCHEMA, req.body);
 
         if (!validate) {

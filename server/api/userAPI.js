@@ -23,6 +23,8 @@ const userAPI = {
      * field.
      */
     postRegisterUser: async (req, res) => {
+        console.log(req.body);
+
         // Get values
         const {
             username,
@@ -78,7 +80,7 @@ const userAPI = {
      * given. Responds 200 if credentials are correct else
      * 403
      */
-    postLogin: async(req, res) => {
+    postLogin: async (req, res) => {
         const { username, password } = req.body;
 
         try {

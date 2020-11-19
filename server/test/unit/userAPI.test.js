@@ -67,6 +67,8 @@ const mockResponse = () => {
     return res;
 };
 
+const oneLineQuery = (queryText) => queryText.trim().replace(/\n/g, ' ').replace(/ {2,}/g, ' ');
+
 describe('Unit test: userAPI.js', () => {
     describe('API: getAuth', () => {
         test('When there is a req.user is supplied', async () => {
@@ -76,7 +78,9 @@ describe('Unit test: userAPI.js', () => {
             };
             const req = mockRequest({ user });
             const res = mockResponse();
+            
             await getAuth(req, res);
+
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.send).toHaveBeenCalledWith({ user });
         });
@@ -84,16 +88,26 @@ describe('Unit test: userAPI.js', () => {
         test('When there is no req.user is supplied', async () => {
             const req = mockRequest({ user: undefined });
             const res = mockResponse();
+
             await getAuth(req, res);
+
             expect(res.status).toHaveBeenCalledWith(403);
             expect(res.send).toHaveBeenCalledWith();
         });
     });
 
     describe('API: postRegisterUser', () => {
-        let body;
+        let body, db, queryText;
+
+        beforeAll(() => {
+            queryText = oneLineQuery(`
+                INSERT INTO users(username, password, email)
+                    VALUES($1, $2, $3);
+            `);
+        });
 
         beforeEach(() => {
+            db = require('../../db');
             body = {
                 username: 'new-username',
                 password: 'password',
@@ -104,51 +118,92 @@ describe('Unit test: userAPI.js', () => {
         test('GOOD: Register with correct credentials', async () => {
             const req = mockRequest({ body });
             const res = mockResponse();
+
             await postRegisterUser(req, res);
+
             expect(res.status).toHaveBeenCalledWith(201);
+            expect(db.query).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    text: queryText,
+                    values: expect.arrayContaining([
+                        body.username,
+                        body.email
+                    ])
+                })
+            );
         });
 
         test('BAD: Existing username', async () => {
             body.username = 'username';
             const req = mockRequest({ body });
             const res = mockResponse();
+
             await postRegisterUser(req, res);
+
             expect(res.status).toHaveBeenCalledWith(401);
             expect(res.send).toHaveBeenCalledWith({ 
                 errors: { 
                     username: 'used'
                 }
             });
+
+            expect(db.query).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    text: queryText,
+                    values: expect.arrayContaining([
+                        body.username,
+                        body.email
+                    ])
+                })
+            );
         });
 
         test('BAD: Existing email', async () => {
             body.email = 'username@gmail.com';
             const req = mockRequest({ body });
             const res = mockResponse();
+
             await postRegisterUser(req, res);
+
             expect(res.status).toHaveBeenCalledWith(401);
             expect(res.send).toHaveBeenCalledWith({ 
                 errors: { 
                     email: 'used'
                 }
             });
+
+            expect(db.query).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    text: queryText,
+                    values: expect.arrayContaining([
+                        body.username,
+                        body.email
+                    ])
+                })
+            );
         });
     });
 
     describe('API: postLogin', () => {
-        let body;
+        let body, db, queryText;
+
+        beforeAll(() => {
+            queryText = oneLineQuery(`
+                SELECT  *
+                FROM    users
+                WHERE   username=$1;
+            `);
+        });
 
         beforeEach(() => {
+            db = require('../../db');
             body = {
                 username: 'username',
                 password: 'password'
             };
         });
+
         test('GOOD: correct credentials', async () => {
-            const body = {
-                username: 'username',
-                password: 'password'
-            };
             const req = mockRequest({ body });
             const res = mockResponse();
 
@@ -160,6 +215,11 @@ describe('Unit test: userAPI.js', () => {
                     token: expect.any(String)
                 })
             );
+
+            expect(db.query).toHaveBeenCalledWith({
+                text: queryText,
+                values: [ body.username ]
+            });
         });
 
         test('BAD: wrong username', async () => {
@@ -170,6 +230,11 @@ describe('Unit test: userAPI.js', () => {
             await postLogin(req, res);
             
             expect(res.status).toHaveBeenCalledWith(401);
+
+            expect(db.query).toHaveBeenCalledWith({
+                text: queryText,
+                values: [ body.username ]
+            });
         });
 
         test('BAD: Existing username, wrong password', async () => {
@@ -180,6 +245,11 @@ describe('Unit test: userAPI.js', () => {
             await postLogin(req, res);
             
             expect(res.status).toHaveBeenCalledWith(401);
+
+            expect(db.query).toHaveBeenCalledWith({
+                text: queryText,
+                values: [ body.username ]
+            });
         });
     });
 });

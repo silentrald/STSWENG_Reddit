@@ -60,7 +60,7 @@ CREATE TABLE stations (
     name            VARCHAR(64)     PRIMARY KEY,
     description     VARCHAR(250),
     rules           VARCHAR(1000),
-    date_created    DATE            NOT NULL,
+    date_created    DATE            DEFAULT now() NOT NULL,
     archived        BOOLEAN         DEFAULT false NOT NULL
 );
 
@@ -80,10 +80,10 @@ CREATE TABLE crewmates() INHERITS (passengers);
 CREATE SEQUENCE post_id_seq MINVALUE -9223372036854775808 START WITH 0;
 CREATE OR REPLACE FUNCTION post_id() RETURNS text LANGUAGE plpgsql IMMUTABLE STRICT AS $$
 BEGIN
-    RETURN stringify_bigint('p' || pseudo_encrypt(nextval('post_id_seq')));
+    RETURN 'p' || stringify_bigint(pseudo_encrypt(nextval('post_id_seq')));
 END $$;
 CREATE TABLE posts (
-    reference_id                VARCHAR(12)     PRIMARY KEY,
+    post_id                     VARCHAR(12)     PRIMARY KEY,
     text                        VARCHAR(1000),
     author                      VARCHAR(64),
     FOREIGN KEY(author)         REFERENCES      users(username),
@@ -96,28 +96,36 @@ CREATE TABLE posts (
 CREATE SEQUENCE comment_id_seq MINVALUE -9223372036854775808;
 CREATE OR REPLACE FUNCTION comment_id() RETURNS text LANGUAGE plpgsql IMMUTABLE STRICT AS $$
 BEGIN
-    RETURN stringify_bigint('c' || pseudo_encrypt(nextval('comment_id_seq')));
+    RETURN 'c' || stringify_bigint(pseudo_encrypt(nextval('comment_id_seq')));
 END $$;
 CREATE TABLE comments (
-    reference_id                VARCHAR(12)     PRIMARY KEY,
+    comment_id                  VARCHAR(12)     PRIMARY KEY,
     text                        VARCHAR(1000),
     author                      VARCHAR(64),
     FOREIGN KEY(author)         REFERENCES      users(username),
+    station_name                VARCHAR(64)     NOT NULL,
+    FOREIGN KEY(station_name)   REFERENCES      stations(name),
     timestamp_created           TIMESTAMP       DEFAULT now() NOT NULL,
     deleted                     BOOLEAN         DEFAULT false NOT NULL
 );
 
 CREATE TABLE subposts (
+    comment_id                  VARCHAR(12) NOT NULL,
     parent_post                 VARCHAR(12) NOT NULL,
-    FOREIGN KEY(parent_post)    REFERENCES  posts(reference_id)
-) INHERITS (comments);
+    FOREIGN KEY(parent_post)    REFERENCES  posts(post_id),
+
+    CONSTRAINT pk_subposts PRIMARY KEY (comment_id, parent_post)
+);
 
 CREATE TABLE subcomments (
+    comment_id                  VARCHAR(12) NOT NULL,
     parent_comment              VARCHAR(12) NOT NULL,
-    FOREIGN KEY(parent_comment) REFERENCES  comments(reference_id)
-) INHERITS (comments);
+    FOREIGN KEY(parent_comment) REFERENCES  comments(comment_id),
 
-CREATE TABLE votes (  
+    CONSTRAINT pk_subcomments PRIMARY KEY (comment_id, parent_comment)
+);
+
+CREATE TABLE votes (
     username                    VARCHAR(64) NOT NULL,
     FOREIGN KEY(username)       REFERENCES  users(username),
     upvote                      BOOLEAN     NOT NULL
@@ -125,14 +133,14 @@ CREATE TABLE votes (
 
 CREATE TABLE post_votes (
     post_id                VARCHAR(12)  NOT NULL,
-    FOREIGN KEY(post_id)   REFERENCES   posts(reference_id),
+    FOREIGN KEY(post_id)   REFERENCES   posts(post_id),
 
     CONSTRAINT pk_post_votes PRIMARY KEY(post_id, username)
 ) INHERITS (votes);
 
 CREATE TABLE comment_votes (
     comment_id              VARCHAR(12) NOT NULL,
-    FOREIGN KEY(comment_id) REFERENCES  comments(reference_id),
+    FOREIGN KEY(comment_id) REFERENCES  comments(comment_id),
 
     CONSTRAINT pk_comment_votes PRIMARY KEY(comment_id, username)
 ) INHERITS (votes);
@@ -151,12 +159,12 @@ CREATE TABLE reports (
 
 CREATE TABLE post_reports (
     post_id                 VARCHAR(12)     NOT NULL,
-    FOREIGN KEY(post_id)    REFERENCES      posts(reference_id)
+    FOREIGN KEY(post_id)    REFERENCES      posts(post_id)
 ) INHERITS (reports);
 
 CREATE TABLE comment_reports (
     comment_id              VARCHAR(12)     NOT NULL,
-    FOREIGN KEY(comment_id) REFERENCES      comments(reference_id)
+    FOREIGN KEY(comment_id) REFERENCES      comments(comment_id)
 ) INHERITS (reports);
 
 CREATE TABLE station_reports (
