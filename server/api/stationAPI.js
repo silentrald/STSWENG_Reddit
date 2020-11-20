@@ -30,16 +30,24 @@ const stationAPI = {
 
         try {
             const querySelStation = {
+                text: 'SELECT * FROM stations WHERE name = $1',
+                values: [ name ]
+            };
+
+            const querySelCaptains = {
                 text: 'SELECT * FROM captains WHERE station_name = $1',
                 values: [ name ]
             };
 
             const { rows } = await db.query(querySelStation);
-            if (rows) {
-                return res.status(200).send({ captains: rows });
-            } else {
-                return res.status(404).send();
+            if (rows && rows[0]) {
+                const { rows } = await db.query(querySelCaptains);
+                if (rows) {
+                    return res.status(200).send({ captains: rows });
+                }
             }
+
+            return res.status(404).send();
         } catch (err) {
             console.log(err);
 
