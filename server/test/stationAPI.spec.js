@@ -79,28 +79,7 @@ describe('Station API', () => {
             };
         });
 
-        test('GOOD: return station with authorization', async () => {
-            const {
-                statusCode,
-                body
-            } = await request(server).get(`${url}/id/${station.name}`).set('Authorization', `Bearer ${token}`)
-                .send(station);
-            
-            expect(statusCode).toEqual(200);
-            expect(body).toEqual(
-                expect.objectContaining({
-                    station: expect.objectContaining({
-                        name: station.name,
-                        description: station.description,
-                        rules: station.rules,
-                        archived: false,
-                        date_created: expect.any(String)
-                    })
-                })
-            );
-        });
-
-        test('GOOD: return station without authorization', async () => {
+        test('GOOD: return station', async () => {
             const {
                 statusCode,
                 body
@@ -121,19 +100,48 @@ describe('Station API', () => {
             );
         });
 
-        test('ERROR: nonexistent station with auth', async () => {
+        test('ERROR: nonexistent station', async () => {
             const {
                 statusCode
-            } = await request(server).get(`${url}/id/${failStation.name}`).set('Authorization', `Bearer ${token}`)
+            } = await request(server).get(`${url}/id/${failStation.name}`)
                 .send(station);
             
             expect(statusCode).toEqual(404);
         });
+    });
 
-        test('ERROR: nonexistent station without auth', async () => {
+    describe(`GET ${url}/captains/:name`, () => {
+        beforeEach(() => {
+            failStation = {
+                name: 'nontest',
+                description: 'Random description',
+                rules: 'No rules yet'
+            };
+        });
+
+        test('GOOD: return list of captains', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).get(`${url}/captains/${station.name}`)
+                .send(station);
+            
+            expect(statusCode).toEqual(200);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    captains: expect.arrayContaining([ {
+                        username: tmpUser.username,
+                        station_name: station.name,
+                        date_join: expect.any(String)
+                    } ])
+                })
+            );
+        });
+
+        test('ERROR: nonexistent station', async () => {
             const {
                 statusCode
-            } = await request(server).get(`${url}/id/${failStation.name}`)
+            } = await request(server).get(`${url}/captains/${failStation.name}`)
                 .send(station);
             
             expect(statusCode).toEqual(404);
