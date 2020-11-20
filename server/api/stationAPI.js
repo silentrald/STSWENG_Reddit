@@ -25,6 +25,28 @@ const stationAPI = {
         }
     },
 
+    getCaptains: async (req, res) => {
+        const { name } = req.params;
+
+        try {
+            const querySelStation = {
+                text: 'SELECT * FROM captains WHERE station_name = $1',
+                values: [ name ]
+            };
+
+            const { rows } = await db.query(querySelStation);
+            if (rows) {
+                return res.status(200).send({ captains: rows });
+            } else {
+                return res.status(404).send();
+            }
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
     // POST
     postCreateStation: async (req, res) => {
         // Get values

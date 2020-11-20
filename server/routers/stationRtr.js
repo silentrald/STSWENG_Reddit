@@ -7,6 +7,10 @@ const loginMw = require('../middlewares/loginMw');
 router.get('/id/:name',
     api.getStation);
 
+router.get('/captains/:name',
+    api.getCaptains);
+
+
 // POST
 
 router.post('/new',
