@@ -89,7 +89,7 @@ ajv.addSchema({
       type: 'string',
       minLength: 3,
       maxLength: 64,
-      pattern: '[A-Za-z_-]+'
+      pattern: '^[A-Za-z0-9_-]+$'
     },
     description: {
       type: 'string',
@@ -111,7 +111,8 @@ const customErrorMsg = {
   name: {
     maxLength: 'Station name is too long (max 64)',
     minLength: 'Station name is too short (min 3)',
-    used: 'Station name is already used'
+    used: 'Station name is already used',
+    pattern: 'Station name contains invalid characters'
   }
 }
 

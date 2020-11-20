@@ -29,7 +29,7 @@ ajv.addSchema({
             type: 'string',
             minLength: 3,
             maxLength: 64,
-            pattern: '[A-Za-z_-]+'
+            pattern: '^[A-Za-z0-9_-]+$'
         },
         description: {
             type: 'string',
