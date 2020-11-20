@@ -55,23 +55,15 @@ const stationAPI = {
             const s_result = await db.query(queryInsStation);
             // Get the returned station
             const station = s_result.rows[0];
-            if (!station) {
-                throw Error('Station not created');
-            }
 
-            const queryInsMod = {
+            await db.query({
                 text: `
                     INSERT INTO captains(username, station_name)
                         VALUES($1, $2)
                     RETURNING *;
                 `,
                 values: [ req.user.username, station.name ]
-            };
-            const c_result = await db.query(queryInsMod);
-            const captain = c_result.rows[0];
-            if (!captain) {
-                throw Error('User not added as captain');
-            }
+            });
 
             await db.query('COMMIT');
             return res.status(201).send({ station });
