@@ -35,6 +35,8 @@ const stationAPI = {
         } = req.body;
 
         try {
+            await db.query('BEGIN');
+
             // Insert query to users table
             const queryInsStation = {
                 text: `
@@ -50,14 +52,37 @@ const stationAPI = {
                 ]
             };
 
-            const { rows } = await db.query(queryInsStation);
+            const s_result = await db.query(queryInsStation);
             // Get the returned station
-            const station = rows[0];
+            const station = s_result.rows[0];
+            if (!station) {
+                throw Error('Station not created');
+            }
 
+            const queryInsMod = {
+                text: `
+                    INSERT INTO captains(username, station_name)
+                        VALUES($1, $2)
+                    RETURNING *;
+                `,
+                values: [ req.user.username, station.name ]
+            };
+            const c_result = await db.query(queryInsMod);
+            const captain = c_result.rows[0];
+            if (!captain) {
+                throw Error('User not added as captain');
+            }
+
+            await db.query('COMMIT');
             return res.status(201).send({ station });
         } catch (err) {
-            console.log(err);
+            try {
+                await db.query('ROLLBACK');
+            } catch (rollbackErr) {
+                console.log(rollbackErr);
+            }
 
+            console.log(err);
             if (err.code === '23505') {
                 if (err.constraint === 'stations_pkey') {
                     return res.status(401).send({ error: `Station '${name}' already exists` });
