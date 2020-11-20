@@ -18,7 +18,7 @@
           <label for="rules">Rules</label>
           <textarea id="rules" v-model="station.rules" class="form-control" placeholder="Write down the rules of your station. Markdown syntax required." />
         </div>
-        <button id="create">
+        <button id="create" @click="submit()">
           CREATE
         </button>
       </form>
@@ -89,7 +89,7 @@ export default {
     }
   },
 
-  /* middleware: ['notAuth'], */
+  middleware: ['auth'],
 
   methods: {
     removeError (field) {
@@ -114,6 +114,10 @@ export default {
 
       axios.post('http://localhost:5000/api/station/new', {
         ...station
+      }, {
+        headers: {
+          Authorization: localStorage.getItem('auth._token.local')
+        }
       })
         .then((res) => {
           if (res.status !== 201) {
