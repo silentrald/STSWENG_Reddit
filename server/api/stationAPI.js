@@ -29,22 +29,14 @@ const stationAPI = {
         const { stationName } = req.params;
 
         try {
-            const querySelStation = {
-                text: 'SELECT * FROM stations WHERE name = $1;',
-                values: [ stationName ]
-            };
-
             const querySelCaptains = {
                 text: 'SELECT * FROM captains WHERE station_name = $1;',
                 values: [ stationName ]
             };
 
-            const { rows } = await db.query(querySelStation);
-            if (rows && rows[0]) {
-                const { rows } = await db.query(querySelCaptains);
-                if (rows) {
-                    return res.status(200).send({ captains: rows });
-                }
+            const { rows, rowCount } = await db.query(querySelCaptains);
+            if (rows && rowCount > 0) {
+                return res.status(200).send({ captains: rows });
             }
 
             return res.status(404).send();
