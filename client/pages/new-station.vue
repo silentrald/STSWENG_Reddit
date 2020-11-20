@@ -7,18 +7,46 @@
         <br>
         <br>
         <div class="form-group">
+          <div v-if="errors.name" class="error">
+            {{ errors.name }}
+          </div>
           <label for="name">Name</label>
-          <input id="name" v-model="station.name" type="text" class="form-control" placeholder="Name of station">
+          <input
+            id="name"
+            v-model="station.name"
+            type="text"
+            class="form-control"
+            placeholder="Name of station"
+            @keydown="removeError('name')"
+          >
         </div>
         <div class="form-group">
+          <div v-if="errors.name" class="error">
+            {{ errors.description }}
+          </div>
           <label for="description">Description</label>
-          <textarea id="description" v-model="station.description" class="form-control" placeholder="Write a brief, but concise description for your station." />
+          <textarea
+            id="description"
+            v-model="station.description"
+            class="form-control"
+            placeholder="Write a brief, but concise description for your station."
+            @keydown="removeError('description')"
+          />
         </div>
         <div class="form-group">
+          <div v-if="errors.rules" class="error">
+            {{ errors.description }}
+          </div>
           <label for="rules">Rules</label>
-          <textarea id="rules" v-model="station.rules" class="form-control" placeholder="Write down the rules of your station. Markdown syntax required." />
+          <textarea
+            id="rules"
+            v-model="station.rules"
+            class="form-control"
+            placeholder="Write down the rules of your station. Markdown syntax required."
+            @keydown="removeError('rules')"
+          />
         </div>
-        <button id="create" @click="submit()">
+        <button id="create" @click="validate()">
           CREATE
         </button>
       </form>
@@ -31,6 +59,7 @@ import Ajv from 'ajv'
 import axios from 'axios'
 
 import ajvErrors from '@/helpers/ajvErrors'
+import customErrors from '@/helpers/customErrors'
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 require('ajv-keywords')(ajv, ['transform'])
@@ -59,7 +88,8 @@ ajv.addSchema({
     name: {
       type: 'string',
       minLength: 3,
-      maxLength: 64
+      maxLength: 64,
+      pattern: '[A-Za-z_-]+'
     },
     description: {
       type: 'string',
@@ -76,6 +106,14 @@ ajv.addSchema({
     'name'
   ]
 }, STATION_V_SCHEMA)
+
+const customErrorMsg = {
+  name: {
+    maxLength: 'Station name is too long (max 64)',
+    minLength: 'Station name is too short (min 3)',
+    used: 'Station name is already used'
+  }
+}
 
 export default {
   data () {
@@ -101,7 +139,7 @@ export default {
       const validate = ajv.validate(STATION_V_SCHEMA, this.station)
 
       if (!validate) {
-        this.errors = ajvErrors(ajv)
+        this.errors = customErrors(ajvErrors(ajv), customErrorMsg)
         return
       }
 
@@ -130,7 +168,11 @@ export default {
           this.$router.push(`/s/${res.data.station.name}`)
         })
         .catch((_err) => {
-          alert('Station not created')
+          const { status, data } = _err.response
+
+          if (status === 401) {
+            this.errors = customErrors(data.errors, customErrorMsg)
+          }
         })
     }
   },

@@ -107,7 +107,7 @@ const stationAPI = {
             console.log(err);
             if (err.code === '23505') {
                 if (err.constraint === 'stations_pkey') {
-                    return res.status(401).send({ error: `Station '${name}' already exists` });
+                    return res.status(401).send({ errors: { name: 'used' } });
                 }
             }
 

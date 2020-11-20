@@ -1,6 +1,7 @@
 const router = require('express')();
 const api = require('../api/stationAPI');
 const loginMw = require('../middlewares/loginMw');
+const stationMw = require('../middlewares/stationMw');
 
 // GET
 
@@ -15,6 +16,7 @@ router.get('/captains/:name',
 
 router.post('/new',
     loginMw.isLogin,
+    stationMw.validateCreateStation,
     api.postCreateStation);
 
 // PATCH
