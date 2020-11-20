@@ -1,26 +1,50 @@
 <template>
   <div>
-    <div class="container mt-3">
-      <div v-if="is404">
+    <div class="container mt-4">
+      <div v-if="is404" class="mt-3">
         <h1>Station does not exist</h1>
       </div>
       <div v-else-if="hasStation">
+        <b-nav class="mb-2">
+          <b-nav-item active>
+            NEW
+          </b-nav-item>
+          <b-nav-item-dropdown
+            id="top-nav-dropdown"
+            text="TOP"
+            toggle-class="nav-link-custom"
+          >
+            <b-dropdown-item>Past hour</b-dropdown-item>
+            <b-dropdown-item>Past 24 hours</b-dropdown-item>
+            <b-dropdown-item>Past week</b-dropdown-item>
+            <b-dropdown-item>Past month</b-dropdown-item>
+            <b-dropdown-item>Past year</b-dropdown-item>
+            <b-dropdown-item>All time</b-dropdown-item>
+          </b-nav-item-dropdown>
+        </b-nav>
         <div class="row">
           <div id="station-info" class="col-md-3 order-md-2">
             <div id="station-name-desc">
-              <h3>Welcome to s/{{ name }}!</h3>
-              {{ description }}
+              <div class="box">
+                <div id="image-container">
+                  <img id="image" src="https://picsum.photos/80/80" width="80" height="80">
+                </div>
+                <h3>s/{{ name }}</h3>
+                <p>{{ description }}</p>
+              </div>
             </div>
-            <div id="station-rules">
+            <div id="station-rules" class="mt-2">
               <h4>Rules</h4>
               <div class="box">
                 {{ rules }}
               </div>
             </div>
-            <div id="station-mods">
+            <div id="station-mods" class="mt-2">
               <h4>Moderators</h4>
               <div class="box">
-                c/user
+                <div v-for="cap in captains" :key="cap.username">
+                  c/{{ cap.username }}
+                </div>
               </div>
             </div>
           </div>
@@ -45,7 +69,8 @@ export default {
       hasStation: false,
       name: '',
       description: '',
-      rules: ''
+      rules: '',
+      captains: []
     }
   },
 
@@ -72,14 +97,50 @@ export default {
             // this.errors = customErrors(data.errors, customErrorMsg)
           }
         })
+
+      this.$axios.get(`/api/station/captains/${name}`)
+        .then((res) => {
+          const { captains } = res.data
+          this.$set(this, 'captains', captains)
+        })
+        .catch((err) => {
+          const { status } = err.response
+
+          if (status === 404) {
+            // this.errors = customErrors(data.errors, customErrorMsg)
+          }
+        })
     }
   }
 }
 </script>
 
 <style>
+.nav-link {
+  color: #aaaaaa;
+}
+
+.nav-link.active {
+  color: #ff3232;
+}
+
 .box {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
+  padding: 10px 15px;
 }
+
+#station-name-desc img {
+  border-radius: 50%;
+}
+
+#image-container {
+  margin: 0 auto;
+  width: 80px;
+}
+
+#station-name-desc h3, p {
+  text-align: center;
+}
+
 </style>
