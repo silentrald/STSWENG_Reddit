@@ -125,7 +125,7 @@ export default {
           }
 
           // TODO: redirect to newly created station
-          this.$router.push(`/s/${res.station.name}`)
+          this.$router.push(`/s/${res.data.station.name}`)
         })
         .catch((_err) => {
           alert('Station not created')
