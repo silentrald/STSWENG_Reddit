@@ -34,6 +34,14 @@ beforeAll(async () => {
 
 describe('Station API', () => {
     describe(`POST ${url}/new`, () => {
+        beforeEach(() => {
+            failStation = {
+                name: 'nontest',
+                description: 'Random description',
+                rules: 'No rules yet'
+            };
+        });
+
         test('GOOD: create station', async () => {
             const {
                 statusCode,
@@ -63,10 +71,78 @@ describe('Station API', () => {
         });
 
         test('ERROR: station already exists', async () => {
-            const { statusCode } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+            const { statusCode, body } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
                 .send(station);
             
             expect(statusCode).toEqual(401);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        name: 'used'
+                    })
+                })
+            );
+        });
+
+        test('ERROR: station name too short', async () => {
+            failStation.name = 'ab';
+            const { statusCode, body } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+                .send(failStation);
+            
+            expect(statusCode).toEqual(401);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        name: 'minLength'
+                    })
+                })
+            );
+        });
+
+        test('ERROR: station name too long', async () => {
+            failStation.name = 'abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcde'; // 65 chars
+            const { statusCode, body } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+                .send(failStation);
+            
+            expect(statusCode).toEqual(401);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        name: 'maxLength'
+                    })
+                })
+            );
+        });
+
+        test('ERROR: station name too short with spaces', async () => {
+            failStation.name = 'ab   '; // 2 chars w/o spaces, 5 chars with spaces, 3 minimum
+            const { statusCode, body } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+                .send(failStation);
+            
+            expect(statusCode).toEqual(401);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        name: 'minLength'
+                    })
+                })
+            );
+        });
+
+        test('ERROR: station name with invalid characters', async () => {
+            // Valid characters are A-Z, a-z, 0-9, _, and -
+            failStation.name = 'abcdef012345???';
+            const { statusCode, body } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+                .send(failStation);
+            
+            expect(statusCode).toEqual(401);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        name: 'pattern'
+                    })
+                })
+            );
         });
     });
 
