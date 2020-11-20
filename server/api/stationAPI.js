@@ -46,7 +46,7 @@ const stationAPI = {
                     name,
                     description,
                     rules,
-                    Date.now()
+                    new Date(Date.now())
                 ]
             };
 
