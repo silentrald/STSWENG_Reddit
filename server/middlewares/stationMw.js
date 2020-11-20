@@ -26,10 +26,12 @@ ajv.addSchema({
     type: 'object',
     properties: {
         name: {
-            type: 'string',
-            minLength: 3,
-            maxLength: 64,
-            pattern: '^[A-Za-z0-9_-]+$'
+            allOf: [
+                { pattern: '^[A-Za-z0-9_-]+$' },
+                { maxLength: 64 },
+                { minLength: 3 },
+                { type: 'string' }
+            ]
         },
         description: {
             type: 'string',
