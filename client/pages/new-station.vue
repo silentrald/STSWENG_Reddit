@@ -116,6 +116,8 @@ export default {
         ...station
       }, {
         headers: {
+          // For some reason, axios auth does not automatically put the authorization header
+          // which is required by the endpoint
           Authorization: localStorage.getItem('auth._token.local')
         }
       })
