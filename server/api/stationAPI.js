@@ -75,9 +75,9 @@ const stationAPI = {
                 ]
             };
 
-            const s_result = await client.query(queryInsStation);
+            const { rows } = await client.query(queryInsStation);
             // Get the returned station
-            const station = s_result.rows[0];
+            const station = rows[0];
 
             await client.query({
                 text: `
