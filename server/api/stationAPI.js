@@ -3,21 +3,21 @@ const db = require('../db');
 const stationAPI = {
     // GET
     getStation: async (req, res) => {
-        const { name } = req.params;
+        const { stationName } = req.params;
 
         try {
             const querySelStation = {
-                text: 'SELECT * FROM stations WHERE name = $1',
-                values: [ name ]
+                text: 'SELECT * FROM stations WHERE name = $1 LIMIT 1;',
+                values: [ stationName ]
             };
 
-            const { rows } = await db.query(querySelStation);
-            if (rows && rows[0]) {
-                const station = rows[0];
-                return res.status(200).send({ station });
-            } else {
+            const { rows, rowCount } = await db.query(querySelStation);
+            if (rowCount < 1) {
                 return res.status(404).send();
             }
+            
+            const station = rows[0];
+            return res.status(200).send({ station });
         } catch (err) {
             console.log(err);
 
@@ -25,18 +25,18 @@ const stationAPI = {
         }
     },
 
-    getCaptains: async (req, res) => {
-        const { name } = req.params;
+    getStationCaptains: async (req, res) => {
+        const { stationName } = req.params;
 
         try {
             const querySelStation = {
-                text: 'SELECT * FROM stations WHERE name = $1',
-                values: [ name ]
+                text: 'SELECT * FROM stations WHERE name = $1;',
+                values: [ stationName ]
             };
 
             const querySelCaptains = {
-                text: 'SELECT * FROM captains WHERE station_name = $1',
-                values: [ name ]
+                text: 'SELECT * FROM captains WHERE station_name = $1;',
+                values: [ stationName ]
             };
 
             const { rows } = await db.query(querySelStation);
@@ -64,29 +64,30 @@ const stationAPI = {
             rules
         } = req.body;
 
+        const client = await db.connect();
+
         try {
-            await db.query('BEGIN');
+            await client.query('BEGIN');
 
             // Insert query to users table
             const queryInsStation = {
                 text: `
-                    INSERT INTO stations(name, description, rules, date_created)
-                        VALUES($1, $2, $3, $4)
+                    INSERT INTO stations(name, description, rules)
+                        VALUES($1, $2, $3)
                     RETURNING *;
                 `,
                 values: [
                     name,
                     description,
-                    rules,
-                    new Date(Date.now())
+                    rules
                 ]
             };
 
-            const s_result = await db.query(queryInsStation);
+            const s_result = await client.query(queryInsStation);
             // Get the returned station
             const station = s_result.rows[0];
 
-            await db.query({
+            await client.query({
                 text: `
                     INSERT INTO captains(username, station_name)
                         VALUES($1, $2)
@@ -95,11 +96,11 @@ const stationAPI = {
                 values: [ req.user.username, station.name ]
             });
 
-            await db.query('COMMIT');
+            await client.query('COMMIT');
             return res.status(201).send({ station });
         } catch (err) {
             try {
-                await db.query('ROLLBACK');
+                await client.query('ROLLBACK');
             } catch (rollbackErr) {
                 console.log(rollbackErr);
             }
@@ -112,6 +113,8 @@ const stationAPI = {
             }
 
             return res.status(500).send();
+        } finally {
+            client.release();
         }
     },
 

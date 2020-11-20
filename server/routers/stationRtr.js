@@ -5,11 +5,11 @@ const stationMw = require('../middlewares/stationMw');
 
 // GET
 
-router.get('/id/:name',
+router.get('/id/:stationName',
     api.getStation);
 
-router.get('/captains/:name',
-    api.getCaptains);
+router.get('/captains/:stationName',
+    api.getStationCaptains);
 
 
 // POST
