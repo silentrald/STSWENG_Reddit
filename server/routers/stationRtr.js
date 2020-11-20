@@ -11,6 +11,10 @@ router.get('/id/:stationName',
 router.get('/captains/:stationName',
     api.getStationCaptains);
 
+router.get('/isJoined/:stationName',
+    loginMw.isLogin,
+    api.getIsJoined);
+
 
 // POST
 
@@ -18,6 +22,14 @@ router.post('/new',
     loginMw.isLogin,
     stationMw.validateCreateStation,
     api.postCreateStation);
+
+router.post('/join/:stationName',
+    loginMw.isLogin,
+    api.postJoinStation);
+
+router.post('/leave/:stationName',
+    loginMw.isLogin,
+    api.postLeaveStation);
 
 // PATCH
 
