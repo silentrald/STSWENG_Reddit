@@ -17,25 +17,7 @@ if (process.env.NODE_ENV === 'development') {
     app.use(require('morgan')('dev')); // import morgan
 }
 
-let allowedOrigins = [
-    'http://localhost:3000'
-];
-
-app.use(cors({
-    credentials: true,
-    origin: function(origin, callback) {
-        // Allow requests with no origin
-        // (e.g. mobile apps and curl requests)
-        if (!origin) return callback(null, true);
-
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
-
-        let msg = 'The CORS policy for this site does not allow access from the specified origin.';
-        return callback(new Error(msg), false);
-    }
-}));
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
