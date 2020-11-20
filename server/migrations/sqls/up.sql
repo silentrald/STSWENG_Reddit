@@ -60,7 +60,7 @@ CREATE TABLE stations (
     name            VARCHAR(64)     PRIMARY KEY,
     description     VARCHAR(250),
     rules           VARCHAR(1000),
-    date_created    DATE            NOT NULL,
+    date_created    DATE            DEFAULT now() NOT NULL,
     archived        BOOLEAN         DEFAULT false NOT NULL
 );
 

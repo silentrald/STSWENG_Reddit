@@ -27,8 +27,10 @@ const loginMw = require('./middlewares/loginMw');
 app.use(loginMw.smartLogin);
 
 // API ROUTERS
+const stationRtr = require('./routers/stationRtr');
 const userRtr = require('./routers/userRtr');
 
+app.use('/api/station', stationRtr);
 app.use('/api/user', userRtr);
 
 const server = app.listen(PORT, () => {

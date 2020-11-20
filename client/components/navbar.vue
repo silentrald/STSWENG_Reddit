@@ -28,6 +28,11 @@
               </div>
             </li>
             <li class="nav-item">
+              <nuxt-link id="new-station" class="nav-link" to="/new-station">
+                Create station
+              </nuxt-link>
+            </li>
+            <li class="nav-item">
               <div id="logout" class="nav-link" @click="$auth.logout()">
                 Logout
               </div>
