@@ -43,6 +43,10 @@ ajv.addSchema({
 }, SUBCOMMENT_V_SCHEMA);
 
 const subcommentMw = {
+    /**
+     * Validates the object for subcomment posting.
+     * Properties: parentComment, text, station
+     */
     validateSubcomment: (req, res, next) => {
         // sanitize
         if (typeof(req.body.text) === 'string')

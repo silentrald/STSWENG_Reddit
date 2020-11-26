@@ -6,8 +6,9 @@ const subcommentAPI = {
 
     // POST
     /**
-     * 
-     * 
+     * Create a subcomment on a specific station,
+     * given that the user is a crewmate of the 
+     * station and the comment is within the station.
      */
     postSubcomment: async (req, res) => {
         const { 

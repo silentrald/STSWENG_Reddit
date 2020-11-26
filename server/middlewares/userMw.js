@@ -2,6 +2,7 @@ const Ajv = require('ajv');
 const { ajvErrors } = require('./ajvHelper');
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true });
+require('ajv-keywords')(ajv, [ 'transform' ]);
 
 const USER_S_SCHEMA = 'us';
 const USER_V_SCHEMA = 'uv';
@@ -13,7 +14,7 @@ ajv.addSchema({
             transform: [ 'trim' ]
         },
         email: {
-            transfomr: [ 'trim' ]
+            transform: [ 'trim' ]
         }
     }
 }, USER_S_SCHEMA);
