@@ -23,8 +23,6 @@ const userAPI = {
      * field.
      */
     postRegisterUser: async (req, res) => {
-        console.log(req.body);
-
         // Get values
         const {
             username,

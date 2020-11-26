@@ -28,7 +28,7 @@ jest.mock('../../db', () => {
 
                 if (query.text === 'INSERT INTO comments(comment_id, text, author, station_name) VALUES(comment_id(), $1, $2, $3) RETURNING comment_id;'
                     && query.values[0] && query.values[1]
-                    && query.values[2] && query.values[2] === 'Station Name') {
+                    && query.values[2] && query.values[2] === 'StationName') {
                     result.rows = [{
                         comment_id: 'cdummydummy'
                     }];
@@ -52,19 +52,26 @@ jest.mock('../../db', () => {
             query.text = oneLineQuery(query.text);
 
             if (query.text === 'SELECT * FROM passengers WHERE username=$1 AND station_name=$2 LIMIT 1;'
-                && query.values[0] === 'crewmate' && query.values[1] === 'Station Name') {
+                && query.values[0] === 'crewmate' && query.values[1] === 'StationName') {
                 result.rows = [{
                     username: query.values[0],
                     station_name: query.values[1]
                 }];
                 result.rowCount = 1;
-            } else if (query.text === 'SELECT * FROM comments WHERE comment_id=$1 LIMIT 1;'
-                && query.values[0] === 'caaaaaaaaaa1') {
-                result.rows = [{
-                    comment_id: query.values[0],
-                    station_name: 'Station Name'
-                }];
-                result.rowCount = 1;
+            } else if (query.text === 'SELECT * FROM comments WHERE comment_id=$1 LIMIT 1;' && query.values[0]) {
+                if (query.values[0] === 'caaaaaaaaaa1') {
+                    result.rows = [{
+                        comment_id: query.values[0],
+                        station_name: 'StationName'
+                    }];
+                    result.rowCount = 1;
+                } else if (query.values[0] === 'canotherS') {
+                    result.rows = [{
+                        comment_id: query.values[0],
+                        station_name: 'AnotherStation'
+                    }];
+                    result.rowCount = 1;
+                }
             }
 
             return result;
@@ -85,7 +92,7 @@ const mockResponse = () => {
 };
 
 // DATA
-const station = 'Station Name';
+const station = 'StationName';
 const comments = {
     0: 'caaaaaaaaaa1',
     1: 'caaaaaaaaaa2',
@@ -167,6 +174,53 @@ describe('Unit Test: subcommentAPI', () => {
             expect(query).toHaveBeenCalledWith('COMMIT');
 
             expect(release).toHaveBeenCalledTimes(1);
+        });
+
+        test('User not a passenger of the station', async () => {
+            const req = mockRequest({
+                body: subcomment,
+                user: 'not-user'
+            });
+            const res = mockResponse();
+
+            await postSubcomment(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.send).toHaveBeenCalledWith({
+                error: 'NOT_PSNGR'
+            });
+        });
+
+        test('Parent comment does not exist', async () => {
+            subcomment.parentComment = 'cnotnotnot';
+            const req = mockRequest({
+                body: subcomment,
+                user: crewmateUser
+            });
+            const res = mockResponse();
+
+            await postSubcomment(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.send).toHaveBeenCalledWith({
+                error: 'PRT_CMT_NONE'
+            });
+        });
+
+        test('Parent comment is not in the station', async () => {
+            subcomment.parentComment = 'canotherS';
+            const req = mockRequest({
+                body: subcomment,
+                user: crewmateUser
+            });
+            const res = mockResponse();
+
+            await postSubcomment(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.send).toHaveBeenCalledWith({
+                error: 'INV_PRT_CMT'
+            });
         });
     });
 });

@@ -1,30 +1,38 @@
 const Ajv = require('ajv');
 const { ajvErrors } = require('./ajvHelper');
 
-const SUBCOMMENT_REGEX = /^c[a-zA-Z0-9]{0,11}$/;
-
-
 const ajv = new Ajv({ allErrors: true });
 
 const SUBCOMMENT_V_SCHEMA = 'sv';
+
+// '^[A-Za-z0-9_-]+$'
 
 ajv.addSchema({
     type: 'object',
     properties: {
         parentComment: {
-            type: 'string',
-            minLength: 1,
-            maxLength: 12
+            allOf: [
+                { pattern: '^c[a-zA-Z0-9]{0,11}$' },
+                { maxLength: 12 },
+                { minLength: 1 },
+                { type: 'string'}
+            ]
         },
         text: {
-            type: 'string',
-            minLength: 1,
-            maxLength: 1000
+            allOf: [
+                { maxLength: 1000 },
+                { minLength: 1 },
+                // { transform: [ 'trim' ] },
+                { type: 'string' }
+            ]
         },
         station: {
-            type: 'string',
-            minLength: 1,
-            maxLength: 64
+            allOf: [
+                { pattern: '^[A-Za-z0-9_-]+$' },
+                { maxLength: 64 },
+                { minLength: 1 },
+                { type: 'string'}
+            ]
         }
     },
     required: [
@@ -46,14 +54,6 @@ const subcommentMw = {
         if (!validate) {
             const errors = ajvErrors(ajv);
             return res.status(403).send({ errors });
-        }
-
-        if (!SUBCOMMENT_REGEX.test(req.body.parentComment)) {
-            return res.status(403).send({ 
-                errors: {
-                    parentComment: 'pattern'
-                }
-            });
         }
 
         next();

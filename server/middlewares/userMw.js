@@ -1,12 +1,22 @@
 const Ajv = require('ajv');
 const { ajvErrors } = require('./ajvHelper');
 
-const PASSWORD_REGEX = /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).*$/;
-
-
 const ajv = new Ajv({ allErrors: true, jsonPointers: true });
 
+const USER_S_SCHEMA = 'us';
 const USER_V_SCHEMA = 'uv';
+
+ajv.addSchema({
+    type: 'object',
+    properties: {
+        username: {
+            transform: [ 'trim' ]
+        },
+        email: {
+            transfomr: [ 'trim' ]
+        }
+    }
+}, USER_S_SCHEMA);
 
 ajv.addSchema({
     type: 'object',
@@ -17,9 +27,12 @@ ajv.addSchema({
             maxLength: 64
         },
         password: {
-            type: 'string',
-            minLength: 8,
-            maxLength: 256
+            allOf: [
+                { pattern: '^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).*$' },
+                { maxLength: 256 },
+                { minLength: 8 },
+                { type: 'string' }
+            ]
         },
         email: {
             type: 'string',
@@ -41,11 +54,7 @@ const userMw = {
      */
     validateRegisterUser: (req, res, next) => {
         // sanitize
-        if (typeof(req.body.username) === 'string')
-            req.body.username = req.body.username.trim();
-        
-        if (typeof(req.body.email) === 'string')
-            req.body.email = req.body.email.trim();
+        ajv.validate(USER_S_SCHEMA, req.body);
 
         // validate
         const validate = ajv.validate(USER_V_SCHEMA, req.body);
@@ -53,12 +62,6 @@ const userMw = {
         if (!validate) {
             const errors = ajvErrors(ajv);
             return res.status(401).send({ errors });
-        }
-
-        if (!PASSWORD_REGEX.test(req.body.password)) {
-            return res.status(401).send({
-                errors: { password: 'pattern' }
-            });
         }
 
         next();
