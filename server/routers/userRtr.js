@@ -9,12 +9,12 @@ router.get('/auth', api.getAuth);
 // POST
 
 router.post('/create',
-    loginMw.isNotLogin,
+    loginMw.isNotAuth,
     mw.validateRegisterUser,
     api.postRegisterUser);
 
 router.post('/login',
-    loginMw.isNotLogin,
+    loginMw.isNotAuth,
     loginMw.validateLogin,
     api.postLogin);
 

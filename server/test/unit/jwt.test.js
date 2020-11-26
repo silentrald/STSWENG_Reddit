@@ -2,7 +2,7 @@ require('dotenv').config();
 const {
     signPromise,
     verifyPromise
-} = require('../modules/jwt');
+} = require('../../modules/jwt');
 
 const dummy = {
     username: 'test',

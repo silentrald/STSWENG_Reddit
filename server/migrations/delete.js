@@ -1,3 +1,7 @@
+/**
+ * Deletes every row in the entire database
+ */
+
 if (!process.env.CI) {
     require('dotenv').config();
 }

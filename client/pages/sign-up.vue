@@ -34,7 +34,7 @@
           >
         </div>
         <div class="form-group">
-          <div class="error">
+          <div v-if="errors.password" class="error">
             {{ errors.password }}
           </div>
           <input
