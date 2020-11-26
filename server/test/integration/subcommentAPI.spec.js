@@ -7,7 +7,7 @@ const db = require('../../db');
 const url = '/api/subcomment';
 
 // DATA
-const station = 'Sample Station';
+const station = 'SampleStation';
 // const station2 = 'Sample Station2';
 const comments = {
     0: 'caaaaaaaaaa1',

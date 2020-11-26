@@ -5,9 +5,9 @@
   "main": "app.js",
   "scripts": {
     "dev": "npx nodemon app --exec \"npm run lint && node\"",
-    "devtest": "npx nodemon app --exec \"npm run lint && jest --color --silent && node\"",
-    "devtemp": "npx nodemon app --exec \"npm run lint && jest --color test/unit/subcomment && node\"",
-    "devstemp": "npx nodemon app --exec \"npm run lint && jest --color --silent test/unit/subcomment && node\"",
+    "devtest": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent && node\"",
+    "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color test/integration/subcomment && node\"",
+    "devstemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/subcomment && node\"",
     "build": "npm run lint && npm run test && node app",
     "lint": "eslint .",
     "test": "jest --runInBand --color --coverage",

@@ -1,8 +1,8 @@
 require('dotenv').config();
 const request = require('supertest');
-const server = require('../app');
+const server = require('../../app');
 
-const db = require('../db');
+const db = require('../../db');
 
 const userUrl = '/api/user';
 const url = '/api/station';
@@ -28,7 +28,14 @@ let failStation;
 let token;
 
 beforeAll(async () => {
-    const { body } = await request(server).post(`${userUrl}/create`).send(tmpUser);
+    await request(server)
+        .post(`${userUrl}/create`)
+        .send(tmpUser);
+    
+    const { body } = await request(server)
+        .post(`${userUrl}/login`)
+        .set(tmpUser);
+        
     token = body.token;
 });
 

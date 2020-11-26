@@ -15,7 +15,7 @@ router.get('/captains/:stationName',
 // POST
 
 router.post('/new',
-    loginMw.isLogin,
+    loginMw.isAuth,
     stationMw.validateCreateStation,
     api.postCreateStation);
 

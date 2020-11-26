@@ -9,31 +9,31 @@ INSERT INTO users(username, password, email) VALUES
 
 /* stations */
 INSERT INTO stations(name, description, rules) VALUES
-    ('Sample Station', 'This is a test station', '1. Do not delete this'),
-    ('Sample Station 2', 'This is another test station', '1. Do not delete this');
+    ('SampleStation', 'This is a test station', '1. Do not delete this'),
+    ('SampleStation2', 'This is another test station', '1. Do not delete this');
 
 /* captains */
 INSERT INTO captains(username, station_name) VALUES
-    ('captain1', 'Sample Station'),
-    ('captain2', 'Sample Station 2');
+    ('captain1', 'SampleStation'),
+    ('captain2', 'SampleStation2');
 
 /* crewmates */
 INSERT INTO crewmates(username, station_name) VALUES
-    ('crewmate', 'Sample Station');
+    ('crewmate', 'SampleStation');
 
 /* posts */
 INSERT INTO posts(post_id, text, author, station_name) VALUES
-    ('paaaaaaaaaa1', 'Sample Post by captain', 'captain1', 'Sample Station'),
-    ('paaaaaaaaaa2', 'Sample Post by crewmate', 'crewmate', 'Sample Station'),
-    ('paaaaaaaaaa3', 'Sample Post by crewmate', 'captain2', 'Sample Station 2');
+    ('paaaaaaaaaa1', 'Sample Post by captain', 'captain1', 'SampleStation'),
+    ('paaaaaaaaaa2', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaaa3', 'Sample Post by crewmate', 'captain2', 'SampleStation2');
 
 /* comments */
 /* subposts */
 INSERT INTO comments(comment_id, text, author, station_name) VALUES
-    ('caaaaaaaaaa1', 'First comment by crewmate to captain', 'crewmate', 'Sample Station'),
-    ('caaaaaaaaaa2', 'Commented to my post', 'crewmate', 'Sample Station'),
-    ('caaaaaaaaaa3', '2nd comment by me as well', 'captain1', 'Sample Station'),
-    ('caaaaaaaaaa4', 'Comment', 'captain2', 'Sample Station 2');
+    ('caaaaaaaaaa1', 'First comment by crewmate to captain', 'crewmate', 'SampleStation'),
+    ('caaaaaaaaaa2', 'Commented to my post', 'crewmate', 'SampleStation'),
+    ('caaaaaaaaaa3', '2nd comment by me as well', 'captain1', 'SampleStation'),
+    ('caaaaaaaaaa4', 'Comment', 'captain2', 'SampleStation2');
 
 INSERT INTO subposts(parent_post, comment_id) VALUES
     ('paaaaaaaaaa1', 'caaaaaaaaaa1'),
