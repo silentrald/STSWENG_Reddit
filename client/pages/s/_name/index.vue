@@ -29,6 +29,14 @@
                 <div id="image-container">
                   <img id="image" src="https://picsum.photos/80/80" width="80" height="80">
                 </div>
+                <div id="join-leave">
+                  <button id="join-button" @click="join()">
+                    JOIN
+                  </button>
+                  <button id="leave-button" @click="leave()">
+                    LEAVE
+                  </button>
+                </div>
                 <h3>s/{{ name }}</h3>
                 <p>{{ description }}</p>
               </div>
