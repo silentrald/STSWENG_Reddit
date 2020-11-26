@@ -28,9 +28,11 @@ app.use(loginMw.smartLogin);
 
 // API ROUTERS
 const subcommentRtr = require('./routers/subcommentRtr');
+const stationRtr = require('./routers/stationRtr');
 const userRtr = require('./routers/userRtr');
 
 app.use('/api/subcomment', subcommentRtr);
+app.use('/api/station', stationRtr);
 app.use('/api/user', userRtr);
 
 const server = app.listen(PORT, () => {
