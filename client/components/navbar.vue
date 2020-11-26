@@ -28,7 +28,7 @@
               </div>
             </li>
             <li class="nav-item">
-              <nuxt-link id="new-station" class="nav-link" to="/new-station">
+              <nuxt-link id="create-station" class="nav-link" to="/create-station">
                 Create station
               </nuxt-link>
             </li>
