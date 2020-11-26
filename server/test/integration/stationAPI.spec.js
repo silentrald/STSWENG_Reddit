@@ -1,8 +1,8 @@
 require('dotenv').config();
 const request = require('supertest');
-const server = require('../app');
+const server = require('../../app');
 
-const db = require('../db');
+const db = require('../../db');
 
 const userUrl = '/api/user';
 const url = '/api/station';
@@ -28,7 +28,17 @@ let failStation;
 let token;
 
 beforeAll(async () => {
-    const { body } = await request(server).post(`${userUrl}/create`).send(tmpUser);
+    await request(server)
+        .post(`${userUrl}/create`)
+        .send(tmpUser);
+    
+    const { body } = await request(server)
+        .post(`${userUrl}/login`)
+        .send({
+            username: tmpUser.username,
+            password: tmpUser.password
+        });
+
     token = body.token;
 });
 
@@ -67,7 +77,7 @@ describe('Station API', () => {
             const { statusCode } = await request(server).post(`${url}/new`)
                 .send(station);
             
-            expect(statusCode).toEqual(302);
+            expect(statusCode).toEqual(403);
         });
 
         test('ERROR: station already exists', async () => {
