@@ -5,6 +5,10 @@ const subcommentAPI = {
     // GET
 
     // POST
+    /**
+     * 
+     * 
+     */
     postSubcomment: async (req, res) => {
         const { 
             parentComment, 

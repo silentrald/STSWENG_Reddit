@@ -34,8 +34,11 @@ beforeAll(async () => {
     
     const { body } = await request(server)
         .post(`${userUrl}/login`)
-        .set(tmpUser);
-        
+        .send({
+            username: tmpUser.username,
+            password: tmpUser.password
+        });
+
     token = body.token;
 });
 
@@ -74,7 +77,7 @@ describe('Station API', () => {
             const { statusCode } = await request(server).post(`${url}/new`)
                 .send(station);
             
-            expect(statusCode).toEqual(302);
+            expect(statusCode).toEqual(403);
         });
 
         test('ERROR: station already exists', async () => {
