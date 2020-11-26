@@ -56,7 +56,6 @@
 
 <script>
 import Ajv from 'ajv'
-import axios from 'axios'
 
 import ajvErrors from '@/helpers/ajvErrors'
 import customErrors from '@/helpers/customErrors'
@@ -153,14 +152,8 @@ export default {
       // Get values from form
       const station = this.station
 
-      axios.post('http://localhost:5000/api/station/new', {
+      this.$axios.post('http://localhost:5000/api/station/new', {
         ...station
-      }, {
-        headers: {
-          // For some reason, axios auth does not automatically put the authorization header
-          // which is required by the endpoint
-          Authorization: localStorage.getItem('auth._token.local')
-        }
       })
         .then((res) => {
           if (res.status !== 201) {
