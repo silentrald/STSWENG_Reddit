@@ -11,14 +11,10 @@ router.get('/id/:stationName',
 router.get('/captains/:stationName',
     api.getStationCaptains);
 
-router.get('/isJoined/:stationName',
-    loginMw.isLogin,
-    api.getIsJoined);
-
 
 // POST
 
-router.post('/new',
+router.post('/create',
     loginMw.isLogin,
     stationMw.validateCreateStation,
     api.postCreateStation);
