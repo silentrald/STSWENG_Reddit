@@ -6,6 +6,8 @@ const stationAPI = {
         const { stationName } = req.params;
 
         try {
+            let result = {};
+
             const querySelStation = {
                 text: 'SELECT * FROM stations WHERE name = $1 LIMIT 1;',
                 values: [ stationName ]
@@ -15,9 +17,23 @@ const stationAPI = {
             if (rowCount < 1) {
                 return res.status(404).send();
             }
+
+            result.station = rows[0];
+
+            // Optionally, if the user is logged in, another property, joined,
+            // is added to indicate whether the user is joined or not.
+            if (req.user) {
+                // TODO: this would better be just a COUNT() query
+                const querySelPassengers = {
+                    text: 'SELECT * FROM passengers WHERE username = $1 AND station_name = $2 LIMIT 1;',
+                    values: [ req.user.username, stationName ]
+                };
+
+                const { rowCount } = await db.query(querySelPassengers);
+                result.joined = rowCount > 0;
+            }
             
-            const station = rows[0];
-            return res.status(200).send({ station });
+            return res.status(200).send(result);
         } catch (err) {
             console.log(err);
 
@@ -40,35 +56,6 @@ const stationAPI = {
             }
 
             return res.status(404).send();
-        } catch (err) {
-            console.log(err);
-
-            return res.status(500).send();
-        }
-    },
-
-    getIsJoined: async (req, res) => {
-        const { stationName } = req.params;
-
-        try {
-            // Ensure the station exists, otherwise return 404.
-            const querySelStations = {
-                text: 'SELECT * FROM stations WHERE name = $1 LIMIT 1;',
-                values: [ stationName ]
-            };
-
-            const sResult = await db.query(querySelStations);
-            if (sResult.rowCount < 1) {
-                return res.status(404).send();
-            }
-
-            const querySelPassengers = {
-                text: 'SELECT * FROM passengers WHERE username = $1 AND station_name = $2 LIMIT 1;',
-                values: [ req.user.username, stationName ]
-            };
-
-            const pResult = await db.query(querySelPassengers);
-            return res.status(200).send({ joined: pResult.rowCount > 0 });
         } catch (err) {
             console.log(err);
 
