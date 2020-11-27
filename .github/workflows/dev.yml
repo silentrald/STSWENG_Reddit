@@ -48,7 +48,7 @@ jobs:
         working-directory: ./client
 
       - name: Run tests 🧪
-        run: yarn test
+        run: yarn test-spec
         working-directory: ./client
 
   express_server:

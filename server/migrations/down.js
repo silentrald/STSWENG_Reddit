@@ -1,3 +1,7 @@
+/**
+ * Drops all the table in the database
+ */
+
 if (!process.env.CI) {
     require('dotenv').config();
 }

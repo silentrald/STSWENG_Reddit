@@ -5,11 +5,13 @@
   "main": "app.js",
   "scripts": {
     "dev": "npx nodemon app --exec \"npm run lint && node\"",
-    "devtest": "npx nodemon app --exec \"npm run lint && jest --color --silent && node\"",
+    "devtest": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent && node\"",
     "build": "npm run lint && npm run test && node app",
     "lint": "eslint .",
-    "test": "jest --color --coverage",
-    "stest": "jest --color --coverage --silent",
+    "test": "jest --runInBand --color --coverage",
+    "stest": "jest --runInBand --color --coverage --silent",
+    "test-unit": "jest --color --coverage --silent --testPathPattern=test/unit",
+    "test-int": "jest --runInBand --color --coverage --silent --testPathPattern=test/integration",
     "migrate-up": "node migrations/up",
     "migrate-down": "node migrations/down",
     "db-delete": "node migrations/delete"

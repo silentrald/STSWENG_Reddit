@@ -1,8 +1,8 @@
 require('dotenv').config();
 const request = require('supertest');
-const server = require('../app');
+const server = require('../../app');
 
-const db = require('../db');
+const db = require('../../db');
 
 const url = '/api/user';
 const JWT_REGEX = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
@@ -36,14 +36,26 @@ describe('User API', () => {
             };
         });
 
-        test('GOOD: Register', async () => {
-            const { 
-                statusCode,
-                body
-            } = await request(server).post(`${url}/create`)
+        test('GOOD: Register & Login', async () => {
+            let statusCode, body;
+            const res1 = await request(server).post(`${url}/create`)
                 .send(user);
 
+            statusCode = res1.statusCode;
+
             expect(statusCode).toEqual(201);
+
+            let loginUser = {};
+            loginUser.username = user.username;
+            loginUser.password = user.password;
+
+            const res2 = await request(server).post(`${url}/login`)
+                .send(loginUser);
+
+            statusCode = res2.statusCode;
+            body = res2.body;
+
+            expect(statusCode).toEqual(200);
             expect(body).toEqual(
                 expect.objectContaining({
                     token: expect.stringMatching(JWT_REGEX)
@@ -59,18 +71,12 @@ describe('User API', () => {
             loginUser.password = user.password;
 
             const {
-                statusCode,
-                body
+                statusCode
             } = await request(server).post(`${url}/create`)
                 .send(loginUser)
                 .set('Authorization', `Bearer ${token}`);
             
-            expect(statusCode).toEqual(302);
-            expect(body).toEqual(
-                expect.objectContaining({
-                    route: '/'
-                })
-            );
+            expect(statusCode).toEqual(403);
         });
         
         describe('ERROR: username field', () => {
@@ -88,6 +94,25 @@ describe('User API', () => {
                     expect.objectContaining({
                         errors: expect.objectContaining({
                             username: 'used'
+                        })
+                    })
+                );
+            });
+
+            test('Username wrong type', async () => {
+                failUser.username = 1;
+                
+                const { 
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: expect.objectContaining({
+                            username: 'type'
                         })
                     })
                 );
@@ -171,6 +196,25 @@ describe('User API', () => {
         });
         
         describe('ERROR: password field', () => {
+            test('Register with wrong password type', async () => {
+                failUser.password = 1;
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: expect.objectContaining({
+                            password: 'type'
+                        })
+                    })
+                );
+            });
+
             test('Register with short password', async () => {
                 failUser.password = 'Sh0r+';
 
@@ -327,6 +371,25 @@ describe('User API', () => {
         });
 
         describe('ERROR: email field', () => {
+            test('Register with wrong email type', async () => {
+                failUser.email = 0;
+
+                const { 
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/create`)
+                    .send(failUser);
+    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: expect.objectContaining({
+                            email: 'type'
+                        })
+                    })
+                );
+            });
+
             test('Register with an existing email', async () => {
                 failUser.email = user.email;
 
@@ -795,18 +858,12 @@ describe('User API', () => {
 
         test('There is already a user login', async () => {
             const {
-                statusCode,
-                body
+                statusCode
             } = await request(server).post(`${url}/login`)
                 .send(loginUser)
                 .set('Authorization', `Bearer ${token}`);
             
-            expect(statusCode).toEqual(302);
-            expect(body).toEqual(
-                expect.objectContaining({
-                    route: '/'
-                })
-            );
+            expect(statusCode).toEqual(403);
         });
 
         test('GOOD: Username exist with whitespace', async () => {
@@ -943,11 +1000,6 @@ describe('User API', () => {
                     user: expect.objectContaining({
                         username: user.username,
                         email: user.email,
-                        // fname: expect.any(String),
-                        // lname: expect.any(String),
-                        // gender: expect.any(String),
-                        // birthday: expect.any(String),
-                        // bio: expect.any(String),
                         fame: expect.any(Number),
                         iat: expect.any(Number)
                     })
