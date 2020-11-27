@@ -177,6 +177,19 @@ const stationAPI = {
         const { stationName } = req.params;
 
         try {
+            // Check if the user is a captain; this query is necessary for proper error information.
+            const querySelCaptains = {
+                text: 'SELECT * FROM captains WHERE username = $1 AND station_name = $2 LIMIT 1;',
+                values: [ req.user.username, stationName ]
+            };
+
+            const selResult = await db.query(querySelCaptains);
+            if (selResult.rowCount > 0) {
+                return res.status(403).send({
+                    errors: { station: 'isCaptain' }
+                });
+            }
+
             const queryDelCrewmates = {
                 text: 'DELETE FROM crewmates WHERE username = $1 AND station_name = $2;',
                 values: [ req.user.username, stationName ]
@@ -184,10 +197,14 @@ const stationAPI = {
 
             // Test that captains cannot leave the station without first being demoted to crewmate.
 
-            // The endpoint always returns 200 even when the user isn't joined in a station
-            // prior to "leaving".
             // This endpoint allows users to leave a station that is already archived.
-            await db.query(queryDelCrewmates);
+            const delResult = await db.query(queryDelCrewmates);
+            if (delResult.rowCount < 1) {
+                return res.status(403).send({
+                    errors: { station: 'notJoined' }
+                });
+            }
+
             return res.status(200).send();
         } catch (err) {
             console.log(err);
