@@ -108,7 +108,7 @@ export default {
           }
         })
 
-      this.$axios.get(`/api/station/captains/${this.name}`)
+      this.$axios.get(`/api/station/captains/${name}`)
         .then((res) => {
           const { captains } = res.data
           this.$set(this, 'captains', captains)
