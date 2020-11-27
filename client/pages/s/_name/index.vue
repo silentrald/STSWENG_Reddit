@@ -29,12 +29,12 @@
                 <div id="image-container">
                   <img id="image" src="https://picsum.photos/80/80" width="80" height="80">
                 </div>
-                <div id="join-leave">
-                  <button id="join-button" @click="join()">
-                    JOIN
-                  </button>
-                  <button id="leave-button" @click="leave()">
+                <div id="join-leave" class="mt-2 mb-1 w-50 mx-auto">
+                  <button v-if="joined" id="leave-button" @click="leave()">
                     LEAVE
+                  </button>
+                  <button v-else id="join-button" @click="join()">
+                    JOIN
                   </button>
                 </div>
                 <h3>s/{{ name }}</h3>
@@ -75,6 +75,7 @@ export default {
     return {
       is404: false,
       hasStation: false,
+      joined: false,
       name: '',
       description: '',
       rules: '',
@@ -91,11 +92,12 @@ export default {
       const name = this.$route.params.name
       this.$axios.get(`/api/station/id/${name}`)
         .then((res) => {
-          const { station } = res.data
+          const { station, joined } = res.data
           this.$set(this, 'hasStation', true)
           this.$set(this, 'name', station.name)
           this.$set(this, 'description', station.description)
           this.$set(this, 'rules', station.rules)
+          if (joined) { this.$set(this, 'joined', joined) }
         })
         .catch((err) => {
           const { status } = err.response
@@ -106,10 +108,40 @@ export default {
           }
         })
 
-      this.$axios.get(`/api/station/captains/${name}`)
+      this.$axios.get(`/api/station/captains/${this.name}`)
         .then((res) => {
           const { captains } = res.data
           this.$set(this, 'captains', captains)
+        })
+        .catch((err) => {
+          const { status } = err.response
+
+          if (status === 404) {
+            // this.errors = customErrors(data.errors, customErrorMsg)
+          }
+        })
+    },
+
+    join () {
+      this.$axios.post(`/api/station/join/${this.name}`)
+        .then(() => {
+          // When the user successfully joins, it sends 200 (or 204?) to indicate success
+          this.$set(this, 'joined', true)
+        })
+        .catch((err) => {
+          const { status } = err.response
+
+          if (status === 404) {
+            // this.errors = customErrors(data.errors, customErrorMsg)
+          }
+        })
+    },
+
+    leave () {
+      this.$axios.post(`/api/station/leave/${this.name}`)
+        .then(() => {
+          // When the user successfully leaves, it sends 200 (or 204?) to indicate success
+          this.$set(this, 'joined', false)
         })
         .catch((err) => {
           const { status } = err.response
