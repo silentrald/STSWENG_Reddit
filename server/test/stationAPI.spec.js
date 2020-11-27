@@ -24,12 +24,25 @@ let tmpUser = {
     bio: 'I like testing stuff'
 };
 
+let tmpUser2 = {
+    username: 'temp-user-2',
+    password: 'Hello-p4ssword',
+    email: 'temp2@gmail.com',
+    fname: 'Temporary Jr.',
+    lname: 'User',
+    gender: 'm',
+    birthday: '2001-01-01',
+    bio: 'I like testing stuff just like my parent'
+};
+
 let failStation;
-let token;
+let token, token2;
 
 beforeAll(async () => {
-    const { body } = await request(server).post(`${userUrl}/create`).send(tmpUser);
-    token = body.token;
+    const res1 = await request(server).post(`${userUrl}/create`).send(tmpUser);
+    token = res1.body.token;
+    const res2 = await request(server).post(`${userUrl}/create`).send(tmpUser2);
+    token2 = res2.body.token;
 });
 
 describe('Station API', () => {
@@ -223,11 +236,90 @@ describe('Station API', () => {
             expect(statusCode).toEqual(404);
         });
     });
+
+    describe(`POST ${url}/join/:name`, () => {
+        test('GOOD: user previously not joined', async () => {
+            const { statusCode } = await request(server).post(`${url}/join/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        test('ERROR: user already joined', async () => {
+            const { statusCode, body } = await request(server).post(`${url}/join/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        station: 'joined'
+                    })
+                })
+            );
+        });
+
+        test('ERROR: user joins nonexistent station', async () => {
+            const { statusCode } = await request(server).post(`${url}/join/${failStation.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+            
+            expect(statusCode).toEqual(404);
+        });
+    });
+
+    describe(`POST ${url}/leave/:name`, () => {
+        test('GOOD: user joined previously before leaving', async () => {
+            const { statusCode } = await request(server).post(`${url}/leave/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        test('ERROR: user not joined', async () => {
+            const { statusCode, body } = await request(server).post(`${url}/leave/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        station: 'notJoined'
+                    })
+                })
+            );
+        });
+
+        test('ERROR: user is a captain and cannot leave', async () => {
+            const { statusCode, body } = await request(server).post(`${url}/leave/${station.name}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send();
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        station: 'isCaptain'
+                    })
+                })
+            );
+        });
+    });
 });
 
 afterAll(async () => {
+    await server.close();
+
     await db.query({ 
-        text: 'DELETE FROM captains WHERE username=$1',
+        text: 'DELETE FROM passengers WHERE username=$1',
+        values: [ tmpUser2.username ]
+    });
+    await db.query({ 
+        text: 'DELETE FROM passengers WHERE username=$1',
         values: [ tmpUser.username ]
     });
     await db.query({ 
@@ -236,9 +328,11 @@ afterAll(async () => {
     });
     await db.query({ 
         text: 'DELETE FROM users WHERE username=$1',
+        values: [ tmpUser2.username ]
+    });
+    await db.query({ 
+        text: 'DELETE FROM users WHERE username=$1',
         values: [ tmpUser.username ]
     });
     await db.end();
-
-    await server.close();
 });
