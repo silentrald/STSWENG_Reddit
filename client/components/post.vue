@@ -2,26 +2,40 @@
   <div class="post">
     <div class="post-votes">
       <div class="post-upvote">
-        <img src="/images/thumb-up.png" width="24" height="24">
+        <img
+          src="/images/thumb-up.png"
+          width="24"
+          height="24"
+          :style="{
+            // TODO: change this
+            backgroundColor: vote === 1 ? 'green' : 'none'
+          }"
+        >
       </div>
       <div class="post-score">
-        999
+        {{ score }}
       </div>
       <div class="post-downvote">
-        <img src="/images/thumb-down.png" width="24" height="24">
+        <img
+          src="/images/thumb-down.png"
+          width="24"
+          height="24"
+          :style="{
+            // TODO: change this
+            backgroundColor: vote === -1 ? 'red' : 'none'
+          }"
+        >
       </div>
     </div>
     <div class="post-text">
       <div class="post-info">
-        Posted by u/someone on November 18, 2020
+        Posted by /u/{{ author }} on {{ date }}
       </div>
       <div class="post-title">
-        This is the post title
+        {{ title }}
       </div>
       <div class="post-preview">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum nam quibusdam impedit.
-        Accusamus, eum maxime fugit ullam, iure impedit voluptatem ipsum laboriosam delectus tempora
-        blanditiis exercitationem perferendis doloribus obcaecati dicta?
+        <slot />
       </div>
     </div>
   </div>
@@ -29,7 +43,28 @@
 
 <script>
 export default {
-
+  props: {
+    score: {
+      type: Number,
+      default: 0
+    },
+    vote: {
+      type: Number,
+      default: 0 // 0 not voted, 1 is up, -1 is down
+    },
+    author: {
+      type: String,
+      default: 'anonymous'
+    },
+    date: {
+      type: String,
+      default: 'no date'
+    },
+    title: {
+      type: String,
+      default: ''
+    }
+  }
 }
 </script>
 

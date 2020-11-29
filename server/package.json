@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "npx nodemon app --exec \"npm run lint && node\"",
     "devtest": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent && node\"",
-    "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color test/integration/subcomment && node\"",
-    "devstemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/subcomment && node\"",
+    "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color test/integration/post && node\"",
+    "devstemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/post && node\"",
     "build": "npm run lint && npm run test && node app",
     "lint": "eslint .",
     "test": "jest --runInBand --color --coverage",
@@ -37,6 +37,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "lru-cache": "^6.0.0",
     "pg": "^8.4.2"
   },
   "devDependencies": {

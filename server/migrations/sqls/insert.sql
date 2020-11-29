@@ -22,10 +22,22 @@ INSERT INTO crewmates(username, station_name) VALUES
     ('crewmate', 'SampleStation');
 
 /* posts */
-INSERT INTO posts(post_id, text, author, station_name) VALUES
-    ('paaaaaaaaaa1', 'Sample Post by captain', 'captain1', 'SampleStation'),
-    ('paaaaaaaaaa2', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
-    ('paaaaaaaaaa3', 'Sample Post by crewmate', 'captain2', 'SampleStation2');
+INSERT INTO posts(post_id, title, text, author, station_name) VALUES
+    ('paaaaaaaaaa1', 'Sample Title 1', 'Sample Post by captain', 'captain1', 'SampleStation'),
+    ('paaaaaaaaaa2', 'Sample Title 2', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaaa3', 'Sample Title 3', 'Sample Post by crewmate', 'captain2', 'SampleStation2'),
+    ('paaaaaaaaaa4', 'Sample Title 4', 'Sample Post by captain', 'captain1', 'SampleStation'),
+    ('paaaaaaaaaa5', 'Sample Title 5', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaaa6', 'Sample Title 6', 'Sample Post by captain', 'captain1', 'SampleStation'),
+    ('paaaaaaaaaa7', 'Sample Title 7', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaaa8', 'Sample Title 8', 'Sample Post by captain', 'captain1', 'SampleStation'),
+    ('paaaaaaaaaa9', 'Sample Title 9', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaa10', 'Sample Title 10', 'Sample Post by captain', 'captain1', 'SampleStation'),
+    ('paaaaaaaaa11', 'Sample Title 11', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaa12', 'Sample Title 12', 'Sample Post by captain', 'captain1', 'SampleStation'),
+    ('paaaaaaaaa13', 'Sample Title 13', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaa14', 'Sample Title 14', 'Sample Post by captain', 'captain1', 'SampleStation'),
+    ('paaaaaaaaa15', 'Sample Title 15', 'Sample Post by crewmate', 'crewmate', 'SampleStation');
 
 /* comments */
 /* subposts */
@@ -40,3 +52,10 @@ INSERT INTO subposts(parent_post, comment_id) VALUES
     ('paaaaaaaaaa2', 'caaaaaaaaaa2'),
     ('paaaaaaaaaa1', 'caaaaaaaaaa3'),
     ('paaaaaaaaaa3', 'caaaaaaaaaa4');
+
+/* post_votes */
+INSERT INTO post_votes(username, post_id, upvote) VALUES
+    ('crewmate', 'paaaaaaaaaa1', true),
+    ('captain1', 'paaaaaaaaaa1', true),
+    ('username', 'paaaaaaaaaa1', false),
+    ('crewmate', 'paaaaaaaaaa2', false);

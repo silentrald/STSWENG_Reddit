@@ -48,10 +48,36 @@
               </div>
             </div>
           </div>
-          <div id="posts" class="col-md-9 order-md-1">
-            <post />
-            <post />
-            <post />
+          <div v-if="posts.length > 0" id="posts" class="col-md-9 order-md-1">
+            <post
+              v-for="post in posts"
+              :key="post.id"
+              :score="post.score"
+              :author="post.author"
+              :date="post.timestamp_created"
+              :title="post.title"
+            >
+              {{ post.scope }}
+              {{ post.text }}
+            </post>
+            <infinite-loading
+              spinner="waveDots"
+              @infinite="infiniteScroll"
+            >
+              <div slot="no-more">
+                <!-- TODO: Add the rocket logo -->
+                End of the Station
+              </div>
+              <div slot="no-results">
+                No results message
+              </div>
+              <div slot="error" slot-scope="{ trigger }">
+                Error message, click <a href="javascript:;" @click="trigger">here</a> to retry
+              </div>
+            </infinite-loading>
+          </div>
+          <div v-else id="posts" class="col-md-9 order-md-1">
+            No posts in this station yet.
           </div>
         </div>
       </div>
@@ -60,9 +86,7 @@
 </template>
 
 <script>
-import post from '../../../components/post.vue'
 export default {
-  components: { post },
   data () {
     return {
       is404: false,
@@ -70,7 +94,8 @@ export default {
       name: '',
       description: '',
       rules: '',
-      captains: []
+      captains: [],
+      posts: []
     }
   },
 
@@ -79,37 +104,66 @@ export default {
   },
 
   methods: {
-    loadStation () {
-      const name = this.$route.params.name
-      this.$axios.get(`/api/station/id/${name}`)
-        .then((res) => {
-          const { station } = res.data
-          this.$set(this, 'hasStation', true)
-          this.$set(this, 'name', station.name)
-          this.$set(this, 'description', station.description)
-          this.$set(this, 'rules', station.rules)
-        })
-        .catch((err) => {
-          const { status } = err.response
+    // Start to load station
+    async loadStation () {
+      const { name } = this.$route.params
+      let res
+      try {
+        // Get all captains
+        res = await this.$axios.get(`/api/station/captains/${name}`)
+        const { captains } = res.data
+        this.$set(this, 'captains', captains)
 
-          if (status === 404) {
-            this.$set(this, 'is404', true)
-            // this.errors = customErrors(data.errors, customErrorMsg)
+        // Get the current station
+        res = await this.$axios.get(`/api/station/id/${name}`)
+        const { station } = res.data
+        this.$set(this, 'hasStation', true)
+        this.$set(this, 'name', station.name)
+        this.$set(this, 'description', station.description)
+        this.$set(this, 'rules', station.rules)
+
+        // Get all the current post in the stations
+        res = await this.$axios.get(`/api/post/station/${name}`)
+        const { posts } = res.data
+
+        this.$set(this, 'posts', posts)
+        await this.getVotes()
+      } catch (err) {
+        const { status } = err.response
+
+        if (status === 404) {
+          this.$set(this, 'is404', true)
+          // this.errors = customErrors(data.errors, customErrorMsg)
+        }
+      }
+    },
+
+    async getVotes () {
+      const posts = this.posts
+      for (const index in posts) {
+        const { data } = await this.$axios.get(`/api/post-vote/score/${posts[index].post_id}`)
+        this.$set(this.posts[index], 'score', data.score)
+      }
+    },
+
+    infiniteScroll ($state) {
+      setTimeout(async () => {
+        let res = await this.$axios.get(`/api/post/station/${this.name}`, {
+          params: {
+            offset: this.posts.length
           }
         })
-
-      this.$axios.get(`/api/station/captains/${name}`)
-        .then((res) => {
-          const { captains } = res.data
-          this.$set(this, 'captains', captains)
-        })
-        .catch((err) => {
-          const { status } = err.response
-
-          if (status === 404) {
-            // this.errors = customErrors(data.errors, customErrorMsg)
+        const { posts } = res.data
+        if (posts.length > 0) {
+          for (const index in posts) {
+            res = await this.$axios.get(`/api/post-vote/score/${posts[index].post_id}`)
+            this.posts.push(posts[index])
           }
-        })
+          $state.loaded()
+        } else {
+          $state.complete()
+        }
+      }, 500)
     }
   }
 }

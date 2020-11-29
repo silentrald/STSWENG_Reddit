@@ -84,6 +84,7 @@ BEGIN
 END $$;
 CREATE TABLE posts (
     post_id                     VARCHAR(12)     PRIMARY KEY,
+    title                       VARCHAR(64),
     text                        VARCHAR(1000),
     author                      VARCHAR(64),
     FOREIGN KEY(author)         REFERENCES      users(username),
