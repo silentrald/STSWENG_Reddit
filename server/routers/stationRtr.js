@@ -15,16 +15,16 @@ router.get('/captains/:stationName',
 // POST
 
 router.post('/create',
-    loginMw.isLogin,
+    loginMw.isAuth,
     stationMw.validateCreateStation,
     api.postCreateStation);
 
 router.post('/join/:stationName',
-    loginMw.isLogin,
+    loginMw.isAuth,
     api.postJoinStation);
 
 router.post('/leave/:stationName',
-    loginMw.isLogin,
+    loginMw.isAuth,
     api.postLeaveStation);
 
 // PATCH
