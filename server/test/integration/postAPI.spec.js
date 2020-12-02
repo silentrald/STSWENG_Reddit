@@ -25,24 +25,27 @@ const station = 'SampleStation';
 //     username: 'captain2',
 //     password: 'password'
 // };
-// const crewmateUser = {
-//     username: 'crewmate',
-//     password: 'password'
-// };
+const crewmateUser = {
+    username: 'crewmate',
+    password: 'password'
+};
 // const imposterUser = {
 //     username: 'imposter',
 //     password: 'password'
 // };
-// let captainToken, crewmateToken, imposterToken;
+let crewmateToken;
+let startingPost;
+let failStation;
 
-// let commentsDelete = [];
+const POST_REGEX = /^p[A-Za-z0-9]{0,11}$/;
+const LIMIT = 10;
 
 beforeAll(async () => {
-    // let res = await request(server)
-    //     .post('/api/user/login')
-    //     .send(crewmateUser);
+    let res = await request(server)
+        .post('/api/user/login')
+        .send(crewmateUser);
     
-    // crewmateToken = res.body.token;
+    crewmateToken = res.body.token;
 
     // res = await request(server)
     //     .post('/api/user/login')
@@ -75,7 +78,7 @@ describe('Station API', () => {
             expect(body.posts).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
-                        post_id: expect.any(String), // regex this
+                        post_id: expect.stringMatching(POST_REGEX),
                         title: expect.any(String),
                         text: expect.any(String),
                         author: expect.any(String),
@@ -84,6 +87,359 @@ describe('Station API', () => {
                     })
                 ])
             );
+            expect(body.posts.length).toEqual(LIMIT);
+
+            startingPost = body.posts[0];
+        });
+
+        test('GOOD: without query while user is login', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server)
+                .get(`${url}/station/${station}`)
+                .set('Authorization', crewmateToken);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.posts).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        post_id: expect.stringMatching(POST_REGEX),
+                        title: expect.any(String),
+                        text: expect.any(String),
+                        author: expect.any(String),
+                        deleted: expect.any(Boolean),
+                        timestamp_created: expect.any(String)
+                    })
+                ])
+            );
+            expect(body.posts.length).toEqual(LIMIT);
+        });
+
+        test('GOOD: Station does not exist', async() => {
+            const {
+                statusCode,
+                body
+            } = await request(server)
+                .get(`${url}/station/NotAStation`);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.posts).toEqual([]);
+        });
+
+        describe('GOOD: sanitize query offset', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        offset: 2
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).not.toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Invalid Type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        offset: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        offset: -2
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+        
+
+        describe('GOOD: sanitize query limit', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        limit: 3
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(3);
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Zero', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        limit: 0
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+
+        describe('GOOD: sanitize query sort', () => {
+            test('Valid (ASC)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        sort: 'ASC'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Valid (DESC)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        sort: 'DESC'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Invalid String', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        sort: 'hello'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        sort: 0
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+
+        describe('BAD: station params', () => {
+            test('Invalid format', async() => {
+                failStation = 'Hello World';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${failStation}`);
+                
+                expect(statusCode).toEqual(403);
+                expect(body).toEqual({
+                    errors: {
+                        station: 'pattern'
+                    }
+                });
+            });
         });
     });
 });

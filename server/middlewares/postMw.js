@@ -2,6 +2,7 @@
 
 const LIMIT = 10;
 const STATION_NAME_REGEX = /^[A-Za-z0-9_-]+$/;
+const SORT_REGEX = /^(ASC|DESC)$/;
 
 // const ajv = new Ajv({ allErrors: true });
 
@@ -21,11 +22,25 @@ const postMw = {
     },
 
     sanitizePostsQuery: (req, _res, next) => {
-        const query = req.query;
+        const { offset, limit, sort } = req.query;
 
-        if (!query.offset)  query.offset = 0;
-        if (!query.limit)   query.limit = LIMIT;
-        if (!query.sort)    query.sort = 'DESC';
+        if (!offset ||
+            !Number.isInteger(parseInt(offset)) ||
+            offset < 0
+        ) {
+            req.query.offset = 0;
+        }
+
+        if (!limit ||
+            !Number.isInteger(parseInt(limit)) ||
+            limit < 1
+        ) {
+            req.query.limit = LIMIT;
+        }
+
+        if (!sort || !SORT_REGEX.test(sort)) {
+            req.query.sort = 'DESC';
+        }
 
         next();
     }

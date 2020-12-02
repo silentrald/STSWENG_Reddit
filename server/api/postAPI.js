@@ -23,8 +23,7 @@ const postAPI = {
                 ]
             };
 
-            const results = await db.query(queryStationPosts);
-            const posts = results.rows;
+            const { rows: posts } = await db.query(queryStationPosts);
 
             return res.status(200).send({ posts });
         } catch (err) {
