@@ -7,18 +7,51 @@ const postAPI = {
      */
     getStationPosts: async (req, res) => {
         const { station } = req.params;
-        const { offset, limit, sort } = req.query;
+        const { 
+            offset,
+            limit,
+            sort,
+            top
+        } = req.query;
 
         try {
-            const queryStationPosts = {
-                text: `
+            let text;
+
+            if (top) {
+                if (top === 'all') {
+                    text = `
+                        SELECT      *
+                        FROM        posts
+                        WHERE       station_name=$1
+                        ORDER BY    score DESC, timestamp_created DESC
+                        OFFSET      $2
+                        LIMIT       $3;
+                    `;
+                } else {
+                    text = `
+                        SELECT      *
+                        FROM        posts
+                        WHERE       station_name=$1
+                        AND         timestamp_created <= now()
+                        AND         timestamp_created >= now() - interval '1 ${top}'
+                        ORDER BY    score DESC, timestamp_created DESC
+                        OFFSET      $2
+                        LIMIT       $3;
+                    `;
+                }
+            } else {
+                text = `
                     SELECT      *
                     FROM        posts
                     WHERE       station_name=$1
                     ORDER BY    timestamp_created ${sort}
                     OFFSET      $2
                     LIMIT       $3;
-                `,
+                `;
+            }
+
+            const queryStationPosts = {
+                text,
                 values: [
                     station,
                     offset,

@@ -209,7 +209,6 @@ describe('Station API', () => {
                 expect(body.posts.length).toEqual(LIMIT);
             });
         });
-        
 
         describe('GOOD: sanitize query limit', () => {
             test('Valid', async () => {
@@ -420,6 +419,106 @@ describe('Station API', () => {
                     ])
                 );
                 expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+
+        describe('GOOD: sanitize query top', () => {
+            test('Valid (hour)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        top: 'hour'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Valid (day)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        top: 'day'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Valid (week)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        top: 'week'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Valid (month)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        top: 'month'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Valid (year)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        top: 'year'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        top: 1
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Invalid String', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/station/${station}`)
+                    .query({
+                        top: 'notvalid'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
             });
         });
 

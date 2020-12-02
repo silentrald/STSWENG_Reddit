@@ -3,6 +3,7 @@
 const LIMIT = 10;
 const STATION_NAME_REGEX = /^[A-Za-z0-9_-]+$/;
 const SORT_REGEX = /^(ASC|DESC)$/;
+const TOP_REGEX = /^(hour|day|week|month|year|all)$/;
 
 // const ajv = new Ajv({ allErrors: true });
 
@@ -29,7 +30,12 @@ const postMw = {
      * Properties: offset, limit, sort
      */
     sanitizePostsQuery: (req, _res, next) => {
-        const { offset, limit, sort } = req.query;
+        const {
+            offset,
+            limit,
+            sort,
+            top
+        } = req.query;
 
         if (!offset ||
             !Number.isInteger(parseInt(offset)) ||
@@ -47,6 +53,12 @@ const postMw = {
 
         if (!sort || !SORT_REGEX.test(sort)) {
             req.query.sort = 'DESC';
+        }
+
+        if (top) {
+            if (!TOP_REGEX.test(top)) {
+                req.query.top = 'day';
+            }
         }
 
         next();

@@ -22,9 +22,11 @@ INSERT INTO crewmates(username, station_name) VALUES
     ('crewmate', 'SampleStation');
 
 /* posts */
+INSERT INTO posts(post_id, title, text, score, author, station_name, timestamp_created) VALUES
+    ('paaaaaaaaaa1', 'Sample Title 1', 'Sample Post by captain', 1, 'captain1', 'SampleStation', now() - interval '2 day'),
+    ('paaaaaaaaaa2', 'Sample Title 2', 'Sample Post by crewmate', -1, 'crewmate', 'SampleStation', now() - interval '1 days');
+
 INSERT INTO posts(post_id, title, text, author, station_name) VALUES
-    ('paaaaaaaaaa1', 'Sample Title 1', 'Sample Post by captain', 'captain1', 'SampleStation'),
-    ('paaaaaaaaaa2', 'Sample Title 2', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
     ('paaaaaaaaaa3', 'Sample Title 3', 'Sample Post by crewmate', 'captain2', 'SampleStation2'),
     ('paaaaaaaaaa4', 'Sample Title 4', 'Sample Post by captain', 'captain1', 'SampleStation'),
     ('paaaaaaaaaa5', 'Sample Title 5', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),

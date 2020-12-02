@@ -86,6 +86,7 @@ CREATE TABLE posts (
     post_id                     VARCHAR(12)     PRIMARY KEY,
     title                       VARCHAR(64),
     text                        VARCHAR(1000),
+    score                       INT             DEFAULT 0 NOT NULL,
     author                      VARCHAR(64),
     FOREIGN KEY(author)         REFERENCES      users(username),
     timestamp_created           TIMESTAMP       DEFAULT now() NOT NULL,
@@ -102,6 +103,7 @@ END $$;
 CREATE TABLE comments (
     comment_id                  VARCHAR(12)     PRIMARY KEY,
     text                        VARCHAR(1000),
+    score                       INT             DEFAULT 0 NOT NULL,
     author                      VARCHAR(64),
     FOREIGN KEY(author)         REFERENCES      users(username),
     station_name                VARCHAR(64)     NOT NULL,

@@ -6,7 +6,7 @@
       </div>
       <div v-else-if="hasStation">
         <b-nav class="mb-2">
-          <b-nav-item active>
+          <b-nav-item active @click="getNewPosts()">
             NEW
           </b-nav-item>
           <b-nav-item-dropdown
@@ -14,12 +14,24 @@
             text="TOP"
             toggle-class="nav-link-custom"
           >
-            <b-dropdown-item>Past hour</b-dropdown-item>
-            <b-dropdown-item>Past 24 hours</b-dropdown-item>
-            <b-dropdown-item>Past week</b-dropdown-item>
-            <b-dropdown-item>Past month</b-dropdown-item>
-            <b-dropdown-item>Past year</b-dropdown-item>
-            <b-dropdown-item>All time</b-dropdown-item>
+            <b-dropdown-item @click="getTopPosts('hour')">
+              Past hour
+            </b-dropdown-item>
+            <b-dropdown-item @click="getTopPosts('day')">
+              Past 24 hours
+            </b-dropdown-item>
+            <b-dropdown-item @click="getTopPosts('week')">
+              Past week
+            </b-dropdown-item>
+            <b-dropdown-item @click="getTopPosts('month')">
+              Past month
+            </b-dropdown-item>
+            <b-dropdown-item @click="getTopPosts('year')">
+              Past year
+            </b-dropdown-item>
+            <b-dropdown-item @click="getTopPosts('all')">
+              All time
+            </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-nav>
         <div class="row">
@@ -95,7 +107,8 @@ export default {
       description: '',
       rules: '',
       captains: [],
-      posts: []
+      posts: [],
+      top: undefined
     }
   },
 
@@ -127,7 +140,6 @@ export default {
         const { posts } = res.data
 
         this.$set(this, 'posts', posts)
-        await this.getVotes()
       } catch (err) {
         const { status } = err.response
 
@@ -138,25 +150,20 @@ export default {
       }
     },
 
-    async getVotes () {
-      const posts = this.posts
-      for (const index in posts) {
-        const { data } = await this.$axios.get(`/api/post-vote/score/${posts[index].post_id}`)
-        this.$set(this.posts[index], 'score', data.score)
-      }
-    },
-
     infiniteScroll ($state) {
       setTimeout(async () => {
-        let res = await this.$axios.get(`/api/post/station/${this.name}`, {
-          params: {
-            offset: this.posts.length
-          }
-        })
+        const params = {
+          offset: this.posts.length
+        }
+
+        if (this.top) {
+          params.top = this.top
+        }
+
+        const res = await this.$axios.get(`/api/post/station/${this.name}`, { params })
         const { posts } = res.data
         if (posts.length > 0) {
           for (const index in posts) {
-            res = await this.$axios.get(`/api/post-vote/score/${posts[index].post_id}`)
             this.posts.push(posts[index])
           }
           $state.loaded()
@@ -164,6 +171,34 @@ export default {
           $state.complete()
         }
       }, 500)
+    },
+
+    async getNewPosts () {
+      if (this.top === undefined) {
+        return
+      }
+
+      this.top = false
+
+      const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`)
+      const { posts } = res.data
+
+      this.$set(this, 'posts', posts)
+    },
+
+    async getTopPosts (top) {
+      if (this.top === top) {
+        return
+      }
+
+      this.top = top
+
+      const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`, {
+        params: { top }
+      })
+      const { posts } = res.data
+
+      this.$set(this, 'posts', posts)
     }
   }
 }
