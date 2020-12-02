@@ -6,6 +6,12 @@ const votePostCache = new LRU(1000);
 
 const postVoteAPI = {
     // GET
+    /**
+     * Gets the score of a post with the 
+     * amount of upvotes minus downvotes.
+     * This will also use caching to lessen
+     * the load on the database server.
+     */
     getScore: async (req, res) => {
         const { post } = req.params;
 

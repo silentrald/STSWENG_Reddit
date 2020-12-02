@@ -7,6 +7,9 @@ const SORT_REGEX = /^(ASC|DESC)$/;
 // const ajv = new Ajv({ allErrors: true });
 
 const postMw = {
+    /**
+     * Validates the station parameter.
+     */
     validateStationParam: (req, res, next) => {
         const { station } = req.params;
 
@@ -21,6 +24,10 @@ const postMw = {
         next();
     },
 
+    /**
+     * Sanitizes the posts query object.
+     * Properties: offset, limit, sort
+     */
     sanitizePostsQuery: (req, _res, next) => {
         const { offset, limit, sort } = req.query;
 

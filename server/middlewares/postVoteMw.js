@@ -2,6 +2,9 @@
 const POST_REGEX = /^p[A-Za-z0-9]{0,11}$/;
 
 const postVoteMw = {
+    /**
+     * Validates the post parameter.
+     */
     validatePostParam: (req, res, next) => {
         const { post } = req.params;
 

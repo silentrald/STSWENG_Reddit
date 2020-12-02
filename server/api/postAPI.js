@@ -2,6 +2,9 @@ const db = require('../db');
 
 const postAPI = {
     // GET
+    /**
+     * Gets all the posts from a given station
+     */
     getStationPosts: async (req, res) => {
         const { station } = req.params;
         const { offset, limit, sort } = req.query;
