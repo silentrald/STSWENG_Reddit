@@ -362,6 +362,25 @@ describe('Unit Testing: postMw', () => {
                 });
             });
 
+            test('Valid (all)', async () => {
+                query.top = 'all';
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizePostsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT,
+                    sort: 'DESC',
+                    top: 'all'
+                });
+            });
+
             test('Invalid String', async () => {
                 query.top = 'not';
                 const req = mockRequest({
