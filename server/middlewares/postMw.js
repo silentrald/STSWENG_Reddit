@@ -57,7 +57,7 @@ const postMw = {
 
         if (top) {
             if (!TOP_REGEX.test(top)) {
-                req.query.top = 'day';
+                req.query.top = undefined;
             }
         }
 

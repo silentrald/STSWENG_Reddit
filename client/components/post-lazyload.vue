@@ -6,37 +6,21 @@
           src="/images/thumb-up.png"
           width="24"
           height="24"
-          :style="{
-            // TODO: change this
-            backgroundColor: vote === 1 ? 'green' : 'none'
-          }"
         >
       </div>
-      <div class="post-score">
-        {{ score }}
-      </div>
+      <div class="post-score empty" />
       <div class="post-downvote">
         <img
           src="/images/thumb-down.png"
           width="24"
           height="24"
-          :style="{
-            // TODO: change this
-            backgroundColor: vote === -1 ? 'red' : 'none'
-          }"
         >
       </div>
     </div>
     <div class="post-text">
-      <div class="post-info">
-        Posted by /u/{{ author }} on {{ date }}
-      </div>
-      <div class="post-title">
-        {{ title }}
-      </div>
-      <div class="post-preview">
-        <slot />
-      </div>
+      <div class="post-info empty" />
+      <div class="post-title empty" />
+      <div class="post-preview empty" />
     </div>
   </div>
 </template>
@@ -84,13 +68,21 @@ export default {
 }
 
 .post-info {
-  font-size: 0.75rem;
-  color: #aaaaaa;
+    height: 1.5em;
+    width: 250px;
+    margin-bottom: 8px;
 }
 
 .post-title {
-  font-size: 1.5em;
-  font-weight: 500;
+    height: 1.5em;
+    width: 150px;
+    margin-bottom: 8px;
+}
+
+.post-preview {
+    height: 18em;
+    width: 500px;
+    margin-bottom: 8px;
 }
 
 .post-upvote, .post-downvote {
@@ -99,7 +91,16 @@ export default {
 }
 
 .post-score {
-  text-align: center;
+    height: 24px;
+    width: 24px;
+
+    text-align: center;
+    margin: 0 auto;
+}
+
+.empty {
+    background-color: #EEEEEE;
+    border-radius: 6px;
 }
 
 </style>

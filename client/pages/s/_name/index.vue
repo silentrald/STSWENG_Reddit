@@ -60,36 +60,44 @@
               </div>
             </div>
           </div>
-          <div v-if="posts.length > 0" id="posts" class="col-md-9 order-md-1">
-            <post
-              v-for="post in posts"
-              :key="post.id"
-              :score="post.score"
-              :author="post.author"
-              :date="post.timestamp_created"
-              :title="post.title"
-            >
-              {{ post.scope }}
-              {{ post.text }}
-            </post>
-            <infinite-loading
-              spinner="waveDots"
-              @infinite="infiniteScroll"
-            >
-              <div slot="no-more">
-                <!-- TODO: Add the rocket logo -->
-                End of the Station
-              </div>
-              <div slot="no-results">
-                No results message
-              </div>
-              <div slot="error" slot-scope="{ trigger }">
-                Error message, click <a href="javascript:;" @click="trigger">here</a> to retry
-              </div>
-            </infinite-loading>
+          <div v-if="loading" class="col-md-9 order-md-1">
+            <post-lazyload />
+            <post-lazyload />
+            <post-lazyload />
           </div>
-          <div v-else id="posts" class="col-md-9 order-md-1">
-            No posts in this station yet.
+          <div v-else class="col-md-9 order-md-1">
+            <div v-if="posts.length > 0" id="posts">
+              <post
+                v-for="post in posts"
+                :key="post.id"
+                :score="post.score"
+                :author="post.author"
+                :date="post.timestamp_created"
+                :title="post.title"
+              >
+                {{ post.scope }}
+                {{ post.text }}
+              </post>
+              <infinite-loading
+                spinner="waveDots"
+                :infinite-scroll-disabled="end"
+                @infinite="infiniteScroll"
+              >
+                <div slot="no-more">
+                  <!-- TODO: Add the rocket logo -->
+                  End of the Station
+                </div>
+                <div slot="no-results">
+                  No results message
+                </div>
+                <div slot="error" slot-scope="{ trigger }">
+                  Error message, click <a href="javascript:;" @click="trigger">here</a> to retry
+                </div>
+              </infinite-loading>
+            </div>
+            <div v-else id="posts">
+              No posts in this station yet.
+            </div>
           </div>
         </div>
       </div>
@@ -98,7 +106,9 @@
 </template>
 
 <script>
+import postLazyload from '../../../components/post-lazyload.vue'
 export default {
+  components: { postLazyload },
   data () {
     return {
       is404: false,
@@ -108,7 +118,8 @@ export default {
       rules: '',
       captains: [],
       posts: [],
-      top: undefined
+      loading: true,
+      end: false
     }
   },
 
@@ -120,6 +131,8 @@ export default {
     // Start to load station
     async loadStation () {
       const { name } = this.$route.params
+      const { t: top } = this.$route.query
+
       let res
       try {
         // Get all captains
@@ -136,10 +149,18 @@ export default {
         this.$set(this, 'rules', station.rules)
 
         // Get all the current post in the stations
-        res = await this.$axios.get(`/api/post/station/${name}`)
+        if (top) {
+          res = await this.$axios.get(`/api/post/station/${name}`, {
+            params: { top }
+          })
+        } else {
+          res = await this.$axios.get(`/api/post/station/${name}`)
+        }
         const { posts } = res.data
 
         this.$set(this, 'posts', posts)
+
+        this.loading = false
       } catch (err) {
         const { status } = err.response
 
@@ -152,15 +173,18 @@ export default {
 
     infiniteScroll ($state) {
       setTimeout(async () => {
+        const { name } = this.$route.params
+        const { t: top } = this.$route.query
+
         const params = {
           offset: this.posts.length
         }
 
-        if (this.top) {
-          params.top = this.top
+        if (top) {
+          params.top = top
         }
 
-        const res = await this.$axios.get(`/api/post/station/${this.name}`, { params })
+        const res = await this.$axios.get(`/api/post/station/${name}`, { params })
         const { posts } = res.data
         if (posts.length > 0) {
           for (const index in posts) {
@@ -178,12 +202,20 @@ export default {
         return
       }
 
+      this.end = false
+
+      this.$router.push({ query: { t: undefined } })
       this.top = false
+      this.loading = true
+      this.$set(this, 'posts', [])
 
-      const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`)
-      const { posts } = res.data
+      try {
+        const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`)
+        const { posts } = res.data
+        this.$set(this, 'posts', posts)
+      } catch (err) {}
 
-      this.$set(this, 'posts', posts)
+      this.loading = false
     },
 
     async getTopPosts (top) {
@@ -191,14 +223,22 @@ export default {
         return
       }
 
+      this.end = false
+
+      this.$router.push({ query: { t: top } })
       this.top = top
+      this.loading = true
+      this.$set(this, 'posts', [])
 
-      const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`, {
-        params: { top }
-      })
-      const { posts } = res.data
+      try {
+        const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`, {
+          params: { top }
+        })
+        const { posts } = res.data
+        this.$set(this, 'posts', posts)
+      } catch (err) {}
 
-      this.$set(this, 'posts', posts)
+      this.loading = false
     }
   }
 }
