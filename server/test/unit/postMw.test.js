@@ -265,5 +265,138 @@ describe('Unit Testing: postMw', () => {
                 });
             });
         });
+
+        describe('GOOD: sanitize topsort', () => {
+            test('Valid (hour)', async () => {
+                query.top = 'hour';
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizePostsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT,
+                    sort: 'DESC',
+                    top: 'hour'
+                });
+            });
+
+            test('Valid (day)', async () => {
+                query.top = 'day';
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizePostsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT,
+                    sort: 'DESC',
+                    top: 'day'
+                });
+            });
+
+            test('Valid (week)', async () => {
+                query.top = 'week';
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizePostsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT,
+                    sort: 'DESC',
+                    top: 'week'
+                });
+            });
+
+            test('Valid (month)', async () => {
+                query.top = 'month';
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizePostsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT,
+                    sort: 'DESC',
+                    top: 'month'
+                });
+            });
+
+            test('Valid (year)', async () => {
+                query.top = 'year';
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizePostsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT,
+                    sort: 'DESC',
+                    top: 'year'
+                });
+            });
+
+            test('Invalid String', async () => {
+                query.top = 'not';
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizePostsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT,
+                    sort: 'DESC'
+                });
+            });
+
+            test('Invalid type', async () => {
+                query.top = 100;
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizePostsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT,
+                    sort: 'DESC'
+                });
+            });
+        });
     });
 });
