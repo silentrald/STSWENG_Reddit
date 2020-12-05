@@ -9,6 +9,11 @@ router.get('/station/:station',
     mw.sanitizePostsQuery,
     api.getStationPosts);
 
+router.get('/station/:station/post/:post',
+    mw.validatePostParam,
+    mw.validateStationParam,
+    api.getStationPost);
+
 // POST
 
 // PATCH

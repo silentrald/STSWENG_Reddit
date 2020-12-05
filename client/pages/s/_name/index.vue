@@ -67,7 +67,7 @@
           </div>
           <div v-else class="col-md-9 order-md-1">
             <div v-if="posts.length > 0" id="posts">
-              <post
+              <post-preview
                 v-for="post in posts"
                 :key="post.id"
                 :score="post.score"
@@ -77,7 +77,7 @@
               >
                 {{ post.scope }}
                 {{ post.text }}
-              </post>
+              </post-preview>
               <infinite-loading
                 spinner="waveDots"
                 :infinite-scroll-disabled="end"
