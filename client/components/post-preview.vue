@@ -1,5 +1,5 @@
 <template>
-  <div class="post">
+  <div class="post" @click="toPost()">
     <div class="post-votes">
       <div class="post-upvote">
         <img
@@ -46,6 +46,10 @@ import moment from 'moment'
 
 export default {
   props: {
+    id: {
+      type: String,
+      default: ''
+    },
     score: {
       type: Number,
       default: 0
@@ -65,12 +69,20 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    station: {
+      type: String,
+      default: ''
     }
   },
 
   methods: {
     formatDate (date) {
       return moment(date).format('MMM D, YYYY')
+    },
+
+    toPost () {
+      this.$router.push(`/s/${this.station}/post/${this.id}`)
     }
   }
 }

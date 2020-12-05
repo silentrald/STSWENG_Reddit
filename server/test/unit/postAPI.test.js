@@ -23,8 +23,8 @@ jest.mock('../../db', () => {
 
             query.text = oneLineQuery(query.text);
 
-            if (query.text === 'SELECT * FROM posts WHERE post_id=$1 AND station_name=$2 LIMIT 1;'
-                && query.values[0] && query.values[1]) {
+            if (query.text === 'SELECT * FROM posts WHERE post_id=$1 LIMIT 1;'
+                && query.values[0]) {
                 if (query.values[0] === 'paaaaaaaaaa1') {
                     result.rows = [{
                         // sample
@@ -81,17 +81,15 @@ describe('Unit test: postAPI.js', () => {
     });
 
     describe('API: getStationPost', () => {
-        let station = '';
         let post = '';
 
         beforeEach(() => {
-            station = 'SampleStation';
             post = 'paaaaaaaaaa1';
         });
         
         test('GOOD', async () => {
             const req = mockRequest({
-                params: { station, post }
+                params: { post }
             });
             const res = mockResponse();
 
@@ -106,7 +104,7 @@ describe('Unit test: postAPI.js', () => {
         test('rowCount < 1', async () => {
             post = 'paaaaa';
             const req = mockRequest({
-                params: { station, post }
+                params: { post }
             });
             const res = mockResponse();
 

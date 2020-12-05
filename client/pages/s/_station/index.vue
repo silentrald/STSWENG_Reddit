@@ -69,14 +69,16 @@
             <div v-if="posts.length > 0" id="posts">
               <post-preview
                 v-for="post in posts"
-                :key="post.id"
+                :id="post.post_id"
+                :key="post.post_id"
                 :score="post.score"
                 :author="post.author"
                 :date="post.timestamp_created"
                 :title="post.title"
+                :station="post.station_name"
+                @click="toPost(post.id)"
               >
-                {{ post.scope }}
-                {{ post.text }}
+                {{ brief(post.text) }}
               </post-preview>
               <infinite-loading
                 spinner="waveDots"
@@ -130,7 +132,7 @@ export default {
   methods: {
     // Start to load station
     async loadStation () {
-      const { name } = this.$route.params
+      const { station: name } = this.$route.params
       const { t: top } = this.$route.query
 
       let res
@@ -173,7 +175,7 @@ export default {
 
     infiniteScroll ($state) {
       setTimeout(async () => {
-        const { name } = this.$route.params
+        const { station } = this.$route.params
         const { t: top } = this.$route.query
 
         const params = {
@@ -184,7 +186,7 @@ export default {
           params.top = top
         }
 
-        const res = await this.$axios.get(`/api/post/station/${name}`, { params })
+        const res = await this.$axios.get(`/api/post/station/${station}`, { params })
         const { posts } = res.data
         if (posts.length > 0) {
           for (const index in posts) {
@@ -239,6 +241,12 @@ export default {
       } catch (err) {}
 
       this.loading = false
+    },
+
+    brief (text) {
+      return text.length > 100
+        ? `${text.substr(0, 100)}...`
+        : text
     }
   }
 }

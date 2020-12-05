@@ -73,7 +73,7 @@ const postAPI = {
      * Gets a post from a station
      */
     getStationPost: async (req, res) => {
-        const { post, station } = req.params;
+        const { post } = req.params;
 
         try {
             const querySelStation = {
@@ -81,10 +81,9 @@ const postAPI = {
                     SELECT  *
                     FROM    posts
                     WHERE   post_id=$1
-                    AND     station_name=$2
                     LIMIT   1;
                 `,
-                values: [ post, station ]
+                values: [ post ]
             };
 
             const { rows: posts, rowCount } = await db.query(querySelStation);

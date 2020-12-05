@@ -72,6 +72,54 @@ beforeAll(async () => {
 });
 
 describe('Station API', () => {
+    describe(`GET ${url}/:post`, () => {
+        test('GOOD', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server)
+                .get(`${url}/${posts[0]}`);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.post).toEqual(
+                expect.objectContaining({
+                    post_id: expect.stringMatching(POST_REGEX),
+                    title: expect.any(String),
+                    text: expect.any(String),
+                    author: expect.any(String),
+                    score: expect.any(Number),
+                    timestamp_created: expect.any(String)
+                })
+            );
+        });
+
+        test('GOOD: Post does not exist', async() => {
+            const {
+                statusCode
+            } = await request(server)
+                .get(`${url}/prandom`);
+            
+            expect(statusCode).toEqual(404);
+        });
+
+        describe('BAD: post params', () => {
+            test('Invalid format', async() => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/asdfasdf`);
+                
+                expect(statusCode).toEqual(403);
+                expect(body).toEqual({
+                    errors: {
+                        post: 'pattern'
+                    }
+                });
+            });
+        });
+    });
+
     describe(`GET ${url}/station/:station`, () => {
         test('GOOD: without query', async () => {
             const {
@@ -550,82 +598,6 @@ describe('Station API', () => {
                     body
                 } = await request(server)
                     .get(`${url}/station/${failStation}`);
-                
-                expect(statusCode).toEqual(403);
-                expect(body).toEqual({
-                    errors: {
-                        station: 'pattern'
-                    }
-                });
-            });
-        });
-    });
-
-    describe(`GET ${url}/station/:station/post/:post`, () => {
-        test('GOOD', async () => {
-            const {
-                statusCode,
-                body
-            } = await request(server)
-                .get(`${url}/station/${station}/post/${posts[0]}`);
-            
-            expect(statusCode).toEqual(200);
-            expect(body.post).toEqual(
-                expect.objectContaining({
-                    post_id: expect.stringMatching(POST_REGEX),
-                    title: expect.any(String),
-                    text: expect.any(String),
-                    author: expect.any(String),
-                    score: expect.any(Number),
-                    timestamp_created: expect.any(String)
-                })
-            );
-        });
-
-        test('GOOD: Station does not exist', async() => {
-            const {
-                statusCode
-            } = await request(server)
-                .get(`${url}/station/NotAStation/post/${posts[0]}`);
-            
-            expect(statusCode).toEqual(404);
-        });
-
-        test('GOOD: Post does not exist', async() => {
-            const {
-                statusCode
-            } = await request(server)
-                .get(`${url}/station/${station}/post/prandom`);
-            
-            expect(statusCode).toEqual(404);
-        });
-
-        describe('BAD: station params', () => {
-            test('Invalid format', async() => {
-                const {
-                    statusCode,
-                    body
-                } = await request(server)
-                    .get(`${url}/station/${station}/post/invalid`);
-                
-                expect(statusCode).toEqual(403);
-                expect(body).toEqual({
-                    errors: {
-                        post: 'pattern'
-                    }
-                });
-            });
-        });
-
-        describe('BAD: post params', () => {
-            test('Invalid format', async() => {
-                failStation = 'Hello World';
-
-                const {
-                    statusCode,
-                    body
-                } = await request(server)
-                    .get(`${url}/station/${failStation}/post/${posts[0]}`);
                 
                 expect(statusCode).toEqual(403);
                 expect(body).toEqual({
