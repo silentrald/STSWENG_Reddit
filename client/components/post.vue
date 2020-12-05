@@ -29,7 +29,7 @@
     </div>
     <div class="post-text">
       <div class="post-info">
-        Posted by /u/{{ author }} on {{ date }}
+        Posted by /u/{{ author }} on {{ formatDate(date) }}
       </div>
       <div class="post-title">
         {{ title }}
@@ -42,6 +42,8 @@
 </template>
 
 <script>
+import moment from 'moment'
+
 export default {
   props: {
     score: {
@@ -63,6 +65,12 @@ export default {
     title: {
       type: String,
       default: ''
+    }
+  },
+
+  methods: {
+    formatDate (date) {
+      return moment(date).format('MMM D, YYYY')
     }
   }
 }
