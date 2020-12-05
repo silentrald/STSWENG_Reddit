@@ -38,7 +38,8 @@ describe('User API', () => {
 
         test('GOOD: Register & Login', async () => {
             let statusCode, body;
-            const res1 = await request(server).post(`${url}/create`)
+            const res1 = await request(server)
+                .post(`${url}/create`)
                 .send(user);
 
             statusCode = res1.statusCode;
@@ -49,7 +50,8 @@ describe('User API', () => {
             loginUser.username = user.username;
             loginUser.password = user.password;
 
-            const res2 = await request(server).post(`${url}/login`)
+            const res2 = await request(server)
+                .post(`${url}/login`)
                 .send(loginUser);
 
             statusCode = res2.statusCode;
@@ -1020,7 +1022,7 @@ describe('User API', () => {
 
 afterAll(async () => {
     await db.query({ 
-        text: 'DELETE FROM users WHERE username=$1',
+        text: 'DELETE FROM users WHERE username=$1;',
         values: [ user.username ]
     });
     await db.end();

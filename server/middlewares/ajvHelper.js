@@ -19,8 +19,8 @@ const ajvHelper = {
             return obj;
         }, {});
 
-        console.log(ajv.errorsText());
-        console.log(ajv.errors);
+        // console.log(ajv.errorsText());
+        // console.log(ajv.errors);
         console.log(errors);
 
         return errors;

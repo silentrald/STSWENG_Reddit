@@ -27,9 +27,15 @@ const loginMw = require('./middlewares/loginMw');
 app.use(loginMw.smartLogin);
 
 // API ROUTERS
+const postRtr = require('./routers/postRtr');
+const postVoteRtr = require('./routers/postVoteRtr');
+const subcommentRtr = require('./routers/subcommentRtr');
 const stationRtr = require('./routers/stationRtr');
 const userRtr = require('./routers/userRtr');
 
+app.use('/api/post', postRtr);
+app.use('/api/post-vote', postVoteRtr);
+app.use('/api/subcomment', subcommentRtr);
 app.use('/api/station', stationRtr);
 app.use('/api/user', userRtr);
 

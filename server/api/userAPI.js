@@ -78,7 +78,7 @@ const userAPI = {
      * given. Responds 200 if credentials are correct else
      * 403
      */
-    postLogin: async(req, res) => {
+    postLogin: async (req, res) => {
         const { username, password } = req.body;
 
         try {
