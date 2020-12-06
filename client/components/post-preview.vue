@@ -38,6 +38,10 @@
         <slot />
       </div>
     </div>
+    <!-- <div>
+      TODO: change to icon
+      Comments: {{ commentCount }}
+    </div> -->
   </div>
 </template>
 
@@ -73,6 +77,10 @@ export default {
     station: {
       type: String,
       default: ''
+    },
+    commentCount: {
+      type: Number,
+      default: 0
     }
   },
 

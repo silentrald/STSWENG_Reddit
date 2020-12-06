@@ -81,10 +81,6 @@ export default {
     }
   },
 
-  created () {
-
-  },
-
   methods: {
     formatDate (date) {
       return moment(date).format('MMM D, YYYY')
@@ -94,13 +90,6 @@ export default {
 </script>
 
 <style scoped>
-.post {
-    width: 70%;
-    min-width: 500px;
-    max-width: 1000px;
-    margin: 24px auto 0 auto;
-}
-
 .margin-bottom {
   margin-bottom: 12px;
 }

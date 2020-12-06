@@ -76,6 +76,7 @@
                 :date="post.timestamp_created"
                 :title="post.title"
                 :station="post.station_name"
+                :comment-count="post.comment_count"
                 @click="toPost(post.id)"
               >
                 {{ brief(post.text) }}
@@ -108,9 +109,7 @@
 </template>
 
 <script>
-import postLazyload from '../../../components/post-lazyload.vue'
 export default {
-  components: { postLazyload },
   data () {
     return {
       is404: false,
@@ -135,8 +134,8 @@ export default {
       const { station: name } = this.$route.params
       const { t: top } = this.$route.query
 
-      let res
       try {
+        let res
         // Get all captains
         res = await this.$axios.get(`/api/station/captains/${name}`)
         const { captains } = res.data
@@ -212,7 +211,7 @@ export default {
       this.$set(this, 'posts', [])
 
       try {
-        const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`)
+        const res = await this.$axios.get(`/api/post/station/${this.$route.params.station}`)
         const { posts } = res.data
         this.$set(this, 'posts', posts)
       } catch (err) {}
@@ -233,7 +232,7 @@ export default {
       this.$set(this, 'posts', [])
 
       try {
-        const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`, {
+        const res = await this.$axios.get(`/api/post/station/${this.$route.params.station}`, {
           params: { top }
         })
         const { posts } = res.data

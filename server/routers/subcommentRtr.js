@@ -4,6 +4,10 @@ const mw = require('../middlewares/subcommentMw');
 const loginMw = require('../middlewares/loginMw');
 
 // GET
+router.get('/comment/:comment',
+    mw.sanitizeSubommentsQuery,
+    mw.validateCommentParams,
+    api.getPostSubcomment);
 
 // POST
 router.post('/create',

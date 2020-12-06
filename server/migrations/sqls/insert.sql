@@ -22,9 +22,9 @@ INSERT INTO crewmates(username, station_name) VALUES
     ('crewmate', 'SampleStation');
 
 /* posts */
-INSERT INTO posts(post_id, title, text, score, author, station_name, timestamp_created) VALUES
-    ('paaaaaaaaaa1', 'Sample Title 1', 'Sample Post by captain', 1, 'captain1', 'SampleStation', now() - interval '2 day'),
-    ('paaaaaaaaaa2', 'Sample Title 2', 'Sample Post by crewmate', -1, 'crewmate', 'SampleStation', now() - interval '1 days');
+INSERT INTO posts(post_id, title, text, score, author, station_name, timestamp_created, comment_count) VALUES
+    ('paaaaaaaaaa1', 'Sample Title 1', 'Sample Post by captain', 1, 'captain1', 'SampleStation', now() - interval '2 day', 14),
+    ('paaaaaaaaaa2', 'Sample Title 2', 'Sample Post by crewmate', -1, 'crewmate', 'SampleStation', now() - interval '1 days', 1);
 
 INSERT INTO posts(post_id, title, text, author, station_name) VALUES
     ('paaaaaaaaaa3', 'Sample Title 3', 'Sample Post by crewmate', 'captain2', 'SampleStation2'),
@@ -51,9 +51,32 @@ INSERT INTO comments(comment_id, text, author, station_name) VALUES
 
 INSERT INTO subposts(parent_post, comment_id) VALUES
     ('paaaaaaaaaa1', 'caaaaaaaaaa1'),
-    ('paaaaaaaaaa2', 'caaaaaaaaaa2'),
+    ('paaaaaaaaaa1', 'caaaaaaaaaa2'),
     ('paaaaaaaaaa1', 'caaaaaaaaaa3'),
-    ('paaaaaaaaaa3', 'caaaaaaaaaa4');
+    ('paaaaaaaaaa2', 'caaaaaaaaaa4');
+
+/* subcomments */
+INSERT INTO comments(comment_id, text, author, station_name) VALUES
+    ('caaaaaaaaaa5', 'More Comments', 'captain1', 'SampleStation'),
+    ('caaaaaaaaaa6', 'More Comments1', 'captain1', 'SampleStation'),
+    ('caaaaaaaaaa7', 'More Comments2', 'captain1', 'SampleStation'),
+    ('caaaaaaaaaa8', 'More Comments3', 'captain1', 'SampleStation'),
+    ('caaaaaaaaaa9', 'More Comments4', 'captain1', 'SampleStation'),
+    ('caaaaaaaaa10', 'More Comments5', 'captain1', 'SampleStation'),
+    ('caaaaaaaaa11', 'More Comments6', 'captain1', 'SampleStation'),
+    ('caaaaaaaaa12', 'More Comments7', 'captain1', 'SampleStation'),
+    ('caaaaaaaaa13', 'More Comments8', 'captain1', 'SampleStation');
+
+INSERT INTO subcomments(parent_post, parent_comment, comment_id) VALUES
+    ('paaaaaaaaaa1', 'caaaaaaaaaa1', 'caaaaaaaaaa5'),
+    ('paaaaaaaaaa1', 'caaaaaaaaaa1', 'caaaaaaaaaa6'),
+    ('paaaaaaaaaa1', 'caaaaaaaaaa2', 'caaaaaaaaaa7'),
+    ('paaaaaaaaaa1', 'caaaaaaaaaa5', 'caaaaaaaaaa8'),
+    ('paaaaaaaaaa1', 'caaaaaaaaaa5', 'caaaaaaaaaa9'),
+    ('paaaaaaaaaa1', 'caaaaaaaaaa7', 'caaaaaaaaa10'),
+    ('paaaaaaaaaa1', 'caaaaaaaaaa7', 'caaaaaaaaa11'),
+    ('paaaaaaaaaa1', 'caaaaaaaaaa1', 'caaaaaaaaa12'),
+    ('paaaaaaaaaa1', 'caaaaaaaaaa2', 'caaaaaaaaa13');
 
 /* post_votes */
 INSERT INTO post_votes(username, post_id, upvote) VALUES

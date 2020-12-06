@@ -33,8 +33,8 @@ jest.mock('../../db', () => {
                         comment_id: 'cdummydummy'
                     }];
                     result.rowCount = 1;
-                } else if (query.text === 'INSERT INTO subcomments(parent_comment, comment_id) VALUES($1, $2);'
-                    && query.values[0] && query.values[0] === 'cdummydummy' && query.values[1]) {
+                } else if (query.text === 'INSERT INTO subcomments(parent_post, parent_comment, comment_id) VALUES($1, $2, $3);'
+                    && query.values[0] && query.values[1] && query.values[2]) {
                     result.rows = 'INSERT 1 0';
                     result.rowCount = 1;
                 }
@@ -115,13 +115,14 @@ describe('Unit Test: subcommentAPI', () => {
                 passenger: 'SELECT * FROM passengers WHERE username=$1 AND station_name=$2 LIMIT 1;',
                 comment: 'SELECT * FROM comments WHERE comment_id=$1 LIMIT 1;',
                 insComment: 'INSERT INTO comments(comment_id, text, author, station_name) VALUES(comment_id(), $1, $2, $3) RETURNING comment_id;',
-                insSubcomment: 'INSERT INTO subcomments(parent_comment, comment_id) VALUES($1, $2);'
+                insSubcomment: 'INSERT INTO subcomments(parent_post, parent_comment, comment_id) VALUES($1, $2, $3);'
             };
         });
 
         beforeEach(() => {
             db = require('../../db');
             subcomment = {
+                parentPost: 'paaaaaaaaaa1',
                 parentComment: comments[0],
                 text: 'Default Subcomment 1',
                 station
@@ -166,10 +167,11 @@ describe('Unit Test: subcommentAPI', () => {
             });
             expect(query).toHaveBeenCalledWith({
                 text: queries.insSubcomment,
-                values: [
+                values: expect.objectContaining([
+                    subcomment.parentPost,
                     subcomment.parentComment,
-                    'cdummydummy'
-                ]
+                    expect.any(String)
+                ])
             });
             expect(query).toHaveBeenCalledWith('COMMIT');
 

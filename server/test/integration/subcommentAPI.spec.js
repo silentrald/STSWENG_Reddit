@@ -68,6 +68,7 @@ describe('Subcomment API', () => {
 
         beforeEach(() => {
             subcomment = {
+                parentPost: 'paaaaaaaaaa1',
                 parentComment: comments[0],
                 text: 'Default Subcomment 1',
                 station
