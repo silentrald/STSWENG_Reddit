@@ -96,7 +96,7 @@ const subcommentMw = {
      * Sanitizes the subcomments query
      * properties: offset, limit
      */
-    sanitizeSubommentsQuery: (req, res, next) => {
+    sanitizeSubcommentsQuery: (req, res, next) => {
         const { offset, limit } = req.query;
 
         if (!offset ||

@@ -5,9 +5,9 @@ const loginMw = require('../middlewares/loginMw');
 
 // GET
 router.get('/comment/:comment',
-    mw.sanitizeSubommentsQuery,
     mw.validateCommentParams,
-    api.getPostSubcomment);
+    mw.sanitizeSubcommentsQuery,
+    api.getPostSubcomments);
 
 // POST
 router.post('/create',

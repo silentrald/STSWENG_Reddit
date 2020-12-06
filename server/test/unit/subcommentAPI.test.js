@@ -1,6 +1,7 @@
 process.env.JWT_SECRET = 'test-value'; // set the jwt token
 
 const {
+    getPostSubcomments,
     postSubcomment
 } = require('../../api/subcommentAPI');
 
@@ -106,6 +107,38 @@ const crewmateUser = {
 // const oneLineQuery = (queryText) => queryText.trim().replace(/\n/g, ' ').replace(/ {2,}/g, ' ');
 
 describe('Unit Test: subcommentAPI', () => {
+    describe('API: getPostSubcomments', () => {
+        let params = {};
+        let query = {};
+
+        beforeEach(() => {
+            params = {
+                post: 'paaaaaaaaaa1'
+            };
+            query = {
+                offset: 0,
+                limit: 7
+            };
+        });
+        
+        test('GOOD', async () => {
+            const req = mockRequest({
+                params,
+                query
+            });
+            const res = mockResponse();
+            
+            await getPostSubcomments(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    subcomments: expect.any(Array)
+                })
+            );
+        });
+    });
+
     describe('API: postSubcomment', () => {
         let subcomment, db;
         let queries;

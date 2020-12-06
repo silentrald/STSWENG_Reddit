@@ -5,6 +5,7 @@ const server = require('../../app');
 const db = require('../../db');
 
 const url = '/api/subcomment';
+const LIMIT = 3;
 
 // DATA
 const station = 'SampleStation';
@@ -63,6 +64,186 @@ beforeAll(async () => {
 });
 
 describe('Subcomment API', () => {
+    describe(`GET: ${url}/comment/:comment`, () => {
+        let query = {};
+        
+        beforeEach(() => {
+            query = {
+                offset: 0,
+                limit: LIMIT
+            };
+        });
+
+        test('GOOD: Get subcomments no query', async () => {
+            const { statusCode, body } = await request(server)
+                .get(`${url}/comment/${comments[0]}`);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.subcomments).toEqual(
+                expect.any(Array)
+            );
+        });
+
+        test('GOOD: Get subcomments with different query', async () => {
+            query.offset = 1;
+            query.limit = 2;
+            const { statusCode, body } = await request(server)
+                .get(`${url}/comment/${comments[0]}`)
+                .query(query);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.subcomments).toEqual(
+                expect.any(Array)
+            );
+        });
+
+        test('GOOD: Get subcomments as logged in', async () => {
+            query.offset = 1;
+            query.limit = 2;
+            const { statusCode, body } = await request(server)
+                .get(`${url}/comment/${comments[0]}`)
+                .query(query)
+                .set('Authorization', `Bearer ${crewmateToken}`);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.subcomments).toEqual(
+                expect.any(Array)
+            );
+        });
+
+        describe('GOOD: sanitize offset query', async () => {
+            test('Wrong Type', async () => {
+                query.offset = 'string';
+                const { statusCode, body } = await request(server)
+                    .get(`${url}/comment/${comments[0]}`)
+                    .query(query)
+                    .set('Authorization', `Bearer ${crewmateToken}`);
+                
+                expect(statusCode).toEqual(200);
+                expect(body.subcomments).toEqual(
+                    expect.any(Array)
+                );
+            });
+
+            test('Negative Number', async () => {
+                query.offset = -3;
+                const { statusCode, body } = await request(server)
+                    .get(`${url}/comment/${comments[0]}`)
+                    .query(query)
+                    .set('Authorization', `Bearer ${crewmateToken}`);
+                
+                expect(statusCode).toEqual(200);
+                expect(body.subcomments).toEqual(
+                    expect.any(Array)
+                );
+            });
+
+            test('Float Number', async () => {
+                query.offset = 2.1;
+                const { statusCode, body } = await request(server)
+                    .get(`${url}/comment/${comments[0]}`)
+                    .query(query)
+                    .set('Authorization', `Bearer ${crewmateToken}`);
+                
+                expect(statusCode).toEqual(200);
+                expect(body.subcomments).toEqual(
+                    expect.any(Array)
+                );
+            });
+
+            test('Empty', async () => {
+                delete query.offset;
+                const { statusCode, body } = await request(server)
+                    .get(`${url}/comment/${comments[0]}`)
+                    .query(query)
+                    .set('Authorization', `Bearer ${crewmateToken}`);
+                
+                expect(statusCode).toEqual(200);
+                expect(body.subcomments).toEqual(
+                    expect.any(Array)
+                );
+            });
+        });
+
+        describe('GOOD: sanitize limit query', async () => {
+            test('Wrong Type', async () => {
+                query.limit = 'string';
+                const { statusCode, body } = await request(server)
+                    .get(`${url}/comment/${comments[0]}`)
+                    .query(query)
+                    .set('Authorization', `Bearer ${crewmateToken}`);
+                
+                expect(statusCode).toEqual(200);
+                expect(body.subcomments).toEqual(
+                    expect.any(Array)
+                );
+            });
+
+            test('Zero', async () => {
+                query.limit = 0;
+                const { statusCode, body } = await request(server)
+                    .get(`${url}/comment/${comments[0]}`)
+                    .query(query)
+                    .set('Authorization', `Bearer ${crewmateToken}`);
+                
+                expect(statusCode).toEqual(200);
+                expect(body.subcomments).toEqual(
+                    expect.any(Array)
+                );
+            });
+
+            test('Negative Number', async () => {
+                query.limit = -3;
+                const { statusCode, body } = await request(server)
+                    .get(`${url}/comment/${comments[0]}`)
+                    .query(query)
+                    .set('Authorization', `Bearer ${crewmateToken}`);
+                
+                expect(statusCode).toEqual(200);
+                expect(body.subcomments).toEqual(
+                    expect.any(Array)
+                );
+            });
+
+            test('Float Number', async () => {
+                query.limit = 2.1;
+                const { statusCode, body } = await request(server)
+                    .get(`${url}/comment/${comments[0]}`)
+                    .query(query)
+                    .set('Authorization', `Bearer ${crewmateToken}`);
+                
+                expect(statusCode).toEqual(200);
+                expect(body.subcomments).toEqual(
+                    expect.any(Array)
+                );
+            });
+
+            test('Empty', async () => {
+                delete query.limit;
+                const { statusCode, body } = await request(server)
+                    .get(`${url}/comment/${comments[0]}`)
+                    .query(query)
+                    .set('Authorization', `Bearer ${crewmateToken}`);
+                
+                expect(statusCode).toEqual(200);
+                expect(body.subcomments).toEqual(
+                    expect.any(Array)
+                );
+            });
+        });
+
+        describe('BAD: Invalid comment params', () => {
+            test('Invalid format', async () => {
+                const { statusCode, body } = await request(server)
+                    .get(`${url}/comment/asdf`)
+                    .query(query);
+            
+                expect(statusCode).toEqual(403);
+                expect(body.errors.comment).toEqual('pattern');
+            });
+        });
+    });
+
     describe(`POST: ${url}/create`, () => {
         let subcomment;
 

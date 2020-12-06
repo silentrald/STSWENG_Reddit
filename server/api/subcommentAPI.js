@@ -6,7 +6,7 @@ const subcommentAPI = {
     /**
      * Gets the comments of a comment
      */
-    getPostSubcomment: async (req, res) => {
+    getPostSubcomments: async (req, res) => {
         const { comment } = req.params;
         const { offset, limit } = req.query;
 
