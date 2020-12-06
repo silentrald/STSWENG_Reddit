@@ -24,6 +24,22 @@
         :author="comment.author"
         :subcomments="comment.subcomments"
       />
+      <infinite-loading
+        spinner="waveDots"
+        @infinite="infiniteScroll"
+      >
+        <div slot="no-more">
+          <!-- TODO: Add the rocket logo -->
+          End of the Post
+        </div>
+        <div slot="no-results">
+          <!-- TODO: Add the rocket logo -->
+          End of the Post
+        </div>
+        <div slot="error" slot-scope="{ trigger }">
+          Error message, click <a href="javascript:;" @click="trigger">here</a> to retry
+        </div>
+      </infinite-loading>
     </div>
   </div>
 </template>
@@ -82,6 +98,34 @@ export default {
           } catch (_err) {}
         }
       }
+    },
+
+    infiniteScroll ($state) {
+      setTimeout(async () => {
+        this.add = false
+        const { post } = this.$route.params
+
+        const params = {
+          offset: this.comments.length
+        }
+
+        const res = await this.$axios.get(`/api/subpost/post/${post}`, { params })
+        const { subposts } = res.data
+        if (subposts.length > 0) {
+          for (const index in subposts) {
+            const comment = subposts[index]
+            this.comments.push(comment)
+
+            try {
+              await this.loadSubcomments(comment, 1)
+            } catch (_err) {}
+          }
+          $state.loaded()
+        } else {
+          $state.complete()
+        }
+        this.add = true
+      }, 500)
     }
   }
 }
@@ -99,7 +143,7 @@ export default {
 }
 
 .comment-container {
-  margin: 24px auto 250px auto;
+  margin: 24px auto 200px auto;
 }
 
 .margin-bottom {
