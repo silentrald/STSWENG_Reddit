@@ -21,10 +21,12 @@ router.post('/create',
 
 router.post('/join/:stationName',
     loginMw.isAuth,
+    stationMw.validateStationParam,
     api.postJoinStation);
 
 router.post('/leave/:stationName',
     loginMw.isAuth,
+    stationMw.validateStationParam,
     api.postLeaveStation);
 
 // PATCH
