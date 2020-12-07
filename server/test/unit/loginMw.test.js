@@ -19,9 +19,8 @@ const mockResponse = () => {
     return res;
 };
 
-const mockNext = (next) => {
-    next = jest.fn();
-    return next;
+const mockNext = () => {
+    return jest.fn();
 };
 
 let token;
