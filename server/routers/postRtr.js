@@ -10,6 +10,10 @@ router.get('/station/:station',
     api.getStationPosts);
 
 // POST
+// TODO: Add middleware
+router.post('/station/:station',
+    api.postStationPost),
+
 
 // PATCH
 

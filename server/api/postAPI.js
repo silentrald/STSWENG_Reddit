@@ -67,9 +67,49 @@ const postAPI = {
 
             return res.status(500).send();
         }
-    }
+    },
 
     // POST
+    /**
+     * Adds a post from a user to a given station
+     */
+    postStationPost: async (req, res) => {
+        // Get values
+        const {
+            title,
+            text,
+            station_name,
+            author
+        } = req.body;
+
+        try {
+
+            // Insert post into posts table
+            const queryInsPost = {
+                text: `
+                    INSERT INTO posts(post_id, title, text, author, station_name) 
+                        VALUES(post_id(), $1, $2, $3, $4)
+                `,
+                values: [
+                    title,
+                    text,
+                    author,
+                    station_name
+                ]
+            };
+
+            await db.query(queryInsPost);
+
+            return res.status(201).send();
+        } catch (err) {
+            console.log(err);
+            
+            // TODO: detect errors
+
+
+            return res.status(500).send();
+        }
+    }
 
     // PUT
 
