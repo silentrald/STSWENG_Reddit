@@ -555,6 +555,22 @@ describe('Station API', () => {
             });
         });
     });
+    /* TODO: AddPost Integration tests
+    describe(`POST ${url}/station/:station`, () => {
+        test('GOOD: Proper query while user is logged in', async() => {
+
+        });
+
+        test('BAD: User is not logged in', () => {
+
+        });
+
+        test('BAD: User is not part of station');
+
+        test('ERROR: Title field');
+
+        test('ERROR: Text field');
+    }); */
 });
 
 afterAll(async () => {
