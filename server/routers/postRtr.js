@@ -12,7 +12,7 @@ router.get('/station/:station',
 // POST
 
 router.post('/station/:station',
-    loginMw.isNotAuth,
+    loginMw.isAuth,
     mw.validateStationParam,
     mw.validateSationPost,
     api.postStationPost);
