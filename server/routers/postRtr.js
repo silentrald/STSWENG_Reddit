@@ -1,6 +1,6 @@
 const router = require('express')();
 const api = require('../api/postAPI');
-// const loginMw = require('../middlewares/loginMw');
+const loginMw = require('../middlewares/loginMw');
 const mw = require('../middlewares/postMw');
 
 // GET
@@ -10,10 +10,12 @@ router.get('/station/:station',
     api.getStationPosts);
 
 // POST
-// TODO: Add middleware
-router.post('/station/:station',
-    api.postStationPost),
 
+router.post('/station/:station',
+    loginMw.isNotAuth,
+    mw.validateStationParam,
+    mw.validateSationPost,
+    api.postStationPost);
 
 // PATCH
 
