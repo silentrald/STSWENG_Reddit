@@ -81,6 +81,8 @@ const postAPI = {
             station_name,
             author
         } = req.body;
+        // author = req.user.username;
+        // station_name = req.params.station;
 
         try {
 
@@ -102,10 +104,7 @@ const postAPI = {
 
             return res.status(201).send();
         } catch (err) {
-            console.log(err);
-            
-            // TODO: detect errors
-
+            console.log(err);            
 
             return res.status(500).send();
         }

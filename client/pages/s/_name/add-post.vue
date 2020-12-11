@@ -25,7 +25,7 @@
             id="text"
             v-model="post.text"
             class="form-control"
-            placeholder="Post Text"
+            placeholder="Post Body"
             @keydown="removeError('text')"
           />
         </div>
@@ -47,46 +47,63 @@ import customErrors from '@/helpers/customErrors'
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 require('ajv-keywords')(ajv, ['transform'])
 
-const USER_S_SCHEMA = 'us'
-const USER_V_SCHEMA = 'uv'
+const POST_S_SCHEMA = 'ps'
+const POST_V_SCHEMA = 'pv'
 
 ajv.addSchema({
   type: 'object',
   properties: {
     title: {
       transform: ['trim']
+    },
+    text: {
+      transform: ['trim']
+    },
+    station_name: {
+      transform: ['trim']
+    },
+    author: {
+      transform: ['trim']
     }
   }
-}, USER_S_SCHEMA)
+}, POST_S_SCHEMA)
 
 ajv.addSchema({
   type: 'object',
   properties: {
     title: {
       type: 'string',
-      minLength: 8,
+      minLength: 1,
       maxLength: 64
     },
     text: {
       type: 'string',
-      minLength: 8,
-      maxLength: 256
+      minLength: 1,
+      maxLength: 1000
+    },
+    station_name: {
+      type: 'string'
+    },
+    author: {
+      type: 'string'
     }
   },
   required: [
     'title',
-    'text'
+    'text',
+    'station_name',
+    'author'
   ]
-}, USER_V_SCHEMA)
+}, POST_V_SCHEMA)
 
 const customErrorMsg = {
   title: {
     maxLength: 'Post title is too long (max 64)',
-    minLength: 'Post title is too short (min 8)'
+    minLength: 'Post title is required'
   },
   text: {
-    maxLength: 'Post text is too long (max 256)',
-    minLength: 'Post text is too short (min 8)'
+    maxLength: 'Post text is too long (max 1000)',
+    minLength: 'Post text is required'
   }
 }
 
@@ -94,8 +111,8 @@ export default {
   data () {
     return {
       post: {
-        title: 'title',
-        text: 'text'
+        title: '',
+        text: ''
       },
       errors: { }
     }
@@ -110,8 +127,8 @@ export default {
 
     // TODO: update this validate
     validate () {
-      ajv.validate(USER_S_SCHEMA, this.user)
-      const validate = ajv.validate(USER_V_SCHEMA, this.user)
+      ajv.validate(POST_S_SCHEMA, this.user)
+      const validate = ajv.validate(POST_V_SCHEMA, this.user)
 
       if (!validate) {
         this.errors = customErrors(ajvErrors(ajv), customErrorMsg)
@@ -122,33 +139,37 @@ export default {
 
     submit () {
       // Get values from form
-      if (this.validate()) {
-        const station_name = this.$route.params.name
-        const post = { ...this.post, station_name } // Deep clone
+      // if (this.validate() {
+      const { name } = this.$route.params
+      const post = {
+        ...this.post,
+        station_name: name,
+        author: this.$auth.user.username
+      } // Deep clone
 
-        this.$axios.post(`/api/station/${station_name}`, {
-          ...post
+      this.$axios.post(`/api/post/station/${name}`, {
+        ...post
+      })
+        .then((res) => {
+          if (res.status !== 201) {
+            return
+          }
+
+          this.$router.push(`/s/${name}`)
         })
-          .then((res) => {
-            if (res.status !== 201) {
-              return
-            }
+        .catch((err) => {
+          const { status, data } = err.response
 
-            this.$router.push('/success')
-          })
-          .catch((err) => {
-            const { status, data } = err.response
-
-            if (status === 401) {
-              this.errors = customErrors(data.errors, customErrorMsg)
-            }
-          })
-      }
+          if (status === 401) {
+            this.errors = customErrors(data.errors, customErrorMsg)
+          }
+        })
+      // }
     }
   },
 
   head: {
-    title: 'Sign Up'
+    title: 'Add Post'
   }
 }
 </script>
