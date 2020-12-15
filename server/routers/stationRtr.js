@@ -14,10 +14,20 @@ router.get('/captains/:stationName',
 
 // POST
 
-router.post('/new',
+router.post('/create',
     loginMw.isAuth,
     stationMw.validateCreateStation,
     api.postCreateStation);
+
+router.post('/join/:stationName',
+    loginMw.isAuth,
+    stationMw.validateStationParam,
+    api.postJoinStation);
+
+router.post('/leave/:stationName',
+    loginMw.isAuth,
+    stationMw.validateStationParam,
+    api.postLeaveStation);
 
 // PATCH
 

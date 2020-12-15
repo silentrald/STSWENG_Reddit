@@ -41,6 +41,14 @@
                 <div id="image-container">
                   <img id="image" src="https://picsum.photos/80/80" width="80" height="80">
                 </div>
+                <div id="join-leave" class="mt-2 mb-1 w-50 mx-auto text-center">
+                  <button v-if="joined" id="leave-button" @click="leave()">
+                    LEAVE
+                  </button>
+                  <button v-else id="join-button" @click="join()">
+                    JOIN
+                  </button>
+                </div>
                 <h3>s/{{ name }}</h3>
                 <p>{{ description }}</p>
               </div>
@@ -119,7 +127,8 @@ export default {
       captains: [],
       posts: [],
       loading: true,
-      end: false
+      end: false,
+      joined: false
     }
   },
 
@@ -142,11 +151,12 @@ export default {
 
         // Get the current station
         res = await this.$axios.get(`/api/station/id/${name}`)
-        const { station } = res.data
+        const { station, joined } = res.data
         this.$set(this, 'hasStation', true)
         this.$set(this, 'name', station.name)
         this.$set(this, 'description', station.description)
         this.$set(this, 'rules', station.rules)
+        if (joined) { this.$set(this, 'joined', joined) }
 
         // Get all the current post in the stations
         if (top) {
@@ -239,6 +249,33 @@ export default {
       } catch (err) {}
 
       this.loading = false
+    },
+
+    join () {
+      this.$axios.post(`/api/station/join/${this.name}`)
+        .then(() => {
+          // When the user successfully joins, it sends 200 (or 204?) to indicate success
+          this.$set(this, 'joined', true)
+        })
+        .catch((err) => {
+          const { status } = err.response
+          if (status === 404) {
+            // this.errors = customErrors(data.errors, customErrorMsg)
+          }
+        })
+    },
+    leave () {
+      this.$axios.post(`/api/station/leave/${this.name}`)
+        .then(() => {
+          // When the user successfully leaves, it sends 200 (or 204?) to indicate success
+          this.$set(this, 'joined', false)
+        })
+        .catch((err) => {
+          const { status } = err.response
+          if (status === 404) {
+            // this.errors = customErrors(data.errors, customErrorMsg)
+          }
+        })
     }
   }
 }

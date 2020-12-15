@@ -6,6 +6,8 @@ const stationAPI = {
         const { stationName } = req.params;
 
         try {
+            let result = {};
+
             const querySelStation = {
                 text: 'SELECT * FROM stations WHERE name = $1 LIMIT 1;',
                 values: [ stationName ]
@@ -15,9 +17,23 @@ const stationAPI = {
             if (rowCount < 1) {
                 return res.status(404).send();
             }
+
+            result.station = rows[0];
+
+            // Optionally, if the user is logged in, another property, joined,
+            // is added to indicate whether the user is joined or not.
+            if (req.user) {
+                // TODO: this would better be just a COUNT() query
+                const querySelPassengers = {
+                    text: 'SELECT * FROM passengers WHERE username = $1 AND station_name = $2 LIMIT 1;',
+                    values: [ req.user.username, stationName ]
+                };
+
+                const { rowCount } = await db.query(querySelPassengers);
+                result.joined = rowCount > 0;
+            }
             
-            const station = rows[0];
-            return res.status(200).send({ station });
+            return res.status(200).send(result);
         } catch (err) {
             console.log(err);
 
@@ -107,6 +123,93 @@ const stationAPI = {
             return res.status(500).send();
         } finally {
             client.release();
+        }
+    },
+
+    postJoinStation: async (req, res) => {
+        const { stationName } = req.params;
+
+        try {
+            const querySelStations = {
+                text: 'SELECT * FROM stations WHERE name = $1 LIMIT 1;',
+                values: [ stationName ]
+            };
+
+            const sResult = await db.query(querySelStations);
+            if (!sResult.rows || sResult.rowCount == 0) {
+                return res.status(404).send();
+            }
+
+            if (sResult.rows[0].archived) {
+                return res.status(403).send({
+                    errors: { station: 'archived' }
+                });
+            }
+
+            const queryInsCrewmates = {
+                text: `
+                    INSERT INTO crewmates(username, station_name)
+                        VALUES($1, $2)
+                    RETURNING *;
+                `,
+                values: [ req.user.username, stationName ]
+            };
+
+            // The endpoint returns 403 when the user is already joined or the station is archived.
+            await db.query(queryInsCrewmates);
+            return res.status(200).send();
+        } catch (err) {
+            console.log(err);
+
+            if (err.code === '23505') {
+                if (err.constraint === 'pk_passengers') {
+                    return res.status(403).send({
+                        errors: { station: 'joined' }
+                    });
+                }
+            }
+
+            return res.status(500).send();
+        }
+    },
+
+    postLeaveStation: async (req, res) => {
+        const { stationName } = req.params;
+
+        try {
+            // Check if the user is a captain; this query is necessary for proper error information.
+            const querySelCaptains = {
+                text: 'SELECT * FROM captains WHERE username = $1 AND station_name = $2 LIMIT 1;',
+                values: [ req.user.username, stationName ]
+            };
+
+            const selResult = await db.query(querySelCaptains);
+            if (selResult.rowCount > 0) {
+                return res.status(403).send({
+                    errors: { station: 'isCaptain' }
+                });
+            }
+
+            const queryDelCrewmates = {
+                text: 'DELETE FROM crewmates WHERE username = $1 AND station_name = $2;',
+                values: [ req.user.username, stationName ]
+            };
+
+            // Test that captains cannot leave the station without first being demoted to crewmate.
+
+            // This endpoint allows users to leave a station that is already archived.
+            const delResult = await db.query(queryDelCrewmates);
+            if (delResult.rowCount < 1) {
+                return res.status(403).send({
+                    errors: { station: 'notJoined' }
+                });
+            }
+
+            return res.status(200).send();
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
         }
     },
 
