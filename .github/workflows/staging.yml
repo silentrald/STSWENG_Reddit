@@ -126,13 +126,4 @@ jobs:
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
-    
-    - name: Deploy Stage to Heroku ✈️
-      uses: akhileshns/heroku-deploy@v3.7.8 
-      with:
-        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-        heroku_app_name: ${{ secrets.HEROKU_STAGE_APP_NAME }}
-        heroku_email: ${{ secrets.HEROKU_EMAIL }}
-        branch: "staging"
-        appdir: "server"
-    
+      
