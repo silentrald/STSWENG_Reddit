@@ -41,7 +41,7 @@
                 <div id="image-container">
                   <img id="image" src="https://picsum.photos/80/80" width="80" height="80">
                 </div>
-                <div id="join-leave" class="mt-2 mb-1 w-50 mx-auto">
+                <div id="join-leave" class="mt-2 mb-1 w-50 mx-auto text-center">
                   <button v-if="joined" id="leave-button" @click="leave()">
                     LEAVE
                   </button>
