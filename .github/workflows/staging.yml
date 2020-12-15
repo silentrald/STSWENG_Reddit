@@ -68,6 +68,7 @@ jobs:
     - name: Migrate Up 🔺
       run: yarn migrate-up
       env:
+        NODE_ENV: development
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
@@ -78,6 +79,7 @@ jobs:
     - name: Insert Data 🔖
       run: yarn db-insert
       env:
+        NODE_ENV: development
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
@@ -88,6 +90,7 @@ jobs:
     - name: Unit Tests (Jest) 🧪
       run: yarn test-unit
       env:
+        NODE_ENV: development
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
@@ -99,6 +102,7 @@ jobs:
     - name: Integration Tests (Jest) 🧪
       run: yarn test-int
       env:
+        NODE_ENV: development
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
@@ -110,6 +114,7 @@ jobs:
     - name: Delete Data ❌
       run: yarn migrate-down
       env:
+        NODE_ENV: development
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
@@ -120,6 +125,7 @@ jobs:
     - name: Migrate Down 🔻
       run: yarn migrate-down
       env:
+        NODE_ENV: development
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
@@ -133,5 +139,4 @@ jobs:
         heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
         heroku_app_name: ${{ secrets.HEROKU_STAGE_APP_NAME }}
         heroku_email: ${{ secrets.HEROKU_EMAIL }}
-        appdir: "server"
     
