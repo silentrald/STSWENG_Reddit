@@ -127,7 +127,10 @@ jobs:
         POSTGRES_PORT: 5432
       working-directory: ./server
     
-    - name: Login to Heroku 🇭
+    - name: Install Heroku 🇭
+      run: sudo apt install heroku
+
+    - name: Login to Heroku ➡️
       run: heroku login
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
