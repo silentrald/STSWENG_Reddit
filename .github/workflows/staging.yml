@@ -126,10 +126,10 @@ jobs:
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
-    
-    - name: Install Heroku 🇭
-      run: sudo apt install heroku
 
+    - name: Install Heroku 🇭
+      run: apt-get install heroku
+    
     - name: Login to Heroku ➡️
       run: heroku login
       env:
