@@ -127,9 +127,10 @@ jobs:
         POSTGRES_PORT: 5432
       working-directory: ./server
     
-    - name: Add remote origin ➡️
-      run: git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_STAGE_APP_NAME }}.git
-
-    - name: Deploy to Heroku ✈️
-      run: git subtree push --prefix server heroku staging:master
+    - uses: akhileshns/heroku-deploy@v3.7.8 ✈️
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_STAGE_APP_NAME }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          appdir: "api"
     
