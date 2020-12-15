@@ -33,6 +33,14 @@ const crewmateUser = {
 //     username: 'imposter',
 //     password: 'password'
 // };
+
+const post = {
+    title: 'Sample Title',
+    text: 'Sample Text',
+    author: 'crewmate',
+    station_name: 'SampleStation'
+};
+
 let crewmateToken;
 let startingPost;
 let failStation;
@@ -555,25 +563,119 @@ describe('Station API', () => {
             });
         });
     });
-    /* TODO: AddPost Integration tests
+
     describe(`POST ${url}/station/:station`, () => {
         test('GOOD: Proper query while user is logged in', async() => {
+            const { statusCode } = await request(server)
+                .post(`${url}/station/${station}`)
+                .set('Authorization', crewmateToken)
+                .send(post);
 
+            expect(statusCode).toEqual(201);
         });
 
+        /* TODO:
         test('BAD: User is not logged in', () => {
+        });
+        */
+        // TODO: Need join-leave branch
+        // test('BAD: User is not part of station');
 
+        describe('ERROR: Title field', () => {
+            test('Title wrong type', async () => {
+                post.title = 0;
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', crewmateToken)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'type'
+                        }
+                    })
+                );
+            });
+
+            test('Empty string title', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', crewmateToken)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'minLength'
+                        }
+                    })
+                );
+            });
+
+            test('Title is too long', async () => {
+                // 65 chars
+                post.title = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', crewmateToken)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'maxLength'
+                        }
+                    })
+                );
+            });
+
+            test('No title property', async () => {
+                delete post.title;
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', crewmateToken)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'required'
+                        }
+                    })
+                );
+            });
         });
 
-        test('BAD: User is not part of station');
-
-        test('ERROR: Title field');
-
-        test('ERROR: Text field');
-    }); */
+        // describe('ERROR: Text field');
+    });
 });
 
 afterAll(async () => {
+    await db.query({
+        text: 'DELETE FROM posts WHERE author=$1',
+        values: [ crewmateUser.username ]
+    });
+
     await db.end();
 
     await server.close();
