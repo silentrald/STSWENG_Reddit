@@ -126,17 +126,10 @@ jobs:
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
+    
+    - name: Add remote origin ➡️
+      run: git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_STAGE_APP_NAME }}.git
 
-    - name: Install Heroku 🇭
-      run: snap install --classic heroku
-    
-    - name: Login to Heroku ➡️
-      run: heroku login
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-    
-    - name: Deploy Stage to Heroku Stage ✈️
-      run: |
-        heroku git:remote -a stsweng-rocket-server-staging
-        git subtree push --prefix server heroku staging:master
+    - name: Deploy to Heroku ✈️
+      run: git subtree push --prefix server heroku staging:master
     
