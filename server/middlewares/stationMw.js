@@ -7,6 +7,8 @@ require('ajv-keywords')(ajv, [ 'transform' ]);
 const STATION_S_SCHEMA = 'ss';
 const STATION_V_SCHEMA = 'sv';
 
+const STATION_NAME_REGEX = /^[A-Za-z0-9_-]+$/;
+
 ajv.addSchema({
     type: 'object',
     properties: {
@@ -50,6 +52,20 @@ ajv.addSchema({
 }, STATION_V_SCHEMA);
 
 const stationMw = {
+    validateStationParam: (req, res, next) => {
+        const { stationName } = req.params;
+
+        if (!STATION_NAME_REGEX.test(stationName)) {
+            return res.status(403).send({ 
+                errors: {
+                    stationName: 'pattern'
+                }
+            });
+        }
+
+        next();
+    },
+
     validateCreateStation: (req, res, next) => {
         ajv.validate(STATION_S_SCHEMA, req.body); // sanitize
         const validate = ajv.validate(STATION_V_SCHEMA, req.body);
