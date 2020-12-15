@@ -8,7 +8,9 @@
         {{ title }}
       </div>
       <div class="post-preview margin-bottom">
-        <slot />
+        <remark>
+          <slot />
+        </remark>
       </div>
     </div>
     <div class="post-votes">

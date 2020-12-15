@@ -12,34 +12,44 @@
       </post>
     </div>
     <div class="comment-container">
-      <h5 class="margin-bottom">
-        COMMENTS ({{ post.comment_count }})
-      </h5>
-      <comment
-        v-for="comment in comments"
-        :id="comment.comment_id"
-        :key="comment.id"
-        :text="comment.text"
-        :score="comment.score"
-        :author="comment.author"
-        :subcomments="comment.subcomments"
-      />
-      <infinite-loading
-        spinner="waveDots"
-        @infinite="infiniteScroll"
-      >
-        <div slot="no-more">
-          <!-- TODO: Add the rocket logo -->
-          End of the Post
-        </div>
-        <div slot="no-results">
-          <!-- TODO: Add the rocket logo -->
-          End of the Post
-        </div>
-        <div slot="error" slot-scope="{ trigger }">
-          Error message, click <a href="javascript:;" @click="trigger">here</a> to retry
-        </div>
-      </infinite-loading>
+      <div v-if="loading">
+        <h5 class="margin-bottom">
+          COMMENTS
+        </h5>
+        <comment-lazyload :subcomments="3" />
+        <comment-lazyload :subcomments="2" />
+      </div>
+      <div v-else>
+        <h5 class="margin-bottom">
+          COMMENTS ({{ post.comment_count }})
+        </h5>
+        <comment
+          v-for="comment in comments"
+          :id="comment.comment_id"
+          :key="comment.id"
+          :text="comment.text"
+          :score="comment.score"
+          :date="comment.timestamp_created"
+          :author="comment.author"
+          :subcomments="comment.subcomments || []"
+        />
+        <infinite-loading
+          spinner="waveDots"
+          @infinite="infiniteScroll"
+        >
+          <div slot="no-more">
+            <!-- TODO: Add the rocket logo -->
+            End of the Post
+          </div>
+          <div slot="no-results">
+            <!-- TODO: Add the rocket logo -->
+            End of the Post
+          </div>
+          <div slot="error" slot-scope="{ trigger }">
+            Error message, click <a href="javascript:;" @click="trigger">here</a> to retry
+          </div>
+        </infinite-loading>
+      </div>
     </div>
   </div>
 </template>
@@ -47,11 +57,13 @@
 <script>
 const DEPTH = 3
 
+// TODO: See More Comments
 export default {
   data () {
     return {
       post: {},
-      comments: []
+      comments: [],
+      loading: true
     }
   },
 
@@ -82,6 +94,8 @@ export default {
           await this.loadSubcomments(comment, 1)
         } catch (_err) {}
       }
+
+      this.loading = false
     },
 
     async loadSubcomments (currentComment, depth) {
@@ -102,7 +116,6 @@ export default {
 
     infiniteScroll ($state) {
       setTimeout(async () => {
-        this.add = false
         const { post } = this.$route.params
 
         const params = {
@@ -124,7 +137,6 @@ export default {
         } else {
           $state.complete()
         }
-        this.add = true
       }, 500)
     }
   }

@@ -27,7 +27,7 @@ INSERT INTO posts(post_id, title, text, score, author, station_name, timestamp_c
     ('paaaaaaaaaa2', 'Sample Title 2', 'Sample Post by crewmate', -1, 'crewmate', 'SampleStation', now() - interval '1 days', 1);
 
 INSERT INTO posts(post_id, title, text, author, station_name) VALUES
-    ('paaaaaaaaaa3', 'Sample Title 3', 'Sample Post by crewmate', 'captain2', 'SampleStation2'),
+    ('paaaaaaaaaa3', 'Sample Markdown', '# Sample Post by crewmate', 'captain2', 'SampleStation2'),
     ('paaaaaaaaaa4', 'Sample Title 4', 'Sample Post by captain', 'captain1', 'SampleStation'),
     ('paaaaaaaaaa5', 'Sample Title 5', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
     ('paaaaaaaaaa6', 'Sample Title 6', 'Sample Post by captain', 'captain1', 'SampleStation'),
@@ -39,7 +39,8 @@ INSERT INTO posts(post_id, title, text, author, station_name) VALUES
     ('paaaaaaaaa12', 'Sample Title 12', 'Sample Post by captain', 'captain1', 'SampleStation'),
     ('paaaaaaaaa13', 'Sample Title 13', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
     ('paaaaaaaaa14', 'Sample Title 14', 'Sample Post by captain', 'captain1', 'SampleStation'),
-    ('paaaaaaaaa15', 'Sample Title 15', 'Sample Post by crewmate', 'crewmate', 'SampleStation');
+    ('paaaaaaaaa15', 'Sample Title 15', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaa16', 'Sample Title 16', 'Sample Post by crewmate', 'crewmate', 'SampleStation');
 
 /* comments */
 /* subposts */

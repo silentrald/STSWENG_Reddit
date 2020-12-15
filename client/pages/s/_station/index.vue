@@ -91,7 +91,7 @@
                   End of the Station
                 </div>
                 <div slot="no-results">
-                  No results message
+                  No Posts
                 </div>
                 <div slot="error" slot-scope="{ trigger }">
                   Error message, click <a href="javascript:;" @click="trigger">here</a> to retry

@@ -9,7 +9,7 @@
             height="24"
             :style="{
               // TODO: change this
-              backgroundColor: vote === 1 ? 'green' : 'none'
+              backgroundColor: 1 === 1 ? 'green' : 'none'
             }"
           >
         </div>
@@ -23,7 +23,7 @@
             height="24"
             :style="{
               // TODO: change this
-              backgroundColor: vote === -1 ? 'red' : 'none'
+              backgroundColor: -1 === -1 ? 'red' : 'none'
             }"
           >
         </div>
@@ -47,8 +47,9 @@
         :key="subcomment.id"
         :text="subcomment.text"
         :score="subcomment.score"
+        :date="subcomment.timestamp_created"
         :author="subcomment.author"
-        :subcomments="subcomment.subcomments"
+        :subcomments="subcomment.subcomments || []"
       />
     </div>
   </div>
