@@ -133,6 +133,6 @@ jobs:
         heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
         heroku_app_name: ${{ secrets.HEROKU_STAGE_APP_NAME }}
         heroku_email: ${{ secrets.HEROKU_EMAIL }}
-        branch: stage
-        appdir: server
+        branch: "stage"
+        appdir: "server"
     
