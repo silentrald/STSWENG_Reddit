@@ -1,12 +1,10 @@
 {
   "name": "stsweng-reddit",
-  "version": "1.0.0",
-  "engines": {
-    "node": "14.x"
-  },
+  "version": "0.0.0",
   "description": "A reddit clone",
   "main": "app.js",
   "scripts": {
+    "start": "node app",
     "dev": "npx nodemon app --exec \"npm run lint && node\"",
     "devtest": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent && node\"",
     "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color test/integration/post && node\"",
