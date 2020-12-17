@@ -135,6 +135,7 @@ jobs:
     
     - name: Deploying Stage to Heroku 🖥️
       run: |
+        git config --global user.email "secrets.HEROKU_EMAIL"
         git init
         git commit -m 'Stage V 0.0.0'
         git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_STAGE_APP_NAME }}.git
