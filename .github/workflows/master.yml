@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Deploying Production to Heroku 🖥️
         run: |
-          git config --global user.email "secrets.HEROKU_EMAIL"
+          git config --global user.email "${{ secrets.HEROKU_EMAIL }}"
           git init
           git add .
           git commit -m 'Release V !!version'
