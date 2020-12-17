@@ -137,7 +137,8 @@ jobs:
       run: |
         git config --global user.email "secrets.HEROKU_EMAIL"
         git init
+        git add .
         git commit -m 'Stage V 0.0.0'
         git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_STAGE_APP_NAME }}.git
-        git push heroku master
+        git push heroku master -f
       working-directory: ./server
