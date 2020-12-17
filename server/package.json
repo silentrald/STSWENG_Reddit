@@ -1,6 +1,9 @@
 {
   "name": "stsweng-reddit",
   "version": "0.0.0",
+  "engines": {
+    "node": "12.x"
+  },
   "description": "A reddit clone",
   "main": "app.js",
   "scripts": {
@@ -9,7 +12,6 @@
     "devtest": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent && node\"",
     "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color test/integration/post && node\"",
     "devstemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/post && node\"",
-    "build": "npm run lint && npm run test && node app",
     "lint": "eslint .",
     "test": "jest --runInBand --color --coverage",
     "stest": "jest --runInBand --color --coverage --silent",
@@ -31,6 +33,7 @@
   },
   "homepage": "https://github.com/silentrald/STSWENG#readme",
   "dependencies": {
+    "ajv": "^6.12.6",
     "ajv-keywords": "^3.5.2",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
