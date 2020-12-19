@@ -185,7 +185,7 @@ jobs:
 
     - name: Push to Github
       run: |
-        git remote add origin https://${{ secrets.GH_USER }}:${{ secrets.GH_TOKEN }}@github.com/${{ secrets.GH_USER }}/STSWENG_Reddit.git
+        git remote add origin https://github.com/${{ secrets.GH_USER }}/STSWENG_Reddit.git
         git add package.json
         git commit -C HEAD@{1}
         git push origin master:dev
