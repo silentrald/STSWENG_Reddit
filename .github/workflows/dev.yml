@@ -192,6 +192,7 @@ jobs:
     - name: Push to Github
       if: ${{ github.event_name == 'push' }}
       run: |
+        git init
         git add .
         git commit -C HEAD@{1}
         git push
