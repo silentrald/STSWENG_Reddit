@@ -122,7 +122,7 @@ jobs:
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: postgres
+        POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
       working-directory: ./server
 
@@ -133,7 +133,7 @@ jobs:
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: postgres
+        POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
       working-directory: ./server
 
@@ -144,7 +144,7 @@ jobs:
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: postgres
+        POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
         JWT_SECRET: temp_secret
       working-directory: ./server
@@ -156,7 +156,7 @@ jobs:
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: postgres
+        POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
         JWT_SECRET: temp_secret
       working-directory: ./server
@@ -168,7 +168,7 @@ jobs:
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: postgres
+        POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
       working-directory: ./server
 
@@ -179,7 +179,7 @@ jobs:
         POSTGRES_USER: stsweng_user
         POSTGRES_PASSWORD: password
         POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: postgres
+        POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
       working-directory: ./server
     
