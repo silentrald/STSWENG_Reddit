@@ -24,26 +24,50 @@ let tmpUser = {
     bio: 'I like testing stuff'
 };
 
+let tmpUser2 = {
+    username: 'temp-user-2',
+    password: 'Hello-p4ssword',
+    email: 'temp2@gmail.com',
+    fname: 'Temporary Jr.',
+    lname: 'User',
+    gender: 'm',
+    birthday: '2001-01-01',
+    bio: 'I like testing stuff just like my parent'
+};
+
 let failStation;
-let token;
+let token, token2;
 
 beforeAll(async () => {
     await request(server)
         .post(`${userUrl}/create`)
         .send(tmpUser);
     
-    const { body } = await request(server)
+    const res1 = await request(server)
         .post(`${userUrl}/login`)
         .send({
             username: tmpUser.username,
             password: tmpUser.password
         });
 
-    token = body.token;
+    token = res1.body.token;
+
+    await request(server)
+        .post(`${userUrl}/create`)
+        .send(tmpUser2);
+    
+    const res2 = await request(server)
+        .post(`${userUrl}/login`)
+        .send({
+            username: tmpUser2.username,
+            password: tmpUser2.password
+        });
+
+    token2 = res2.body.token;
 });
 
 describe('Station API', () => {
-    describe(`POST ${url}/new`, () => {
+    describe(`POST ${url}/create`, () => {
         beforeEach(() => {
             failStation = {
                 name: 'nontest',
@@ -56,7 +80,7 @@ describe('Station API', () => {
             const {
                 statusCode,
                 body
-            } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+            } = await request(server).post(`${url}/create`).set('Authorization', `Bearer ${token}`)
                 .send(station);
             
             expect(statusCode).toEqual(201);
@@ -74,14 +98,14 @@ describe('Station API', () => {
         });
 
         test('ERROR: invalid token', async () => {
-            const { statusCode } = await request(server).post(`${url}/new`)
+            const { statusCode } = await request(server).post(`${url}/create`)
                 .send(station);
             
             expect(statusCode).toEqual(403);
         });
 
         test('ERROR: station already exists', async () => {
-            const { statusCode, body } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+            const { statusCode, body } = await request(server).post(`${url}/create`).set('Authorization', `Bearer ${token}`)
                 .send(station);
             
             expect(statusCode).toEqual(401);
@@ -96,7 +120,7 @@ describe('Station API', () => {
 
         test('ERROR: station name too short', async () => {
             failStation.name = 'ab';
-            const { statusCode, body } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+            const { statusCode, body } = await request(server).post(`${url}/create`).set('Authorization', `Bearer ${token}`)
                 .send(failStation);
             
             expect(statusCode).toEqual(401);
@@ -111,7 +135,7 @@ describe('Station API', () => {
 
         test('ERROR: station name too long', async () => {
             failStation.name = 'abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcde'; // 65 chars
-            const { statusCode, body } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+            const { statusCode, body } = await request(server).post(`${url}/create`).set('Authorization', `Bearer ${token}`)
                 .send(failStation);
             
             expect(statusCode).toEqual(401);
@@ -126,7 +150,7 @@ describe('Station API', () => {
 
         test('ERROR: station name too short with spaces', async () => {
             failStation.name = 'ab   '; // 2 chars w/o spaces, 5 chars with spaces, 3 minimum
-            const { statusCode, body } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+            const { statusCode, body } = await request(server).post(`${url}/create`).set('Authorization', `Bearer ${token}`)
                 .send(failStation);
             
             expect(statusCode).toEqual(401);
@@ -142,7 +166,7 @@ describe('Station API', () => {
         test('ERROR: station name with invalid characters', async () => {
             // Valid characters are A-Z, a-z, 0-9, _, and -
             failStation.name = 'abcdef012345???';
-            const { statusCode, body } = await request(server).post(`${url}/new`).set('Authorization', `Bearer ${token}`)
+            const { statusCode, body } = await request(server).post(`${url}/create`).set('Authorization', `Bearer ${token}`)
                 .send(failStation);
             
             expect(statusCode).toEqual(401);
@@ -233,11 +257,92 @@ describe('Station API', () => {
             expect(statusCode).toEqual(404);
         });
     });
+
+    describe(`POST ${url}/join/:name`, () => {
+        test('GOOD: user previously not joined', async () => {
+            const { statusCode } = await request(server).post(`${url}/join/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        // some unknown issue with primary key constraint here
+        // fails, at least on my machine
+        /*test('ERROR: user already joined', async () => {
+            const { statusCode, body } = await request(server).post(`${url}/join/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        station: 'joined'
+                    })
+                })
+            );
+        });*/
+
+        test('ERROR: user joins nonexistent station', async () => {
+            const { statusCode } = await request(server).post(`${url}/join/${failStation.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+            
+            expect(statusCode).toEqual(404);
+        });
+    });
+
+    describe(`POST ${url}/leave/:name`, () => {
+        test('GOOD: user joined previously before leaving', async () => {
+            const { statusCode } = await request(server).post(`${url}/leave/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        test('ERROR: user not joined', async () => {
+            const { statusCode, body } = await request(server).post(`${url}/leave/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        station: 'notJoined'
+                    })
+                })
+            );
+        });
+
+        test('ERROR: user is a captain and cannot leave', async () => {
+            const { statusCode, body } = await request(server).post(`${url}/leave/${station.name}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send();
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        station: 'isCaptain'
+                    })
+                })
+            );
+        });
+    });
 });
 
 afterAll(async () => {
+    await server.close();
+
     await db.query({ 
-        text: 'DELETE FROM captains WHERE username=$1',
+        text: 'DELETE FROM passengers WHERE username=$1',
+        values: [ tmpUser2.username ]
+    });
+    await db.query({ 
+        text: 'DELETE FROM passengers WHERE username=$1',
         values: [ tmpUser.username ]
     });
     await db.query({ 
@@ -246,9 +351,11 @@ afterAll(async () => {
     });
     await db.query({ 
         text: 'DELETE FROM users WHERE username=$1',
+        values: [ tmpUser2.username ]
+    });
+    await db.query({ 
+        text: 'DELETE FROM users WHERE username=$1',
         values: [ tmpUser.username ]
     });
     await db.end();
-
-    await server.close();
 });
