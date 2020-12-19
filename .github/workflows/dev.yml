@@ -185,8 +185,9 @@ jobs:
 
     - name: Push to Github
       run: |
-        git remote add origin https://github.com/silentrald/STSWENG_Reddit.git
+        git init
         git add package.json
         git commit -C HEAD@{1}
+        git remote add origin https://github.com/silentrald/STSWENG_Reddit.git
         git push origin master:dev
       
