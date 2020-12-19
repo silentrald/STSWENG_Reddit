@@ -189,8 +189,12 @@ jobs:
         npm version minor
       working-directory: ./server
 
-    - name: Push to Github
-      if: ${{ github.event_name == 'push' }}
+    - name: Push Changes
       run: |
-        git push
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "Update Version" -a
+        git push "${URL}" HEAD:dev
+      env:
+        URL: https://${{ secrets.GH_USER }}:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
       
