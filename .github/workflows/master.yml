@@ -17,6 +17,11 @@ jobs:
     steps:
       - name: Checkout 🛎
         uses: actions/checkout@v2
+      
+      - name: Update Version 🌀
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
 
       - name: Deploying Production to Heroku 🖥️
         run: |

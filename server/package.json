@@ -2,7 +2,7 @@
   "name": "stsweng-reddit",
   "version": "0.0.0",
   "engines": {
-    "node": "12.x"
+    "node": "14.x"
   },
   "description": "A reddit clone",
   "main": "app.js",
@@ -24,14 +24,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/silentrald/STSWENG.git"
+    "url": "git+https://github.com/silentrald/STSWENG_Reddit.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/silentrald/STSWENG/issues"
+    "url": "https://github.com/silentrald/STSWENG_Reddit/issues"
   },
-  "homepage": "https://github.com/silentrald/STSWENG#readme",
+  "homepage": "https://github.com/silentrald/STSWENG_Reddit#readme",
   "dependencies": {
     "ajv": "^6.12.6",
     "ajv-keywords": "^3.5.2",
@@ -49,6 +49,10 @@
     "jest": "^26.6.1",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.6",
+    "semantic-release": "^17.3.0",
     "supertest": "^6.0.0"
+  },
+  "release": {
+    "branches": ["master", "next"]
   }
 }
