@@ -79,6 +79,8 @@ jobs:
     steps:
     - name: Checkout 🛎
       uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GH_TOKEN }}
     
     - name: Use Node.js ${{ matrix.node-version }} 😊
       uses: actions/setup-node@v1
@@ -179,15 +181,15 @@ jobs:
       working-directory: ./server
       
     - name: Update Feature Version 🌀
+      if: ${{ github.event_name == 'push' }}
       run: |
         npm version minor
       working-directory: ./server
 
     - name: Push to Github
+      if: ${{ github.event_name == 'push' }}
       run: |
-        git init
         git add package.json
         git commit -C HEAD@{1}
-        git remote add origin https://github.com/silentrald/STSWENG_Reddit.git
-        git push origin master:dev
+        git push
       
