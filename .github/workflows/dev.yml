@@ -81,9 +81,12 @@ jobs:
 
     steps:
     - name: Checkout 🛎
-      uses: actions/checkout@v2
+      uses: actions/checkout@master
+      with:
+        persist-credentials: false
+        fetch-depth: 0
     
-    - run: ls -a  
+    - run: ls -a
 
     - name: Use Node.js ${{ matrix.node-version }} 😊
       uses: actions/setup-node@v1
@@ -182,8 +185,6 @@ jobs:
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
-
-    - run: ls -a  
     
     - name: Update Feature Version 🌀
       if: ${{ github.event_name == 'push' }}
