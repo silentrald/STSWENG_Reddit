@@ -7,6 +7,9 @@ on:
     paths-ignore:
       - 'server/package.json'
       - 'server/CHANGELOG.md'
+  pull_request:
+    branches:
+      - dev
 
 jobs:
   nuxt_client:
@@ -189,7 +192,7 @@ jobs:
     - name: Push to Github
       if: ${{ github.event_name == 'push' }}
       run: |
-        git add package.json
+        git add server/package.json
         git commit -C HEAD@{1}
         git push
       
