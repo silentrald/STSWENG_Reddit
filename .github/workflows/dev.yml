@@ -191,8 +191,6 @@ jobs:
 
     - name: Push Changes
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
         git commit -m "Update Version" -a
         git push "${URL}" HEAD:dev
       env:
