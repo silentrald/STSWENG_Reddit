@@ -191,8 +191,7 @@ jobs:
 
     - name: Push Changes
       run: |
-        git commit -m "Update Version" -a
-        git push "${URL}" HEAD:dev
-      env:
-        URL: https://${{ secrets.GH_USER }}:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
-      
+        git config --global user.name "Github Actions"
+        git add server/package.json
+        git commit -m "Update Version"
+        git push
