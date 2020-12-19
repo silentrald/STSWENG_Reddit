@@ -20,11 +20,12 @@
     "migrate-up": "node migrations/up",
     "migrate-down": "node migrations/down",
     "db-delete": "node migrations/delete",
-    "db-insert": "node migrations/insert"
+    "db-insert": "node migrations/insert",
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/silentrald/STSWENG_Reddit.git"
+    "url": "https://github.com/silentrald/STSWENG_Reddit.git"
   },
   "author": "",
   "license": "MIT",
@@ -53,6 +54,12 @@
     "supertest": "^6.0.0"
   },
   "release": {
-    "branches": ["master", "next"]
+    "branches": [
+      "master",
+      "next"
+    ]
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }
