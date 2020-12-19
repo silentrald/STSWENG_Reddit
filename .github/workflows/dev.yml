@@ -82,6 +82,8 @@ jobs:
     steps:
     - name: Checkout 🛎
       uses: actions/checkout@v2
+    
+    - run: ls -a  
 
     - name: Use Node.js ${{ matrix.node-version }} 😊
       uses: actions/setup-node@v1
@@ -180,7 +182,9 @@ jobs:
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
-      
+
+    - run: ls -a  
+    
     - name: Update Feature Version 🌀
       if: ${{ github.event_name == 'push' }}
       run: |
@@ -188,6 +192,7 @@ jobs:
       working-directory: ./server
 
     - name: Push Changes
+      if: ${{ github.event_name == 'push' }}
       run: |
         git config --global user.name "Github Actions"
         git add server/package.json
