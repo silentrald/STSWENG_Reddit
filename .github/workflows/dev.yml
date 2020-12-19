@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout 🛎
         uses: actions/checkout@v2
+      
+      - run: ls -a
 
       - name: Setup node env 🏗
         uses: actions/setup-node@v1
