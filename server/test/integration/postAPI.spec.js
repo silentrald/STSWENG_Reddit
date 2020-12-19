@@ -35,6 +35,7 @@ const crewmateUser = {
 // };
 
 let post;
+let testPostIds = [];
 let crewmateToken;
 let startingPost;
 let failStation;
@@ -569,15 +570,17 @@ describe('Station API', () => {
         });
 
         test('GOOD: Proper query while user is logged in', async() => {
-            const { statusCode } = await request(server)
+            const { statusCode, body } = await request(server)
                 .post(`${url}/station/${station}`)
                 .set('Authorization', `Bearer ${crewmateToken}`)
                 .send(post);
 
+            let { postId } = body;
+            testPostIds.push(postId);
+
             expect(statusCode).toEqual(201);
         });
 
-        
         test('BAD: User is not logged in', async () => {
             const { statusCode } = await request(server)
                 .post(`${url}/station/${station}`)
@@ -778,10 +781,10 @@ describe('Station API', () => {
 });
 
 afterAll(async () => {
-    /*await db.query({
-        text: 'DELETE FROM posts WHERE author=$1',
-        values: [ crewmateUser.username ]
-    });*/
+    await db.query({
+        text: 'DELETE FROM posts WHERE post_id = ANY($1)',
+        values: [ testPostIds ]
+    });
 
     await db.end();
 

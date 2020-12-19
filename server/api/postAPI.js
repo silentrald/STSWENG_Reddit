@@ -91,6 +91,7 @@ const postAPI = {
                 text: `
                     INSERT INTO posts(post_id, title, text, author, station_name) 
                         VALUES(post_id(), $1, $2, $3, $4)
+                    RETURNING post_id;
                 `,
                 values: [
                     title,
@@ -100,9 +101,10 @@ const postAPI = {
                 ]
             };
 
-            await db.query(queryInsPost);
+            const resultPost = await db.query(queryInsPost);
+            const postId = resultPost.rows[0].post_id;
 
-            return res.status(201).send();
+            return res.status(201).send({ postId });
         } catch (err) {
             console.log(err);            
 
