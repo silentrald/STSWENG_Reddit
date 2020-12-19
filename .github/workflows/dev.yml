@@ -59,27 +59,25 @@ jobs:
   express_server:
     runs-on: ${{ matrix.os }}
 
-    container: node
-
     strategy:
       matrix:
         os: [ubuntu-latest]
         node-version: [14.x]
 
-    # services:
-    #   postgres:
-    #     image: postgres
-    #     env:
-    #       POSTGRES_USER: stsweng_user
-    #       POSTGRES_PASSWORD: password
-    #       POSTGRES_DB: stsweng_db
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
-    #     ports:
-    #       - 5432:5432
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
     - name: Checkout 🛎
