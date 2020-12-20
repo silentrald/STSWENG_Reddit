@@ -192,8 +192,6 @@ jobs:
     - name: Push Changes
       if: ${{ github.event_name == 'push' }}
       run: |
-        git config --global user.name "Github Actions"
         git add server/package.json
         git commit -m "Update Version"
-        git remote add url https://${{ secrets.GH_USER }}:${{ secrets.GH_TOKEN }}@github.com/{{ github.repository }}.git
-        git push url HEAD:dev
+        git push https://${{ secrets.GH_USER }}:${{ secrets.GH_TOKEN }}@github.com/{{ github.repository }}.git HEAD:dev
