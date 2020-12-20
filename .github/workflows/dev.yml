@@ -192,7 +192,8 @@ jobs:
     - name: Push Changes ➡️
       if: ${{ github.event_name == 'push' }}
       run: |
-        git config --global user.name "Github-Actions"
+        git config --global user.name "${{ secrets.GH_USER }}"
+        git config --global user.email "${{ secrets.GH_EMAIL }}"
         git add server/package.json
         git commit -m "Update Version"
         git push https://${{ secrets.GH_USER }}:${{ secrets.GH_TOKEN }}@github.com/{{ github.repository }}.git HEAD:dev
