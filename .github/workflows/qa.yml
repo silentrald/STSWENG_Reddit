@@ -1,12 +1,9 @@
-name: Development
+name: QA
 
 on:
   push:
     branches:
-      - dev
-  pull_request:
-    branches:
-      - dev
+      - qa
 
 jobs:
   nuxt_client:
@@ -153,6 +150,42 @@ jobs:
         POSTGRES_PORT: 5432
         JWT_SECRET: temp_secret
       working-directory: ./server
+      
+    # Initiate docker
+    - name: Initialize Docker 📤
+      run: |
+        docker build -t rocket-server .
+        docker run -p 5000:5000 -d rocket-server
+
+    # Automation testing
+    - name: Install Python 🐍
+      run: sudo apt-get install python3
+    
+    - name: Install Robot Framework 🤖
+      run: |
+        pip install pipenv
+        pipenv install
+      working-directory: ./e2e
+    
+    - name: Install Chrome Browser 🥽
+      run: |
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo apt install ./google-chrome-stable_current_amd64.deb
+    
+    - name: Install chromedriver 🥽
+      run: |
+        wget https://chromedriver.storage.googleapis.com/88.0.4324.27/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+        sudo cp chromedriver /usr/bin/chromedriver
+        sudo chown root /usr/bin/chromedriver
+        sudo chmod +x /usr/bin/chromedriver
+        sudo chmod 755 /usr/bin/chromedriver
+
+    - name: Automated E2E test with Robot 🤖
+      run: robot UserRegistration.robot
+    
+    - name: Stop Docker
+      run: docker stop $(docker ps | grep 'rocket-server' | cut -d " " -f 1)
     
     - name: Delete Data ❌
       run: yarn migrate-down
