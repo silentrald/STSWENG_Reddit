@@ -9,8 +9,6 @@ services:
   server:
     build: ./server
     command: bash -c "yarn migrate-down && yarn migrate-up && yarn db-insert && node app"
-    depends_on: 
-      - db
     volumes:
       - ./opt/server:/server
     ports:
@@ -18,6 +16,7 @@ services:
     environment:
       HOST: '0.0.0.0'
       NODE_ENV: development
+      # DATABASE_URL: postgres://stsweng_user:password@db:5432/stsweng_db
       POSTGRES_USER: stsweng_user
       POSTGRES_PASSWORD: password
       POSTGRES_HOST: db
@@ -34,4 +33,3 @@ services:
     environment:
       HOST: '0.0.0.0'
       SERVER_URL: http://localhost:5000
-      

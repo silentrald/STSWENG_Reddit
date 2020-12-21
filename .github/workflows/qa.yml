@@ -224,7 +224,7 @@ jobs:
     - name: Initialize Docker 📤
       run: |
         docker-compose build
-        docker-compose up -d
+        docker-compose up
     
     - name: Install Node Postgres
       run: yarn add pg
@@ -280,8 +280,6 @@ jobs:
         sudo chown root /usr/bin/chromedriver
         sudo chmod +x /usr/bin/chromedriver
         sudo chmod 755 /usr/bin/chromedriver
-
-    - run: docker ps -a
 
     - name: Automated E2E test with Robot 🤖
       run: robot UserRegistration.robot
