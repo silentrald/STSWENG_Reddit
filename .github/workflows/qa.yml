@@ -264,7 +264,7 @@ jobs:
       run: |
         pip install robotframework
         pip install --upgrade robotframework-seleniumlibrary
-        pip install webdriver-manager
+        pip install webdrivermanager
         pip install chromedriver
       working-directory: ./e2e
     
