@@ -1,16 +1,8 @@
 version: '3'
 services:
-  db:
-    image: postgres
-    ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_DB: stsweng_db
-      POSTGRES_USER: stsweng_user
-      POSTGRES_PASSWORD: password
   server:
     build: ./server
-    command: bash -c "yarn migrate-down && yarn migrate-up && yarn db-insert && node app"
+    command: node app
     volumes:
       - ./opt/server:/server
     ports:

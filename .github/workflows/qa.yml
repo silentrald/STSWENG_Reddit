@@ -183,20 +183,47 @@ jobs:
         os: [ubuntu-latest]
         node-version: [14.x]
 
-    # services:
-    #   db:
-    #     image: postgres
-    #     env:
-    #       POSTGRES_USER: stsweng_user
-    #       POSTGRES_PASSWORD: password
-    #       POSTGRES_DB: stsweng_db
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
-    #     ports:
-    #       - 5432:5432
+    services:
+      db:
+        image: postgres
+        env:
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      server:
+        build: ./server
+        command: node app
+        volumes:
+          - ./opt/server:/server
+        ports:
+          - 5000:5000
+        env:
+          HOST: '0.0.0.0'
+          NODE_ENV: development
+          # DATABASE_URL: postgres://stsweng_user:password@db:5432/stsweng_db
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_HOST: db
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: stsweng_db
+          JWT_SECRET: random_secret
+      client:
+        build: ./client
+        command: yarn dev
+        volumes:
+          - ./opt/client:/client
+        ports:
+          - 3000:3000
+        env:
+          HOST: '0.0.0.0'
+          SERVER_URL: http://localhost:5000
     
     steps:
     - name: Checkout 🛎
@@ -221,36 +248,36 @@ jobs:
           ${{ runner.os }}-yarn-
     
     # Initiate docker
-    - name: Initialize Docker 📤
-      run: |
-        docker-compose build
-        docker-compose up -d
+    # - name: Initialize Docker 📤
+    #   run: |
+    #     docker-compose build
+    #     docker-compose up -d
     
     - name: Install Node Postgres
       run: yarn add pg
       working-directory: ./server
 
-    # - name: Migrate Up 🔺
-    #   run: yarn migrate-up
-    #   env:
-    #     NODE_ENV: development
-    #     POSTGRES_USER: stsweng_user
-    #     POSTGRES_PASSWORD: password
-    #     POSTGRES_DB: stsweng_db
-    #     POSTGRES_HOST: localhost
-    #     POSTGRES_PORT: 5432
-    #   working-directory: ./server
+    - name: Migrate Up 🔺
+      run: yarn migrate-up
+      env:
+        NODE_ENV: development
+        POSTGRES_USER: stsweng_user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: stsweng_db
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
+      working-directory: ./server
 
-    # - name: Insert Data 🔖
-    #   run: yarn db-insert
-    #   env:
-    #     NODE_ENV: development
-    #     POSTGRES_USER: stsweng_user
-    #     POSTGRES_PASSWORD: password
-    #     POSTGRES_DB: stsweng_db
-    #     POSTGRES_HOST: localhost
-    #     POSTGRES_PORT: 5432
-    #   working-directory: ./server
+    - name: Insert Data 🔖
+      run: yarn db-insert
+      env:
+        NODE_ENV: development
+        POSTGRES_USER: stsweng_user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: stsweng_db
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
+      working-directory: ./server
 
     # Automation testing
     - name: Install Python 🐍
@@ -289,24 +316,24 @@ jobs:
       run: |
         docker-compose down
     
-    # - name: Delete Data ❌
-    #   run: yarn db-delete
-    #   env:
-    #     NODE_ENV: development
-    #     POSTGRES_USER: stsweng_user
-    #     POSTGRES_PASSWORD: password
-    #     POSTGRES_DB: stsweng_db
-    #     POSTGRES_HOST: localhost
-    #     POSTGRES_PORT: 5432
-    #   working-directory: ./server
+    - name: Delete Data ❌
+      run: yarn db-delete
+      env:
+        NODE_ENV: development
+        POSTGRES_USER: stsweng_user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: stsweng_db
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
+      working-directory: ./server
 
-    # - name: Migrate Down 🔻
-    #   run: yarn migrate-down
-    #   env:
-    #     NODE_ENV: development
-    #     POSTGRES_USER: stsweng_user
-    #     POSTGRES_PASSWORD: password
-    #     POSTGRES_DB: stsweng_db
-    #     POSTGRES_HOST: localhost
-    #     POSTGRES_PORT: 5432
-    #   working-directory: ./server
+    - name: Migrate Down 🔻
+      run: yarn migrate-down
+      env:
+        NODE_ENV: development
+        POSTGRES_USER: stsweng_user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: stsweng_db
+        POSTGRES_HOST: localhost
+        POSTGRES_PORT: 5432
+      working-directory: ./server
