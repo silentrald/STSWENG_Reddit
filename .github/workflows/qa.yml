@@ -257,10 +257,11 @@ jobs:
     - name: Install Python 🐍
       run: sudo apt-get install python3
     
-    - name: Install Robot Framework 🤖
+    - name: Install Robot Framework Packages 🤖
       run: |
-        pip install pipenv
-        pipenv install
+        pip install robotframework
+        pip install --upgrade robotframework-seleniumlibrary
+        pip install chromedriver
       working-directory: ./e2e
     
     - name: Install Chrome Browser 🥽
