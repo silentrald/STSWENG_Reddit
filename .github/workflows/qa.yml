@@ -220,6 +220,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
     
+    # Initiate docker
+    - name: Initialize Docker 📤
+      run: |
+        docker-compose build
+        docker-compose up -d
+
+    - name: Check docker
+      run: docker ps
+    
     - name: Install Node Postgres
       run: yarn add pg
       working-directory: ./server
@@ -245,12 +254,6 @@ jobs:
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
       working-directory: ./server
-
-    # Initiate docker
-    - name: Initialize Docker 📤
-      run: |
-        docker-compose build
-        docker-compose up -d
 
     # Automation testing
     - name: Install Python 🐍
