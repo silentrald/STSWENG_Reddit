@@ -155,7 +155,7 @@ jobs:
       working-directory: ./server
     
     - name: Delete Data ❌
-      run: yarn migrate-down
+      run: yarn db-delete
       env:
         NODE_ENV: development
         POSTGRES_USER: stsweng_user
