@@ -255,14 +255,16 @@ jobs:
 
     # Automation testing
     - name: Install Python 🐍
-      run: sudo apt-get install python3
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+        architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
     
     - name: Install Robot Framework Packages 🤖
       run: |
         pip install robotframework
         pip install --upgrade robotframework-seleniumlibrary
         pip install chromedriver
-        pip install robotframework -t .
       working-directory: ./e2e
     
     - name: Install Chrome Browser 🥽
@@ -280,7 +282,7 @@ jobs:
         sudo chmod 755 /usr/bin/chromedriver
 
     - name: Automated E2E test with Robot 🤖
-      run: server/robot UserRegistration.robot
+      run: robot UserRegistration.robot
       working-directory: ./e2e
     
     - name: Stop Docker 📤
