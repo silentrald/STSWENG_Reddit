@@ -222,7 +222,7 @@ jobs:
     
     - name: Install Node Postgres
       run: yarn add pg
-      working-server: ./server
+      working-directory: ./server
 
     - name: Migrate Up 🔺
       run: yarn migrate-up
