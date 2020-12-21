@@ -4,7 +4,7 @@ services:
     build: ./server
     command: node app
     volumes:
-      - ./server:/opt/server
+      - ./opt/server:/server
     ports:
       - "5000:5000"
     environment:
@@ -20,7 +20,7 @@ services:
     build: ./client
     command: yarn dev
     volumes:
-      - ./client:/opt/client
+      - ./opt/client:/client
     ports:
       - "3000:3000"
     environment:
