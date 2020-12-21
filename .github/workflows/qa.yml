@@ -264,7 +264,7 @@ jobs:
       run: |
         pip install robotframework
         pip install --upgrade robotframework-seleniumlibrary
-        pip install webdrivermanager
+        pip install webdriver-manager
         pip install chromedriver
       working-directory: ./e2e
     
@@ -281,6 +281,9 @@ jobs:
         sudo chown root /usr/bin/chromedriver
         sudo chmod +x /usr/bin/chromedriver
         sudo chmod 755 /usr/bin/chromedriver
+
+    - name: Check docker
+      run: docker ps
 
     - name: Automated E2E test with Robot 🤖
       run: robot UserRegistration.robot
