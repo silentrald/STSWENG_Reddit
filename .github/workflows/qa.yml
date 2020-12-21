@@ -220,6 +220,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
     
+    # Initiate docker
+    - name: Initialize Docker 📤
+      run: |
+        docker-compose build
+        docker-compose up -d
+    
     - name: Install Node Postgres
       run: yarn add pg
       working-directory: ./server
@@ -275,14 +281,8 @@ jobs:
         sudo chmod +x /usr/bin/chromedriver
         sudo chmod 755 /usr/bin/chromedriver
 
-    # Initiate docker
-    - name: Initialize Docker 📤
-      run: |
-        docker-compose build
-        docker-compose up -d
-
     - name: Check docker
-      run: docker ps
+      run: docker ps -a
 
     - name: Automated E2E test with Robot 🤖
       run: robot UserRegistration.robot
