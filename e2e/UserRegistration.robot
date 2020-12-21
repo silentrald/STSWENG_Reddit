@@ -18,7 +18,7 @@ This is sample test case
     Input Text  id=cpassword  Password1
     Click Element  id=submit
 
-    Wait Until Element is Visible  id=success  1 min
+    Wait Until Element is Visible  id=success
     Close Browser
 
 *** Keywords ***
