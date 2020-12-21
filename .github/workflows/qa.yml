@@ -226,6 +226,8 @@ jobs:
         docker-compose build
         docker-compose up -d
     
+    - run: docker ps -a
+    
     - name: Install Node Postgres
       run: yarn add pg
       working-directory: ./server

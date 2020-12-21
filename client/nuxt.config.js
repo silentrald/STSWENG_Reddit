@@ -1,4 +1,9 @@
 export default {
+  server: {
+    port: process.env.PORT || 3000,
+    host: process.env.HOST || 'localhost'
+  },
+
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
     title: 'Rocket',
