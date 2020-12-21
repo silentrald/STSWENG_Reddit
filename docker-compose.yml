@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: password
   server:
     build: ./server
-    command: node app
+    command: bash -c "yarn migrate-down && yarn migrate-up && yarn db-insert && node app"
     volumes:
       - ./opt/server:/server
     ports:
