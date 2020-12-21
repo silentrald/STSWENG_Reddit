@@ -6,8 +6,8 @@ Library  SeleniumLibrary
 This is sample test case
     [documentation]  User Registration
 
-    Open Browser  http://localhost:3000  chrome
-    Maximize Browser Window
+    Open Browser  http://localhost:3000  headlesschrome
+    Set Window Size  1980  720  true
 
     Click Element  id=signup
 
@@ -17,7 +17,8 @@ This is sample test case
     Input Text  id=password  Password1
     Input Text  id=cpassword  Password1
     Click Element  id=submit
-    Page Should Contain Element  xpath=//*[@id="__layout"]/div/div/div
+
+    Wait Until Element is Visible  id=success
     Close Browser
 
 *** Keywords ***
