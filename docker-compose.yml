@@ -2,7 +2,7 @@ version: '3'
 services:
   server:
     build: ./server
-    command: node app # fix: not working
+    command: node app
     volumes:
       - ./server:/opt/server
     ports:
@@ -18,12 +18,12 @@ services:
       JWT_SECRET: random_secret
   client:
     build: ./client
-    command: yarn dev # FIX: not working
+    command: yarn dev
     volumes:
       - ./client:/opt/client
     ports:
       - "3000:3000"
     environment:
       HOST: '0.0.0.0'
-      SERVER_URL: http://server:5000
+      SERVER_URL: http://localhost:5000
       
