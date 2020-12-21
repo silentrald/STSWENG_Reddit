@@ -220,6 +220,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
     
+    - name: Install Node Postgres
+      run: yarn add pg
+      working-server: ./server
+
     - name: Migrate Up 🔺
       run: yarn migrate-up
       env:
