@@ -280,7 +280,7 @@ jobs:
       run: |
         docker-compose down
     
-        - name: Delete Data ❌
+    - name: Delete Data ❌
       run: yarn db-delete
       env:
         NODE_ENV: development
