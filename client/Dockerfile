@@ -1,6 +1,6 @@
 FROM node:14
 
-WORKDIR /opt/server
+WORKDIR /opt/client
 
 COPY package.json ./
 COPY yarn.lock ./
@@ -9,5 +9,5 @@ RUN yarn
 
 COPY . .
 
-EXPOSE 5000
-CMD node app
+EXPOSE 3000
+CMD yarn dev

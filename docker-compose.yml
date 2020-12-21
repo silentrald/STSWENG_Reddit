@@ -1,0 +1,29 @@
+version: '3'
+services:
+  server:
+    build: ./server
+    command: node app # fix: not working
+    volumes:
+      - ./server:/opt/server
+    ports:
+      - "5000:5000"
+    environment:
+      HOST: '0.0.0.0'
+      NODE_ENV: development
+      POSTGRES_USER: stsweng_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: stsweng_db
+      JWT_SECRET: random_secret
+  client:
+    build: ./client
+    command: yarn dev # FIX: not working
+    volumes:
+      - ./client:/opt/client
+    ports:
+      - "3000:3000"
+    environment:
+      HOST: '0.0.0.0'
+      SERVER_URL: http://server:5000
+      
