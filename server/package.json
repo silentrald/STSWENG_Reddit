@@ -1,14 +1,17 @@
 {
   "name": "stsweng-reddit",
-  "version": "1.0.0",
+  "version": "0.0.0",
+  "engines": {
+    "node": "14.x"
+  },
   "description": "A reddit clone",
   "main": "app.js",
   "scripts": {
+    "start": "node app",
     "dev": "npx nodemon app --exec \"npm run lint && node\"",
     "devtest": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent && node\"",
     "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color test/integration/post && node\"",
     "devstemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/post && node\"",
-    "build": "npm run lint && npm run test && node app",
     "lint": "eslint .",
     "test": "jest --runInBand --color --coverage",
     "stest": "jest --runInBand --color --coverage --silent",
@@ -17,19 +20,21 @@
     "migrate-up": "node migrations/up",
     "migrate-down": "node migrations/down",
     "db-delete": "node migrations/delete",
-    "db-insert": "node migrations/insert"
+    "db-insert": "node migrations/insert",
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/silentrald/STSWENG.git"
+    "url": "https://github.com/silentrald/STSWENG_Reddit.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/silentrald/STSWENG/issues"
+    "url": "https://github.com/silentrald/STSWENG_Reddit/issues"
   },
-  "homepage": "https://github.com/silentrald/STSWENG#readme",
+  "homepage": "https://github.com/silentrald/STSWENG_Reddit#readme",
   "dependencies": {
+    "ajv": "^6.12.6",
     "ajv-keywords": "^3.5.2",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
@@ -45,6 +50,16 @@
     "jest": "^26.6.1",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.6",
+    "semantic-release": "^17.3.0",
     "supertest": "^6.0.0"
+  },
+  "release": {
+    "branches": [
+      "master",
+      "next"
+    ]
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }

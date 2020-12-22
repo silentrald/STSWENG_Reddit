@@ -1,12 +1,9 @@
-name: Development
+name: Development Pull Request
 
 on:
-  push:
+  pull_request:
     branches:
       - dev
-    paths-ignore:
-      - 'server/package.json'
-      - 'server/CHANGELOG.md'
 
 jobs:
   nuxt_client:
@@ -177,17 +174,4 @@ jobs:
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
-      
-    - name: Update Feature Version 🌀
-      run: |
-        npm version minor
-      working-directory: ./server
-
-    - name: Push to Github
-      run: |
-        git init
-        git add package.json
-        git commit -C HEAD@{1}
-        git remote add origin https://github.com/silentrald/STSWENG_Reddit.git
-        git push origin master:dev
       

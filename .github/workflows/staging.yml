@@ -1,56 +1,11 @@
-name: Development
+name: Staging
 
 on:
   push:
     branches:
-      - dev
-    paths-ignore:
-      - 'server/package.json'
-      - 'server/CHANGELOG.md'
+      - staging
 
 jobs:
-  nuxt_client:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node: [14]
-
-    steps:
-      - name: Checkout 🛎
-        uses: actions/checkout@master
-
-      - name: Setup node env 🏗
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Get yarn cache directory path 🛠
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Cache node_modules 📦
-        uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install dependencies 👨🏻‍💻
-        run: yarn
-        working-directory: ./client
-
-      - name: Run linter 👀
-        run: yarn lint
-        working-directory: ./client
-
-      - name: Run tests 🧪
-        run: yarn test-spec
-        working-directory: ./client
-
   express_server:
     runs-on: ${{ matrix.os }}
 
@@ -61,20 +16,20 @@ jobs:
         os: [ubuntu-latest]
         node-version: [14.x]
 
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: stsweng_user
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: stsweng_db
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    # services:
+    #   postgres:
+    #     image: postgres
+    #     env:
+    #       POSTGRES_USER: stsweng_user
+    #       POSTGRES_PASSWORD: password
+    #       POSTGRES_DB: stsweng_db
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
+    #     ports:
+    #       - 5432:5432
 
     steps:
     - name: Checkout 🛎
@@ -102,9 +57,9 @@ jobs:
       run: yarn
       working-directory: ./server
 
-    # - name: Build
-    #   run: npm run build --if-present
-    #   working-directory: ./server
+    - name: Build
+      run: npm run build --if-present
+      working-directory: ./server
 
     - name: Linter 👌
       run: yarn lint
@@ -177,17 +132,13 @@ jobs:
         POSTGRES_HOST: postgres
         POSTGRES_PORT: 5432
       working-directory: ./server
-      
-    - name: Update Feature Version 🌀
+    
+    - name: Deploying Stage to Heroku 🖥️
       run: |
-        npm version minor
-      working-directory: ./server
-
-    - name: Push to Github
-      run: |
+        git config --global user.name "Github-Stage"
         git init
-        git add package.json
-        git commit -C HEAD@{1}
-        git remote add origin https://github.com/silentrald/STSWENG_Reddit.git
-        git push origin master:dev
-      
+        git add .
+        git commit -m 'Stage V !!version'
+        git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_STAGE_APP_NAME }}.git
+        git push heroku master -f
+      working-directory: ./server

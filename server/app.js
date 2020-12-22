@@ -10,7 +10,7 @@ if (!process.env.CI) {
 
 const app = express();
 
-const PORT = process.env.PORT | 5000;
+const PORT = process.env.PORT || 5000;
 
 // MIDDLEWARES
 if (process.env.NODE_ENV === 'development') {
