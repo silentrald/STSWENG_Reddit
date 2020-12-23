@@ -174,7 +174,7 @@ jobs:
   #     working-directory: ./server
     
   e2e:
-    needs: [ nuxt_client, express_server ]
+    # needs: [ nuxt_client, express_server ]
 
     runs-on: ${{ matrix.os }}
 
