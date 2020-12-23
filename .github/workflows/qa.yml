@@ -251,6 +251,13 @@ jobs:
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
       working-directory: ./server
+    
+    - name: Curl Sign Up
+      run: |
+        curl http://localhost:5000/api/user/create -X POST -H "Content-Type: application/json" -d "{ /"username/": /"Sample/", /"password/": /"Asdf1234/", /"email/": /"sample@gmail.com/" }"
+
+    - name: Docker Compose Logs
+      run: docker-compose logs
 
     # Automation testing
     - name: Install Python 🐍
@@ -280,13 +287,6 @@ jobs:
         sudo chown root /usr/bin/chromedriver
         sudo chmod +x /usr/bin/chromedriver
         sudo chmod 755 /usr/bin/chromedriver
-    
-    - name: Curl Sign Up
-      run: |
-        curl http://localhost:5000/api/user/create -X POST -H "Content Type: application/json" -d "{ /"username/": /"Sample/", /"password/": /"Asdf1234/", /"email/": /"sample@gmail.com/" }"
-
-    - name: Docker Compose Logs
-      run: docker-compose logs
 
     - name: Automated E2E test with Robot 🤖
       run: robot UserRegistration.robot
