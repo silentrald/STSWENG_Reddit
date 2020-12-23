@@ -254,7 +254,7 @@ jobs:
     
     - name: Curl Sign Up
       run: |
-        curl http://localhost:5000/api/user/create -X POST -H "Content-Type: application/json" -d "{ /"username/": /"Sample/", /"password/": /"Asdf1234/", /"email/": /"sample@gmail.com/" }"
+        curl http://localhost:5000/api/user/create -X POST -H "Content-Type: application/json" -d '{ "username": "blaasdfasdf", "password": "Asdf1234", "email": "sample@gmail.com" }'
 
     - name: Docker Compose Logs
       run: docker-compose logs
