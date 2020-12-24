@@ -29,6 +29,9 @@
     </div>
     <div class="post-text">
       <div class="post-info">
+        <nuxt-link class="station-link" :to="`/s/${station}`">
+          s/{{ station }}
+        </nuxt-link>
         Posted by /u/{{ author }} on {{ formatDate(date) }}
       </div>
       <div class="post-title">
@@ -53,6 +56,10 @@ export default {
     vote: {
       type: Number,
       default: 0 // 0 not voted, 1 is up, -1 is down
+    },
+    station: {
+      type: String,
+      default: 'sample'
     },
     author: {
       type: String,
@@ -94,6 +101,12 @@ export default {
 .post-info {
   font-size: 0.75rem;
   color: #aaaaaa;
+}
+
+.station-link {
+  font-size: 18px;
+  color: white;
+  text-decoration: none;
 }
 
 .post-title {

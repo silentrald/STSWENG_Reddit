@@ -79,6 +79,7 @@
                 v-for="post in posts"
                 :key="post.id"
                 :score="post.score"
+                :station="post.station_name"
                 :author="post.author"
                 :date="post.timestamp_created"
                 :title="post.title"
@@ -264,6 +265,7 @@ export default {
           }
         })
     },
+
     leave () {
       this.$axios.post(`/api/station/leave/${this.name}`)
         .then(() => {
