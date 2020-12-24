@@ -8,14 +8,22 @@ INSERT INTO users(username, password, email) VALUES
     ('captain2', '$2b$10$uIugTkePCOSCvKw.jccpAeBZ.b1IatDqh.Qt.dnzfpQY.ABeRGwIS', 'captain2@station.org');
 
 /* stations */
+INSERT INTO stations(name, description, rules, members) VALUES
+    ('SampleStation', 'This is a test station', '1. Do not delete this', 2); /* captain1, crewmate */
+
 INSERT INTO stations(name, description, rules) VALUES
-    ('SampleStation', 'This is a test station', '1. Do not delete this'),
-    ('SampleStation2', 'This is another test station', '1. Do not delete this');
+    ('SampleStation2', 'This is another test station', '1. Do not delete this'), /* captain2 */
+    ('SampleStation3', 'This is another test station', '1. Do not delete this'), /* captain2 */
+    ('SampleStation4', 'This is another test station', '1. Do not delete this'), /* captain2 */
+    ('SampleStation5', 'This is another test station', '1. Do not delete this'); /* captain2 */
 
 /* captains */
 INSERT INTO captains(username, station_name) VALUES
     ('captain1', 'SampleStation'),
-    ('captain2', 'SampleStation2');
+    ('captain2', 'SampleStation2'),
+    ('captain2', 'SampleStation3'),
+    ('captain2', 'SampleStation4'),
+    ('captain2', 'SampleStation5');
 
 /* crewmates */
 INSERT INTO crewmates(username, station_name) VALUES

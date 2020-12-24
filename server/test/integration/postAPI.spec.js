@@ -67,6 +67,465 @@ beforeAll(async () => {
 });
 
 describe('Station API', () => {
+    describe(`GET ${url}`, () => {
+        test('GOOD: without query', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).get(`${url}`);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.posts).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        post_id: expect.stringMatching(POST_REGEX),
+                        title: expect.any(String),
+                        text: expect.any(String),
+                        author: expect.any(String),
+                        deleted: expect.any(Boolean),
+                        timestamp_created: expect.any(String)
+                    })
+                ])
+            );
+            expect(body.posts.length).toEqual(LIMIT);
+
+            startingPost = body.posts[0];
+        });
+
+        test('GOOD: without query while user is login', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server)
+                .get(`${url}`)
+                .set('Authorization', crewmateToken);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.posts).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        post_id: expect.stringMatching(POST_REGEX),
+                        title: expect.any(String),
+                        text: expect.any(String),
+                        author: expect.any(String),
+                        deleted: expect.any(Boolean),
+                        timestamp_created: expect.any(String)
+                    })
+                ])
+            );
+            expect(body.posts.length).toEqual(LIMIT);
+        });
+
+        describe('GOOD: sanitize query offset', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        offset: 2
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).not.toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Invalid Type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        offset: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        offset: -2
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+
+        describe('GOOD: sanitize query limit', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 3
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(3);
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Zero', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 0
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+
+        describe('GOOD: sanitize query sort', () => {
+            test('Valid (ASC)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        sort: 'ASC'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Valid (DESC)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        sort: 'DESC'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Invalid String', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        sort: 'hello'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        sort: 0
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+
+        describe('GOOD: sanitize query top', () => {
+            test('Valid (hour)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        top: 'hour'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Valid (day)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        top: 'day'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Valid (week)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        top: 'week'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Valid (month)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        top: 'month'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Valid (year)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        top: 'year'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Valid (all)', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        top: 'all'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        top: 1
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Invalid String', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        top: 'notvalid'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+        });
+    });
+
     describe(`GET ${url}/station/:station`, () => {
         test('GOOD: without query', async () => {
             const {
