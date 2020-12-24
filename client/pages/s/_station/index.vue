@@ -75,7 +75,7 @@
           </div>
           <div v-else class="col-md-9 order-md-1">
             <div v-if="posts.length > 0" id="posts">
-              <post
+              <post-preview
                 v-for="post in posts"
                 :key="post.id"
                 :score="post.score"
@@ -85,7 +85,7 @@
               >
                 {{ post.scope }}
                 {{ post.text }}
-              </post>
+              </post-preview>
               <infinite-loading
                 spinner="waveDots"
                 :infinite-scroll-disabled="end"
@@ -114,9 +114,7 @@
 </template>
 
 <script>
-import postLazyload from '../../../components/post-lazyload.vue'
 export default {
-  components: { postLazyload },
   data () {
     return {
       is404: false,
@@ -139,7 +137,7 @@ export default {
   methods: {
     // Start to load station
     async loadStation () {
-      const { name } = this.$route.params
+      const { station: name } = this.$route.params
       const { t: top } = this.$route.query
 
       let res
@@ -183,7 +181,7 @@ export default {
 
     infiniteScroll ($state) {
       setTimeout(async () => {
-        const { name } = this.$route.params
+        const { station } = this.$route.params
         const { t: top } = this.$route.query
 
         const params = {
@@ -194,7 +192,7 @@ export default {
           params.top = top
         }
 
-        const res = await this.$axios.get(`/api/post/station/${name}`, { params })
+        const res = await this.$axios.get(`/api/post/station/${station}`, { params })
         const { posts } = res.data
         if (posts.length > 0) {
           for (const index in posts) {
@@ -220,7 +218,7 @@ export default {
       this.$set(this, 'posts', [])
 
       try {
-        const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`)
+        const res = await this.$axios.get(`/api/post/station/${this.$route.params.station}`)
         const { posts } = res.data
         this.$set(this, 'posts', posts)
       } catch (err) {}

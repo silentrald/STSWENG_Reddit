@@ -3,6 +3,39 @@ const db = require('../db');
 
 const subcommentAPI = {
     // GET
+    /**
+     * Gets the comments of a comment
+     */
+    getPostSubcomments: async (req, res) => {
+        const { comment } = req.params;
+        const { offset, limit } = req.query;
+
+        try {
+            const querySelComment = {
+                text: `
+                    SELECT      *
+                    FROM        comments
+                    WHERE       comment_id IN (
+                        SELECT  comment_id
+                        FROM    subcomments
+                        WHERE   parent_comment=$1
+                    )
+                    ORDER BY    timestamp_created DESC
+                    OFFSET      ${offset}
+                    LIMIT       ${limit};
+                `,
+                values: [ comment ]
+            };
+
+            const { rows: subcomments } = await db.query(querySelComment);
+
+            return res.status(200).send({ subcomments });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).end();
+        }
+    },
 
     // POST
     /**
@@ -11,7 +44,8 @@ const subcommentAPI = {
      * station and the comment is within the station.
      */
     postSubcomment: async (req, res) => {
-        const { 
+        const {
+            parentPost,
             parentComment, 
             text,
             station
@@ -90,10 +124,11 @@ const subcommentAPI = {
 
                 const queryInsSubcomment = {
                     text: `
-                        INSERT INTO subcomments(parent_comment, comment_id)
-                            VALUES($1, $2);
+                        INSERT INTO subcomments(parent_post, parent_comment, comment_id)
+                            VALUES($1, $2, $3);
                     `,
                     values: [
+                        parentPost,
                         parentComment,
                         commentID
                     ]

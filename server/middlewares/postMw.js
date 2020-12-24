@@ -2,6 +2,7 @@
 
 const LIMIT = 10;
 const STATION_NAME_REGEX = /^[A-Za-z0-9_-]+$/;
+const POST_NAME_REGEX = /^p[A-Za-z0-9]{0,11}$/;
 const SORT_REGEX = /^(ASC|DESC)$/;
 const TOP_REGEX = /^(hour|day|week|month|year|all)$/;
 
@@ -18,6 +19,23 @@ const postMw = {
             return res.status(403).send({ 
                 errors: {
                     station: 'pattern'
+                }
+            });
+        }
+
+        next();
+    },
+
+    /**
+     * Validates the post parameter.
+     */
+    validatePostParam: (req, res, next) => {
+        const { post } = req.params;
+
+        if (!POST_NAME_REGEX.test(post)) {
+            return res.status(403).send({
+                errors: {
+                    post: 'pattern'
                 }
             });
         }

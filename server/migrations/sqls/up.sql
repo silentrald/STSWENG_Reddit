@@ -89,6 +89,7 @@ CREATE TABLE posts (
     score                       INT             DEFAULT 0 NOT NULL,
     author                      VARCHAR(64),
     FOREIGN KEY(author)         REFERENCES      users(username),
+    comment_count               INT             DEFAULT 0 NOT NULL,
     timestamp_created           TIMESTAMP       DEFAULT now() NOT NULL,
     deleted                     BOOLEAN         DEFAULT false NOT NULL,
     station_name                VARCHAR(64)     NOT NULL,
@@ -122,6 +123,8 @@ CREATE TABLE subposts (
 
 CREATE TABLE subcomments (
     comment_id                  VARCHAR(12) NOT NULL,
+    parent_post                 VARCHAR(12) NOT NULL,
+    FOREIGN KEY(parent_post)    REFERENCES  posts(post_id),
     parent_comment              VARCHAR(12) NOT NULL,
     FOREIGN KEY(parent_comment) REFERENCES  comments(comment_id),
 

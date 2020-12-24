@@ -4,6 +4,10 @@ const api = require('../api/postAPI');
 const mw = require('../middlewares/postMw');
 
 // GET
+router.get('/:post',
+    mw.validatePostParam,
+    api.getStationPost);
+
 router.get('/station/:station',
     mw.validateStationParam,
     mw.sanitizePostsQuery,

@@ -1,18 +1,5 @@
 <template>
-  <div class="post">
-    <div class="post-text">
-      <div class="post-info margin-bottom">
-        Posted by /u/{{ author }} on {{ formatDate(date) }}
-      </div>
-      <div class="post-title margin-bottom">
-        {{ title }}
-      </div>
-      <div class="post-preview margin-bottom">
-        <remark>
-          <slot />
-        </remark>
-      </div>
-    </div>
+  <div class="post" @click="toPost()">
     <div class="post-votes">
       <div class="post-upvote">
         <img
@@ -40,9 +27,21 @@
         >
       </div>
     </div>
-    <div class="post-comments">
-      <!-- -->
+    <div class="post-text">
+      <div class="post-info">
+        Posted by /u/{{ author }} on {{ formatDate(date) }}
+      </div>
+      <div class="post-title">
+        {{ title }}
+      </div>
+      <div class="post-preview">
+        <slot />
+      </div>
     </div>
+    <!-- <div>
+      TODO: change to icon
+      Comments: {{ commentCount }}
+    </div> -->
   </div>
 </template>
 
@@ -74,26 +73,42 @@ export default {
     title: {
       type: String,
       default: ''
-    }
-  },
-
-  data () {
-    return {
-      comments: {}
+    },
+    station: {
+      type: String,
+      default: ''
+    },
+    commentCount: {
+      type: Number,
+      default: 0
     }
   },
 
   methods: {
     formatDate (date) {
       return moment(date).format('MMM D, YYYY')
+    },
+
+    toPost () {
+      this.$router.push(`/s/${this.station}/post/${this.id}`)
     }
   }
 }
 </script>
 
 <style scoped>
-.margin-bottom {
-  margin-bottom: 12px;
+.post {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 20px 16px;
+
+  display: flex;
+}
+
+.post-votes {
+  padding-right: 16px;
+  min-width: 64px;
 }
 
 .post-info {
@@ -106,21 +121,13 @@ export default {
   font-weight: 500;
 }
 
-.post-votes {
-  display: flex;
-  justify-content: flex-end;
-  background-color: #ffffff1a; /* 10% opacity */
-  padding: 0.5rem;
-  border-radius: 10px;
-}
-
 .post-upvote, .post-downvote {
   width: 24px;
+  margin: 0 auto;
 }
 
 .post-score {
   text-align: center;
-  margin: 0 8px;
 }
 
 </style>
