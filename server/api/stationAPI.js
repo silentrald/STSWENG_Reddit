@@ -41,6 +41,9 @@ const stationAPI = {
         }
     },
 
+    /**
+     * Gets the top stations
+     */
     getTopStations: async (_req, res) => {
         try {
             // TODO: add more algorithms here
