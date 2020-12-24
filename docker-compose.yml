@@ -17,6 +17,7 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_DB: stsweng_db
       JWT_SECRET: random_secret
+    network_mode: host
   client:
     build: ./client
     command: yarn dev
