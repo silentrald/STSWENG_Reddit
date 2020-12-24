@@ -1,7 +1,10 @@
 process.env.JWT_SECRET = 'test-value'; // set the jwt token
 
 const {
-    getStation, getStationCaptains, postCreateStation
+    getStation,
+    getTopStations,
+    getStationCaptains,
+    postCreateStation
 } = require('../../api/stationAPI');
 
 /**
@@ -98,6 +101,8 @@ jest.mock('../../db', () => {
     };
 });
 
+const db = require('../../db');
+
 const mockRequest = (data) => {
     return data;
 };
@@ -172,6 +177,23 @@ describe('Unit test: stationAPI.js', () => {
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.send).toHaveBeenCalledWith();
+        });
+    });
+
+    describe('API: getTopStations', async () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+        });
+
+        test('GOOD', async () => {
+            const req = mockRequest({});
+            const res = mockResponse();
+            
+            await getTopStations(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledTimes(1);
+            expect(db.query).toHaveBeenCalledTimes(1);
         });
     });
 

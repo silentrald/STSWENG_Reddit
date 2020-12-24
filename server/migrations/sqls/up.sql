@@ -61,6 +61,7 @@ CREATE TABLE stations (
     description     VARCHAR(250),
     rules           VARCHAR(1000),
     date_created    DATE            DEFAULT now() NOT NULL,
+    members         BIGINT          DEFAULT 1 NOT NULL,
     archived        BOOLEAN         DEFAULT false NOT NULL
 );
 

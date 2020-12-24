@@ -1,5 +1,5 @@
 <template>
-  <div class="post" @click="toPost()">
+  <div class="post">
     <div class="post-votes">
       <div class="post-upvote">
         <img
@@ -29,12 +29,15 @@
     </div>
     <div class="post-text">
       <div class="post-info">
+        <nuxt-link class="station-link" :to="`/s/${station}`">
+          s/{{ station }}
+        </nuxt-link>
         Posted by /u/{{ author }} on {{ formatDate(date) }}
       </div>
-      <div class="post-title">
+      <div class="post-title" @click="toPost()">
         {{ title }}
       </div>
-      <div class="post-preview">
+      <div class="post-preview" @click="toPost()">
         <slot />
       </div>
     </div>
@@ -114,6 +117,12 @@ export default {
 .post-info {
   font-size: 0.75rem;
   color: #aaaaaa;
+}
+
+.station-link {
+  font-size: 18px;
+  color: white;
+  text-decoration: none;
 }
 
 .post-title {

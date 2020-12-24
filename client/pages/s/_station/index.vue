@@ -77,14 +77,17 @@
             <div v-if="posts.length > 0" id="posts">
               <post-preview
                 v-for="post in posts"
-                :key="post.id"
+                :id="post.post_id"
+                :key="post.post_id"
                 :score="post.score"
                 :author="post.author"
                 :date="post.timestamp_created"
                 :title="post.title"
+                :station="post.station_name"
+                :comment-count="post.comment_count"
+                @click="toPost(post.id)"
               >
-                {{ post.scope }}
-                {{ post.text }}
+                {{ brief(post.text) }}
               </post-preview>
               <infinite-loading
                 spinner="waveDots"
@@ -114,7 +117,9 @@
 </template>
 
 <script>
+import postLazyload from '../../../components/post-lazyload.vue'
 export default {
+  components: { postLazyload },
   data () {
     return {
       is404: false,
@@ -249,6 +254,12 @@ export default {
       this.loading = false
     },
 
+    brief (text) {
+      return text.length > 100
+        ? `${text.substr(0, 100)}...`
+        : text
+    },
+
     join () {
       this.$axios.post(`/api/station/join/${this.name}`)
         .then(() => {
@@ -262,6 +273,7 @@ export default {
           }
         })
     },
+
     leave () {
       this.$axios.post(`/api/station/leave/${this.name}`)
         .then(() => {

@@ -63,6 +63,10 @@ export default {
       type: Number,
       default: 0 // 0 not voted, 1 is up, -1 is down
     },
+    station: {
+      type: String,
+      default: 'sample'
+    },
     author: {
       type: String,
       default: 'anonymous'
@@ -99,6 +103,12 @@ export default {
 .post-info {
   font-size: 0.75rem;
   color: #aaaaaa;
+}
+
+.station-link {
+  font-size: 18px;
+  color: white;
+  text-decoration: none;
 }
 
 .post-title {
