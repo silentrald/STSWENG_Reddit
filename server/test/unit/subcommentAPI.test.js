@@ -27,7 +27,7 @@ jest.mock('../../db', () => {
     
                 query.text = oneLineQuery(query.text);
 
-                if (query.text === 'INSERT INTO comments(comment_id, text, author, station_name) VALUES(comment_id(), $1, $2, $3) RETURNING comment_id;'
+                if (query.text === 'INSERT INTO comments(comment_id, text, author, station_name) VALUES(comment_id(), $1, $2, $3) RETURNING *;'
                     && query.values[0] && query.values[1]
                     && query.values[2] && query.values[2] === 'StationName') {
                     result.rows = [{
@@ -147,7 +147,7 @@ describe('Unit Test: subcommentAPI', () => {
             queries = {
                 passenger: 'SELECT * FROM passengers WHERE username=$1 AND station_name=$2 LIMIT 1;',
                 comment: 'SELECT * FROM comments WHERE comment_id=$1 LIMIT 1;',
-                insComment: 'INSERT INTO comments(comment_id, text, author, station_name) VALUES(comment_id(), $1, $2, $3) RETURNING comment_id;',
+                insComment: 'INSERT INTO comments(comment_id, text, author, station_name) VALUES(comment_id(), $1, $2, $3) RETURNING *;',
                 insSubcomment: 'INSERT INTO subcomments(parent_post, parent_comment, comment_id) VALUES($1, $2, $3);'
             };
         });

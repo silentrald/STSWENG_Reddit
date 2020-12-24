@@ -105,12 +105,6 @@ export default {
   color: #aaaaaa;
 }
 
-.station-link {
-  font-size: 18px;
-  color: white;
-  text-decoration: none;
-}
-
 .post-title {
   font-size: 1.5em;
   font-weight: 500;

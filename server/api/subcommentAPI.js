@@ -52,7 +52,7 @@ const subcommentAPI = {
         } = req.body;
 
         const author = req.user.username;
-        let commentID;
+        let subcomment;
 
         try {
             // Check if the user is a crewmate/captain of the station
@@ -101,7 +101,7 @@ const subcommentAPI = {
             } 
 
             const client = await db.connect();
-
+            
             try {
                 await client.query('BEGIN');
 
@@ -109,7 +109,7 @@ const subcommentAPI = {
                     text: `
                         INSERT INTO comments(comment_id, text, author, station_name)
                             VALUES(comment_id(), $1, $2, $3)
-                        RETURNING comment_id;
+                        RETURNING *;
                     `,
                     values: [
                         text,
@@ -119,8 +119,8 @@ const subcommentAPI = {
                 };
     
                 const resultComment = await client.query(queryInsComment);
-
-                commentID = resultComment.rows[0].comment_id;
+                
+                subcomment = resultComment.rows[0];
 
                 const queryInsSubcomment = {
                     text: `
@@ -130,7 +130,7 @@ const subcommentAPI = {
                     values: [
                         parentPost,
                         parentComment,
-                        commentID
+                        subcomment.comment_id
                     ]
                 };
 
@@ -144,7 +144,7 @@ const subcommentAPI = {
                 await client.release();
             }
 
-            return res.status(201).send({ comment: commentID });
+            return res.status(201).send({ subcomment });
         } catch (err) {
             console.log(err);
 

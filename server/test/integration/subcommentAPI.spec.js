@@ -263,12 +263,16 @@ describe('Subcomment API', () => {
                 .send(subcomment);
             
             expect(statusCode).toEqual(201);
-            expect(body).toEqual(
+            expect(body.subcomment).toEqual(
                 expect.objectContaining({
-                    comment: expect.any(String)
+                    comment_id: expect.any(String),
+                    text: expect.any(String),
+                    score: expect.any(Number),
+                    author: expect.any(String),
+                    timestamp_created: expect.any(String)
                 })
             );
-            commentsDelete.push(body.comment);
+            commentsDelete.push(body.subcomment.comment_id);
         });
 
         test('GOOD: Captain can subcomment on a comment', async () => {
@@ -278,12 +282,16 @@ describe('Subcomment API', () => {
                 .send(subcomment);
             
             expect(statusCode).toEqual(201);
-            expect(body).toEqual(
+            expect(body.subcomment).toEqual(
                 expect.objectContaining({
-                    comment: expect.any(String)
+                    comment_id: expect.any(String),
+                    text: expect.any(String),
+                    score: expect.any(Number),
+                    author: expect.any(String),
+                    timestamp_created: expect.any(String)
                 })
             );
-            commentsDelete.push(body.comment);
+            commentsDelete.push(body.subcomment.comment_id);
         });
     
         test('BAD: Parent Comment does not exist', async () => {

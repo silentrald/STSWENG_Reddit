@@ -244,7 +244,7 @@ export default {
       this.$set(this, 'posts', [])
 
       try {
-        const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`, {
+        const res = await this.$axios.get(`/api/post/station/${this.$route.params.station}`, {
           params: { top }
         })
         const { posts } = res.data
