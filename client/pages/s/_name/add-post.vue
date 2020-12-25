@@ -80,19 +80,11 @@ ajv.addSchema({
       type: 'string',
       minLength: 1,
       maxLength: 1000
-    },
-    station_name: {
-      type: 'string'
-    },
-    author: {
-      type: 'string'
     }
   },
   required: [
     'title',
-    'text',
-    'station_name',
-    'author'
+    'text'
   ]
 }, POST_V_SCHEMA)
 
@@ -118,7 +110,7 @@ export default {
     }
   },
 
-  middleware: [],
+  middleware: ['auth', 'joined'],
 
   methods: {
     removeError (field) {
