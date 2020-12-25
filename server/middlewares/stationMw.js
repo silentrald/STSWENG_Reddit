@@ -1,3 +1,5 @@
+const db = require('../db');
+
 const Ajv = require('ajv');
 const { ajvErrors } = require('./ajvHelper');
 
@@ -73,6 +75,28 @@ const stationMw = {
         if (!validate) {
             const errors = ajvErrors(ajv);
             return res.status(401).send({ errors });
+        }
+
+        next();
+    },
+
+    userIsPartOfStation: async (req, res, next) => {
+        const { station } = req.params;
+
+        if (!req.user) {
+            return res.status(403).send();
+        }
+
+        const querySelPassengers = {
+            text: 'SELECT * FROM passengers WHERE username = $1 AND station_name = $2 LIMIT 1;',
+            values: [ req.user.username, station ]
+        };
+
+        const { rowCount } = await db.query(querySelPassengers);
+        const joined = rowCount > 0;
+
+        if (!joined) {
+            return res.status(403).send();
         }
 
         next();

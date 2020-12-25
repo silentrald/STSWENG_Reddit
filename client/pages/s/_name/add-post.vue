@@ -142,9 +142,7 @@ export default {
       // if (this.validate() {
       const { name } = this.$route.params
       const post = {
-        ...this.post,
-        station_name: name,
-        author: this.$auth.user.username
+        ...this.post
       } // Deep clone
 
       this.$axios.post(`/api/post/station/${name}`, {

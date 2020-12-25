@@ -421,18 +421,22 @@ describe('Unit Testing: postMw', () => {
     });
 
     describe('Middleware: validateStationPost', () => {
-        let body;
+        let body, user, params;
         beforeEach(() => {
             body = {
                 title: 'sample-title',
-                text: 'Sample text post.',
-                station_name: 'SampleStation',
-                author: 'SampleAuthor'
+                text: 'sample-text',
+            };
+            user = {
+                username: 'crewmate'
+            };
+            params = {
+                station: 'SampleStation'
             };
         });
 
         test('GOOD', async () => {
-            const req = mockRequest({ body });
+            const req = mockRequest({ body, user, params });
             const res = mockResponse();
             const next = mockNext();
 
@@ -444,7 +448,7 @@ describe('Unit Testing: postMw', () => {
         test('GOOD with extra whitespaces', async () => {
             body.title += '   ';
             body.text += '     ';
-            const req = mockRequest({ body });
+            const req = mockRequest({ body, user, params });
             const res = mockResponse();
             const next = mockNext();
 
@@ -456,7 +460,7 @@ describe('Unit Testing: postMw', () => {
         describe('BAD: Invalid title', () => {
             test('Title wrong type', async () => {
                 body.title = 0;
-                const req = mockRequest({ body });
+                const req = mockRequest({ body, user, params });
                 const res = mockResponse();
                 const next = mockNext();
 
@@ -473,7 +477,7 @@ describe('Unit Testing: postMw', () => {
 
             test('Empty string title', async () => {
                 body.title = '';
-                const req = mockRequest({ body });
+                const req = mockRequest({ body, user, params });
                 const res = mockResponse();
                 const next = mockNext();
 
@@ -491,7 +495,7 @@ describe('Unit Testing: postMw', () => {
             test('Title is too long', async () => {
                 // 65 chars
                 body.title = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-                const req = mockRequest({ body });
+                const req = mockRequest({ body, user, params });
                 const res = mockResponse();
                 const next = mockNext();
 
@@ -509,7 +513,7 @@ describe('Unit Testing: postMw', () => {
             test('No title property', async () => {
                 // 65 chars
                 delete body.title;
-                const req = mockRequest({ body });
+                const req = mockRequest({ body, user, params });
                 const res = mockResponse();
                 const next = mockNext();
 
@@ -528,7 +532,7 @@ describe('Unit Testing: postMw', () => {
         describe('BAD: Invalid text', () => {
             test('Text wrong type', async () => {
                 body.text = 0;
-                const req = mockRequest({ body });
+                const req = mockRequest({ body, user, params });
                 const res = mockResponse();
                 const next = mockNext();
 
@@ -545,7 +549,7 @@ describe('Unit Testing: postMw', () => {
 
             test('Empty string text', async () => {
                 body.text = '';
-                const req = mockRequest({ body });
+                const req = mockRequest({ body, user, params });
                 const res = mockResponse();
                 const next = mockNext();
 
@@ -577,7 +581,7 @@ describe('Unit Testing: postMw', () => {
                     Barry. - Is that fuzz gel? - A little. Special day, graduation. Never thought I'd make 
                     it. Three days grade school, three days high school.
                 `;
-                const req = mockRequest({ body });
+                const req = mockRequest({ body, user, params });
                 const res = mockResponse();
                 const next = mockNext();
 
@@ -595,7 +599,7 @@ describe('Unit Testing: postMw', () => {
             test('No text property', async () => {
                 // 65 chars
                 delete body.text;
-                const req = mockRequest({ body });
+                const req = mockRequest({ body, user, params });
                 const res = mockResponse();
                 const next = mockNext();
 

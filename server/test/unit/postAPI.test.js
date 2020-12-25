@@ -72,13 +72,14 @@ describe('Unit test: postAPI.js', () => {
         });
     });
 
-    describe('API: postStationPost', async () => {
-        let body, db, queryText;
+    describe('API: postStationPost', () => {
+        let body, db, user, params, queryText;
 
         beforeAll(() => {
             queryText = oneLineQuery(`
                 INSERT INTO posts(post_id, title, text, author, station_name) 
                     VALUES(post_id(), $1, $2, $3, $4)
+                RETURNING post_id;
             `);
         });
 
@@ -87,13 +88,17 @@ describe('Unit test: postAPI.js', () => {
             body = {
                 title: 'sample-title',
                 text: 'sample-text',
-                author: 'sample-username',
-                station_name: 'SampleStation'
+            };
+            user = {
+                username: 'crewmate'
+            };
+            params = {
+                station: 'SampleStation'
             };
         });
         
         test('GOOD: Create post with correct format', async () => {
-            const req = mockRequest({ body });
+            const req = mockRequest({ body, user, params });
             const res = mockResponse();
 
             await postStationPost(req, res);
@@ -104,9 +109,7 @@ describe('Unit test: postAPI.js', () => {
                     text: queryText,
                     values: expect.arrayContaining([
                         body.title,
-                        body.text,
-                        body.author,
-                        body.station_name
+                        body.text
                     ])
                 })
             );

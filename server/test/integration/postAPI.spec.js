@@ -563,9 +563,7 @@ describe('Station API', () => {
         beforeAll(() => {
             post = {
                 title: 'Sample Title',
-                text: 'Sample Text',
-                author: 'crewmate',
-                station_name: 'SampleStation'
+                text: 'Sample Text'
             };
         });
 
@@ -588,8 +586,8 @@ describe('Station API', () => {
 
             expect(statusCode).toEqual(403);
         });
-        // TODO: Need join-leave branch
-        // test('BAD: User is not part of station');
+        // TODO: 
+        // test('ERROR: User is not part of station');
 
         describe('ERROR: Title field', () => {
             test('Title wrong type', async () => {

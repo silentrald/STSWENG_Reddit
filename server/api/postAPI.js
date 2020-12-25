@@ -77,12 +77,10 @@ const postAPI = {
         // Get values
         const {
             title,
-            text,
-            station_name,
-            author
+            text
         } = req.body;
-        // author = req.user.username;
-        // station_name = req.params.station;
+        const author = req.user.username;
+        const station_name = req.params.station;
 
         try {
 
