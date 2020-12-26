@@ -13,33 +13,11 @@
         </remark>
       </div>
     </div>
-    <div class="post-votes">
-      <div class="post-upvote">
-        <img
-          src="/images/thumb-up.png"
-          width="24"
-          height="24"
-          :style="{
-            // TODO: change this
-            backgroundColor: vote === 1 ? 'green' : 'none'
-          }"
-        >
-      </div>
-      <div class="post-score">
-        {{ score }}
-      </div>
-      <div class="post-downvote">
-        <img
-          src="/images/thumb-down.png"
-          width="24"
-          height="24"
-          :style="{
-            // TODO: change this
-            backgroundColor: vote === -1 ? 'red' : 'none'
-          }"
-        >
-      </div>
-    </div>
+    <vote
+      :id="id"
+      :score="score"
+      direction="row"
+    />
     <div class="post-comments">
       <!-- -->
     </div>
@@ -58,10 +36,6 @@ export default {
     score: {
       type: Number,
       default: 0
-    },
-    vote: {
-      type: Number,
-      default: 0 // 0 not voted, 1 is up, -1 is down
     },
     station: {
       type: String,
@@ -109,22 +83,4 @@ export default {
   font-size: 1.5em;
   font-weight: 500;
 }
-
-.post-votes {
-  display: flex;
-  justify-content: flex-end;
-  background-color: #ffffff1a; /* 10% opacity */
-  padding: 0.5rem;
-  border-radius: 10px;
-}
-
-.post-upvote, .post-downvote {
-  width: 24px;
-}
-
-.post-score {
-  text-align: center;
-  margin: 0 8px;
-}
-
 </style>
