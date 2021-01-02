@@ -3,9 +3,6 @@
 
 const db = require('../db');
 
-// // TODO: Update cache value when someone upvotes
-// const votePostCache = new LRU(1000);
-
 const postVoteAPI = {
     // GET
     /**
