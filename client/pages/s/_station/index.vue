@@ -83,17 +83,20 @@
           </div>
           <div v-else class="col-md-9 order-md-1">
             <div v-if="posts.length > 0" id="posts">
-              <post
+              <post-preview
                 v-for="post in posts"
-                :key="post.id"
+                :id="post.post_id"
+                :key="post.post_id"
                 :score="post.score"
                 :author="post.author"
                 :date="post.timestamp_created"
                 :title="post.title"
+                :station="post.station_name"
+                :comment-count="post.comment_count"
+                @click="toPost(post.id)"
               >
-                {{ post.scope }}
-                {{ post.text }}
-              </post>
+                {{ brief(post.text) }}
+              </post-preview>
               <infinite-loading
                 spinner="waveDots"
                 :infinite-scroll-disabled="end"
@@ -147,7 +150,7 @@ export default {
   methods: {
     // Start to load station
     async loadStation () {
-      const { name } = this.$route.params
+      const { station: name } = this.$route.params
       const { t: top } = this.$route.query
 
       let res
@@ -191,7 +194,7 @@ export default {
 
     infiniteScroll ($state) {
       setTimeout(async () => {
-        const { name } = this.$route.params
+        const { station } = this.$route.params
         const { t: top } = this.$route.query
 
         const params = {
@@ -202,7 +205,7 @@ export default {
           params.top = top
         }
 
-        const res = await this.$axios.get(`/api/post/station/${name}`, { params })
+        const res = await this.$axios.get(`/api/post/station/${station}`, { params })
         const { posts } = res.data
         if (posts.length > 0) {
           for (const index in posts) {
@@ -228,7 +231,7 @@ export default {
       this.$set(this, 'posts', [])
 
       try {
-        const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`)
+        const res = await this.$axios.get(`/api/post/station/${this.$route.params.station}`)
         const { posts } = res.data
         this.$set(this, 'posts', posts)
       } catch (err) {}
@@ -249,7 +252,7 @@ export default {
       this.$set(this, 'posts', [])
 
       try {
-        const res = await this.$axios.get(`/api/post/station/${this.$route.params.name}`, {
+        const res = await this.$axios.get(`/api/post/station/${this.$route.params.station}`, {
           params: { top }
         })
         const { posts } = res.data
@@ -257,6 +260,12 @@ export default {
       } catch (err) {}
 
       this.loading = false
+    },
+
+    brief (text) {
+      return text.length > 100
+        ? `${text.substr(0, 100)}...`
+        : text
     },
 
     join () {
@@ -272,6 +281,7 @@ export default {
           }
         })
     },
+
     leave () {
       this.$axios.post(`/api/station/leave/${this.name}`)
         .then(() => {

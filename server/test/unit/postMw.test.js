@@ -1,7 +1,8 @@
 const {
     validateStationParam,
     sanitizePostsQuery,
-    validateSationPost
+    validateSationPost,
+    validatePostParam
 } = require('../../middlewares/postMw');
 
 const mockRequest = (data) => {
@@ -52,6 +53,41 @@ describe('Unit Testing: postMw', () => {
             expect(res.send).toHaveBeenCalledWith({
                 errors: {
                     station: 'pattern'
+                }
+            });
+        });
+    });
+
+    describe('Middleware: validatePostParam', () => {
+        test('GOOD', async () => {
+            const req = mockRequest({
+                params: {
+                    post: 'pdummydummy'
+                }
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validatePostParam(req, res, next);
+
+            expect(next).toHaveBeenCalledTimes(1);
+        });
+
+        test('BAD: pattern', async () => {
+            const req = mockRequest({
+                params: {
+                    post: 'Sample-post'
+                }
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validatePostParam(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.send).toHaveBeenCalledWith({
+                errors: {
+                    post: 'pattern'
                 }
             });
         });

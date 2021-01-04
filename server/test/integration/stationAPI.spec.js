@@ -204,6 +204,7 @@ describe('Station API', () => {
                         description: station.description,
                         rules: station.rules,
                         archived: false,
+                        members: expect.any(String),
                         date_created: expect.any(String)
                     })
                 })
@@ -217,6 +218,32 @@ describe('Station API', () => {
                 .send(station);
             
             expect(statusCode).toEqual(404);
+        });
+    });
+
+    describe(`GET ${url}/top`, () => {
+        test('GOOD', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server)
+                .get(`${url}/top`)
+                .send(station);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.stations).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        name: expect.any(String),
+                        description: expect.any(String),
+                        rules: expect.any(String),
+                        archived: expect.any(Boolean),
+                        members: expect.any(String),
+                        date_created: expect.any(String)
+                    })
+                ])
+            );
+            expect(body.stations.length).toBeLessThanOrEqual(5);
         });
     });
 
