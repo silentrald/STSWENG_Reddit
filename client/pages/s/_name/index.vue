@@ -67,6 +67,14 @@
                 </div>
               </div>
             </div>
+            <!-- Add check if user if part of station instead of logged in -->
+            <div v-if="joined" class="mt-2">
+              <nuxt-link id="add-post" class="nav-link" to="add-post" append>
+                <button class="btn-block">
+                  Add Post
+                </button>
+              </nuxt-link>
+            </div>
           </div>
           <div v-if="loading" class="col-md-9 order-md-1">
             <post-lazyload />
