@@ -23,11 +23,21 @@ jest.mock('../../db', () => {
 
             query.text = oneLineQuery(query.text);
 
+            if (query.text == 'INSERT INTO posts(post_id, title, text, author, station_name) VALUES(post_id(), $1, $2, $3, $4) RETURNING post_id;' &&
+                query.values[0] && query.values[1] && query.values[2] && query.values[3]) {
+                result.rows[0] = {
+                    post_id: 'testingidlol'
+                };
+                result.rowCount = 1;
+            }
+
             return result;
         }),
         end: jest.fn(),
     };
 });
+
+const db = require('../../db');
 
 const mockRequest = (data) => {
     return data;
@@ -39,8 +49,6 @@ const mockResponse = () => {
     res.send = jest.fn().mockReturnValue(res);
     return res;
 };
-
-const oneLineQuery = (queryText) => queryText.trim().replace(/\n/g, ' ').replace(/ {2,}/g, ' ');
 
 describe('Unit test: postAPI.js', () => {
     describe('API: getStationPosts', () => {
@@ -73,18 +81,11 @@ describe('Unit test: postAPI.js', () => {
     });
 
     describe('API: postStationPost', () => {
-        let body, db, user, params, queryText;
-
-        beforeAll(() => {
-            queryText = oneLineQuery(`
-                INSERT INTO posts(post_id, title, text, author, station_name) 
-                    VALUES(post_id(), $1, $2, $3, $4)
-                RETURNING post_id;
-            `);
-        });
+        let body, user, params;
 
         beforeEach(() => {
-            db = require('../../db');
+            jest.clearAllMocks();
+
             body = {
                 title: 'sample-title',
                 text: 'sample-text',
@@ -104,15 +105,7 @@ describe('Unit test: postAPI.js', () => {
             await postStationPost(req, res);
 
             expect(res.status).toHaveBeenCalledWith(201);
-            expect(db.query).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    text: queryText,
-                    values: expect.arrayContaining([
-                        body.title,
-                        body.text
-                    ])
-                })
-            );
+            expect(db.query).toHaveBeenCalledTimes(1);
         });
     });
 });

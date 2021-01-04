@@ -99,7 +99,9 @@ const postAPI = {
                 ]
             };
 
+            console.log(queryInsPost);
             const resultPost = await db.query(queryInsPost);
+            console.log(resultPost);
             const postId = resultPost.rows[0].post_id;
 
             return res.status(201).send({ postId });
