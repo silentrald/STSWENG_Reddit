@@ -38,6 +38,9 @@ const crewmateUser = {
 //     username: 'imposter',
 //     password: 'password'
 // };
+
+let post;
+let testPostIds = [];
 let crewmateToken;
 let startingPost;
 let failStation;
@@ -1019,9 +1022,232 @@ describe('Station API', () => {
             });
         });
     });
+
+    describe(`POST ${url}/station/:station`, () => {
+        beforeAll(() => {
+            post = {
+                title: 'Sample Title',
+                text: 'Sample Text'
+            };
+        });
+
+        test('GOOD: Proper query while user is logged in', async() => {
+            const { statusCode, body } = await request(server)
+                .post(`${url}/station/${station}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(post);
+
+            let { postId } = body;
+            testPostIds.push(postId);
+
+            expect(statusCode).toEqual(201);
+        });
+
+        test('BAD: User is not logged in', async () => {
+            const { statusCode } = await request(server)
+                .post(`${url}/station/${station}`)
+                .send(post);
+
+            expect(statusCode).toEqual(403);
+        });
+        // TODO: 
+        // test('ERROR: User is not part of station');
+
+        describe('ERROR: Title field', () => {
+            test('Title wrong type', async () => {
+                post.title = 0;
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'type'
+                        }
+                    })
+                );
+            });
+
+            test('Empty string title', async () => {
+                post.title = '';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'minLength'
+                        }
+                    })
+                );
+            });
+
+            test('Title is too long', async () => {
+                // 65 chars
+                post.title = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'maxLength'
+                        }
+                    })
+                );
+            });
+
+            test('No title property', async () => {
+                delete post.title;
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'required'
+                        }
+                    })
+                );
+            });
+        });
+
+        describe('ERROR: Text field', () => {
+            test('Text wrong type', async () => {
+                post.text = 0;
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            text: 'type'
+                        }
+                    })
+                );
+            });
+
+            test('Empty string text', async () => {
+                post.text = '';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            text: 'minLength'
+                        }
+                    })
+                );
+            });
+
+            test('Text is too long', async () => {
+                post.text = `
+                    According to all known laws of aviation, there is no way a bee should be 
+                    able to fly. Its wings are too small to get its fat little body off the 
+                    ground. The bee, of course, flies anyway because bees don't care what humans 
+                    think is impossible. Yellow, black. Yellow, black. Yellow, black. Yellow, black. 
+                    Ooh, black and yellow! Let's shake it up a little. Barry! Breakfast is ready! 
+                    Ooming! Hang on a second. Hello? - Barry? - Adam? - Oan you believe this is 
+                    happening? - I can't. I'll pick you up. Looking sharp. Use the stairs. Your father 
+                    paid good money for those. Sorry. I'm excited. Here's the graduate. We're very 
+                    proud of you, son. A perfect report card, all B's. Very proud. Ma! I got a thing 
+                    going here. - You got lint on your fuzz. - Ow! That's me! - Wave to us! We'll be in 
+                    row 118,000. - Bye! Barry, I told you, stop flying in the house! - Hey, Adam. - Hey, 
+                    Barry. - Is that fuzz gel? - A little. Special day, graduation. Never thought I'd make 
+                    it. Three days grade school, three days high school.
+                `;
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            text: 'maxLength'
+                        }
+                    })
+                );
+            });
+
+            test('No text property', async () => {
+                delete post.text;
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/station/${station}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(post);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            text: 'required'
+                        }
+                    })
+                );
+            });
+        });
+    });
 });
 
 afterAll(async () => {
+    await db.query({
+        text: 'DELETE FROM posts WHERE post_id = ANY($1)',
+        values: [ testPostIds ]
+    });
+
     await db.end();
 
     await server.close();

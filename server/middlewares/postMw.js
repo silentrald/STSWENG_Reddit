@@ -1,4 +1,8 @@
-// const Ajv = require('ajv');
+const Ajv = require('ajv');
+const { ajvErrors } = require('./ajvHelper');
+
+const ajv = new Ajv({ allErrors: true, jsonPointers: true });
+require('ajv-keywords')(ajv, [ 'transform' ]);
 
 const LIMIT = 10;
 const STATION_NAME_REGEX = /^[A-Za-z0-9_-]+$/;
@@ -6,7 +10,46 @@ const POST_NAME_REGEX = /^p[A-Za-z0-9]{0,11}$/;
 const SORT_REGEX = /^(ASC|DESC)$/;
 const TOP_REGEX = /^(hour|day|week|month|year|all)$/;
 
-// const ajv = new Ajv({ allErrors: true });
+const POST_S_SCHEMA = 'ps';
+const POST_V_SCHEMA = 'pv';
+
+ajv.addSchema({
+    type: 'object',
+    properties: {
+        title: {
+            transform: ['trim']
+        },
+        text: {
+            transform: ['trim']
+        },
+        station_name: {
+            transform: ['trim']
+        },
+        author: {
+            transform: ['trim']
+        }
+    }
+}, POST_S_SCHEMA);
+
+ajv.addSchema({
+    type: 'object',
+    properties: {
+        title: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 64
+        },
+        text: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 1000
+        }
+    },
+    required: [
+        'title',
+        'text'
+    ]
+}, POST_V_SCHEMA);
 
 const postMw = {
     /**
@@ -38,6 +81,25 @@ const postMw = {
                     post: 'pattern'
                 }
             });
+        }
+
+        next();
+    },
+
+    /**
+     * Validates the object for adding a post.
+     * Properties: title, text, author, station_name
+     */
+    validateStationPost: (req, res, next) => {
+        // sanititze
+        ajv.validate(POST_S_SCHEMA, req.body);
+
+        // validate
+        const validate = ajv.validate(POST_V_SCHEMA, req.body);
+
+        if (!validate) {
+            const errors = ajvErrors(ajv);
+            return res.status(401).send({ errors });
         }
 
         next();
