@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="success">
+    <div id="success" class="success">
       Account has been registered
       <nuxt-link to="/login">
         <button id="login">

@@ -50,14 +50,7 @@
     "jest": "^26.6.1",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.6",
-    "semantic-release": "^17.3.0",
     "supertest": "^6.0.0"
-  },
-  "release": {
-    "branches": [
-      "master",
-      "next"
-    ]
   },
   "publishConfig": {
     "access": "restricted"

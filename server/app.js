@@ -10,6 +10,7 @@ if (!process.env.CI) {
 
 const app = express();
 
+const HOST = process.env.HOST || 'localhost';
 const PORT = process.env.PORT || 5000;
 
 // MIDDLEWARES
@@ -39,7 +40,7 @@ app.use('/api/subcomment', subcommentRtr);
 app.use('/api/station', stationRtr);
 app.use('/api/user', userRtr);
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, HOST, () => {
     console.log(`Listening to port ${PORT}`);
 });
 
