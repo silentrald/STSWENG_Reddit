@@ -11,7 +11,7 @@
     "dev": "npx nodemon app --exec \"npm run lint && node\"",
     "devtest": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent && node\"",
     "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color test/integration/post && node\"",
-    "devstemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/post && node\"",
+    "devstemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/post test/unit/post && node\"",
     "lint": "eslint .",
     "test": "jest --runInBand --color --coverage",
     "stest": "jest --runInBand --color --coverage --silent",

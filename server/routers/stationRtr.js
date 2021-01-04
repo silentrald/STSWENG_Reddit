@@ -8,6 +8,9 @@ const stationMw = require('../middlewares/stationMw');
 router.get('/id/:stationName',
     api.getStation);
 
+router.get('/top',
+    api.getTopStations);
+
 router.get('/captains/:stationName',
     api.getStationCaptains);
 

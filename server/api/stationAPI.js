@@ -41,6 +41,33 @@ const stationAPI = {
         }
     },
 
+    /**
+     * Gets the top stations
+     */
+    getTopStations: async (_req, res) => {
+        try {
+            // TODO: add more algorithms here
+            // (a * t) + ((1 - a) * p) = Simple Popularity algorithm
+            // a = 0.05, t = time, p = popularity val
+            const querySelTopStations = {
+                text: `
+                    SELECT      *
+                    FROM        stations
+                    ORDER BY    members DESC
+                    LIMIT       5;
+                `
+            };
+
+            const { rows: stations } = await db.query(querySelTopStations);
+
+            return res.status(200).send({ stations });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
     getStationCaptains: async (req, res) => {
         const { stationName } = req.params;
 

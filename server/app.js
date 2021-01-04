@@ -31,12 +31,14 @@ app.use(loginMw.smartLogin);
 const postRtr = require('./routers/postRtr');
 const postVoteRtr = require('./routers/postVoteRtr');
 const subcommentRtr = require('./routers/subcommentRtr');
+const subpostRtr = require('./routers/subpostRtr');
 const stationRtr = require('./routers/stationRtr');
 const userRtr = require('./routers/userRtr');
 
 app.use('/api/post', postRtr);
 app.use('/api/post-vote', postVoteRtr);
 app.use('/api/subcomment', subcommentRtr);
+app.use('/api/subpost', subpostRtr);
 app.use('/api/station', stationRtr);
 app.use('/api/user', userRtr);
 

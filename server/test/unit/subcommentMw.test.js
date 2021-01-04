@@ -1,5 +1,7 @@
 const {
-    validateSubcomment
+    validateCommentParams,
+    validateSubcomment,
+    sanitizeSubcommentsQuery
 } = require('../../middlewares/subcommentMw');
 
 const mockRequest = (data) => {
@@ -17,8 +19,50 @@ const mockNext = () => {
     return jest.fn();
 };
 
+const LIMIT = 3;
+
 
 describe('Unit Testing: subcommentMw', () => {
+    describe('Middleware: validateCommentParams', () => {
+        let params = {};
+
+        beforeEach(() => {
+            params = {
+                comment: 'caaaaaaaaaa1'
+            };
+        });
+
+        test('GOOD', async () => {
+            const req = mockRequest({
+                params
+            });
+            const res = mockResponse();
+            const next = mockNext();
+            
+            await validateCommentParams(req, res, next);
+
+            expect(next).toHaveBeenCalledTimes(1);
+        });
+
+        test('BAD: Invalid format', async () => {
+            params.comment = 'asdfasdf';
+            const req = mockRequest({
+                params
+            });
+            const res = mockResponse();
+            const next = mockNext();
+            
+            await validateCommentParams(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.send).toHaveBeenCalledWith({
+                errors: {
+                    comment: 'pattern'
+                }
+            });
+        });
+    });
+
     describe('Middleware: validateSubcomment', () => {
         let subcomment = {};
 
@@ -284,6 +328,139 @@ describe('Unit Testing: subcommentMw', () => {
                     errors: {
                         station: 'pattern'
                     }
+                });
+            });
+        });
+    });
+
+    describe('Middleware: sanitizeSubcommentsQuery', () => {
+        let query = {};
+
+        beforeEach(() => {
+            query = {};
+        });
+        
+        test('GOOD: No query', async () => {
+            const req = mockRequest({
+                query
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await sanitizeSubcommentsQuery(req, res, next);
+
+            expect(next).toHaveBeenCalledTimes(1);
+            expect(req.query).toEqual({
+                offset: 0,
+                limit: LIMIT
+            });
+        });
+
+        test('GOOD: With query', async () => {
+            query = {
+                offset: 1,
+                limit: 2
+            };
+            const req = mockRequest({
+                query
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await sanitizeSubcommentsQuery(req, res, next);
+
+            expect(next).toHaveBeenCalledTimes(1);
+            expect(req.query).toEqual({
+                offset: 1,
+                limit: 2
+            });
+        });
+
+        describe('GOOD: sanitize offset', () => {
+            test('Invalid type', async () => {
+                query.offset = 'hello';
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizeSubcommentsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT
+                });
+            });
+
+            test('Negative Number', async () => {
+                query.offset = -2;
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizeSubcommentsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT
+                });
+            });
+        });
+
+        describe('GOOD: sanitize limit', () => {
+            test('Invalid type', async () => {
+                query.limit = 'hello';
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizeSubcommentsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT
+                });
+            });
+
+            test('Zero', async () => {
+                query.limit = 0;
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizeSubcommentsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT
+                });
+            });
+
+            test('Negative Number', async () => {
+                query.limit = -2;
+                const req = mockRequest({
+                    query
+                });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await sanitizeSubcommentsQuery(req, res, next);
+    
+                expect(next).toHaveBeenCalledTimes(1);
+                expect(req.query).toEqual({
+                    offset: 0,
+                    limit: LIMIT
                 });
             });
         });
