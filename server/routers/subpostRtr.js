@@ -15,7 +15,7 @@ router.get('/post/:post',
 router.post('/post/:post',
     loginMw.isAuth,
     postMw.validatePostParam,
-    mw.validateCommentText,
+    mw.validateComment,
     api.postSubpost);
 
 // PATCH
