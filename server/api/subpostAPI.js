@@ -44,8 +44,6 @@ const subpostAPI = {
         const client = await db.connect();
 
         try {
-            await client.query('BEGIN');
-
             const queryGetPostInfo = {
                 text: `
                     SELECT      station_name
@@ -58,8 +56,14 @@ const subpostAPI = {
 
             const { rows: station, rowCount: postExists } = await db.query(queryGetPostInfo);
             if (!postExists) {
-                throw Error('Attempted to create a comment to a non-existent post.');
+                return res.status(403).send({
+                    errors: {
+                        post: 'required'
+                    }
+                });
             }
+
+            await client.query('BEGIN');
 
             const { station_name } = station[0];
             const queryPostComment = {
@@ -72,7 +76,7 @@ const subpostAPI = {
                 values: [ text, req.user.username, station_name ]
             };
 
-            const { rows: comments, rowCount: commentCreated } = await db.query(queryPostComment);
+            const { rows: comments, rowCount: commentCreated } = await client.query(queryPostComment);
             if (!commentCreated) {
                 // TODO: helpful error message
                 throw Error('Comment not created.');
@@ -88,7 +92,7 @@ const subpostAPI = {
                 `,
                 values: [ comment.comment_id, post ]
             };
-            const { rowCount: subpostCreated } = await db.query(queryPostSubpost);
+            const { rowCount: subpostCreated } = await client.query(queryPostSubpost);
             if (!subpostCreated) {
                 throw Error('Subpost not created.');
             }
