@@ -23,6 +23,16 @@ const subpostMw = {
         }
 
         next();
+    },
+
+    validateCommentText: (req, res, next) => {
+        const { text } = req.body;
+
+        if (text && text.length > 0) {
+            next();
+        } else {
+            res.status(403).send({ errors: { text: 'minLength' } });
+        }
     }
 };
 

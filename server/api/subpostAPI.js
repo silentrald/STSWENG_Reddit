@@ -34,9 +34,78 @@ const subpostAPI = {
 
             return res.status(500).send();
         }
-    }
+    },
 
     // POST
+    postSubpost: async(req, res) => {
+        const { post } = req.params;
+        const { text } = req.body;
+
+        const client = await db.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            const queryGetPostInfo = {
+                text: `
+                    SELECT      station_name
+                    FROM        posts
+                    WHERE       post_id = $1
+                    LIMIT       1;
+                `,
+                values: [ post ]
+            };
+
+            const { rows: station, rowCount: postExists } = await db.query(queryGetPostInfo);
+            if (!postExists) {
+                throw Error('Attempted to create a comment to a non-existent post.');
+            }
+
+            const { station_name } = station[0];
+            const queryPostComment = {
+                text: `
+                    INSERT INTO comments
+                    (comment_id, text, author, station_name)
+                    VALUES (comment_id(), $1, $2, $3)
+                    RETURNING *;
+                `,
+                values: [ text, req.user.username, station_name ]
+            };
+
+            const { rows: comments, rowCount: commentCreated } = await db.query(queryPostComment);
+            if (!commentCreated) {
+                // TODO: helpful error message
+                throw Error('Comment not created.');
+            }
+            const comment = comments[0];
+
+            const queryPostSubpost = {
+                text: `
+                    INSERT INTO subposts
+                    (comment_id, parent_post)
+                    VALUES ($1, $2)
+                    RETURNING *;
+                `,
+                values: [ comment.comment_id, post ]
+            };
+            const { rowCount: subpostCreated } = await db.query(queryPostSubpost);
+            if (!subpostCreated) {
+                throw Error('Subpost not created.');
+            }
+
+            return res.status(201).send({ comment });
+        } catch (err) {
+            try {
+                await client.query('ROLLBACK');
+            } catch (rollbackErr) {
+                console.log(rollbackErr);
+            }
+
+            return res.status(500).send();
+        } finally {
+            client.release();
+        }
+    }
 
     // PATCH
 
