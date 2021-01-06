@@ -7,35 +7,39 @@ const queryMw = {
             station = req.params.station;
         }
 
-        const querySelPassengers = {
-            text: `
-                SELECT  *
-                FROM    passengers
-                WHERE   username = $1
-                    AND station_name = $2
-                LIMIT 1;
-            `,
-            values: [
-                req.user.username,
-                station
-            ]
-        };
-
-        const { rowCount } = await db.query(querySelPassengers);
-        const joined = rowCount > 0;
-
-        if (!joined) {
-            return res.status(403).send();
-        }
-
-        next();
-    },
+        try {
+            const querySelPassengers = {
+                text: `
+                    SELECT  *
+                    FROM    passengers
+                    WHERE   username = $1
+                        AND station_name = $2
+                    LIMIT 1;
+                `,
+                values: [
+                    req.user.username,
+                    station
+                ]
+            };
     
+            const { rowCount } = await db.query(querySelPassengers);
+    
+            if (rowCount === 0) {
+                return res.status(403).send({ error: 'not_crew' });
+            }
+    
+            next();
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
     /**
      * Gets the station name from a post and sets it
      * to the req body
      */
-    // TODO: Make unit and int test
     getStationPostParams: async (req, res, next) => {
         const { post } = req.params;
 

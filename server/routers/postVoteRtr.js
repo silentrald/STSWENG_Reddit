@@ -3,7 +3,7 @@ const api = require('../api/postVoteAPI');
 const loginMw = require('../middlewares/loginMw');
 const postMw = require('../middlewares/postMw');
 const queryMw = require('../middlewares/queryMw');
-// const mw = require('../middlewares/postVoteMw');
+const mw = require('../middlewares/postVoteMw');
 
 // GET
 router.get('/:post',
@@ -17,6 +17,7 @@ router.post('/:post',
     postMw.validatePostParam,
     queryMw.getStationPostParams,
     queryMw.userIsPartOfStation,
+    mw.validateUpvoteBody,
     api.postPostVote);
 
 // PATCH

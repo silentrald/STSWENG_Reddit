@@ -5,7 +5,7 @@
       <div class="post-title margin-bottom empty" />
       <div class="post-preview margin-bottom empty" />
     </div>
-    <vote-lazyload direction="row" />
+    <post-vote-lazyload direction="row" />
     <div class="post-comments">
       <!-- -->
     </div>

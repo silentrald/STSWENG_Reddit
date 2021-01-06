@@ -13,7 +13,7 @@
         </remark>
       </div>
     </div>
-    <vote
+    <post-vote
       :id="id"
       :score="score"
       direction="row"

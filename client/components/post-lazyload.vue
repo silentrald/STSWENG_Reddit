@@ -1,6 +1,6 @@
 <template>
   <div class="post">
-    <vote-lazyload direction="col" />
+    <post-vote-lazyload direction="col" />
     <div class="post-text">
       <div class="post-info empty" />
       <div class="post-title empty" />

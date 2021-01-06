@@ -92,7 +92,11 @@ export default {
         const { data } = await this.$axios.post(`/api/post-vote/${this.id}`, { upvote })
         this.$set(this, 'localScore', this.localScore + data.inc)
         this.$set(this, 'vote', data.vote)
-      } catch (_err) {}
+      } catch ({ response }) {
+        if (response.status === 403 && response.data.error === 'not_crew') {
+          // TODO: Make alert that the user is not login
+        }
+      }
       this.voting = false
     }
   }

@@ -1,5 +1,6 @@
 const {
-    validatePostParam
+    validatePostParam,
+    validateUpvoteBody
 } = require('../../middlewares/postVoteMw');
 
 const mockRequest = (data) => {
@@ -58,6 +59,56 @@ describe('Unit Testing: postVoteMw', () => {
             expect(res.send).toHaveBeenCalledWith({
                 errors: {
                     post: 'pattern'
+                }
+            });
+        });
+    });
+
+    describe('Middleware: validateUpvoteBody', () => {
+        test('GOOD', async () => {
+            const req = mockRequest({
+                body: {
+                    upvote: true
+                }
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateUpvoteBody(req, res, next);
+
+            expect(next).toHaveBeenCalledTimes(1);
+        });
+
+        test('BAD: Empty', async () => {
+            const req = mockRequest({ body: {} });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateUpvoteBody(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.send).toHaveBeenCalledWith({
+                errors: {
+                    upvote: 'type'
+                }
+            });
+        });
+
+        test('BAD: Invalid format', async () => {
+            const req = mockRequest({
+                body: {
+                    upvote: 100
+                }
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateUpvoteBody(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.send).toHaveBeenCalledWith({
+                errors: {
+                    upvote: 'type'
                 }
             });
         });

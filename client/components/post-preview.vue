@@ -1,6 +1,6 @@
 <template>
   <div class="post">
-    <vote
+    <post-vote
       :id="id"
       :score="score"
       direction="col"

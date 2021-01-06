@@ -8,7 +8,6 @@ const postVoteAPI = {
     /**
      * Gets the post vote of the user
      */
-    // TODO: Make unit and int test
     getPostVote: async (req, res) => {
         const { post } = req.params;
 
@@ -46,49 +45,13 @@ const postVoteAPI = {
     /**
      * Creates a new post vote
      */
-    // TODO: Make unit and int test
     postPostVote: async (req, res) => {
         const { post } = req.params;
         const { upvote } = req.body;
 
+        let inc, vote;
+
         try {
-            // Check whether the user is a crewmate
-            const querySelPost = {
-                text: `
-                    SELECT  station_name
-                    FROM    posts
-                    WHERE   post_id=$1
-                    LIMIT   1;
-                `,
-                values: [ post ]
-            };
-
-            const { rows: posts, rowCount: postCount } = await db.query(querySelPost);
-            if (postCount === 0) {
-                return res.status(404).send();
-            }
-            
-            // Get the station of the post and check if the user is a
-            // crewmate of the station
-            const querySelCrewmate = {
-                text: `
-                    SELECT  *
-                    FROM    crewmates
-                    WHERE   username=$1
-                        AND station_name=$2
-                    LIMIT   1;
-                `,
-                values: [
-                    req.user.username,
-                    posts[0].station_name
-                ]
-            };
-
-            const { rowCount: crewmateCount } = await db.query(querySelCrewmate);
-            if (crewmateCount === 0) {
-                return res.status(403).send();
-            }
-
             const client = await db.connect();
 
             try {
@@ -119,117 +82,114 @@ const postVoteAPI = {
                 await client.query(queryUpPost);
 
                 await client.query('COMMIT');
-            }
-            catch (err) {
+                vote = upvote ? 1 : -1;
+                inc = upvote ? 1 : -1;
+            } catch (err) {
                 await client.query('ROLLBACK');
-
-                // check if the post vote already exist
-                if (err.code === '23505' && err.constraint === 'pk_post_votes') {
-                    const querySelPostVote = {
-                        text: `
-                            SELECT  upvote
-                            FROM    post_votes
-                            WHERE   post_id=$1
-                                AND username=$2
-                            LIMIT   1;
-                        `,
-                        values: [
-                            post,
-                            req.user.username
-                        ]
-                    };
-    
-                    const resultPostVote = await db.query(querySelPostVote);
-                    const postVote = resultPostVote.rows[0];
-    
-                    const deleteVote = postVote.upvote === upvote;
-    
-                    // if the upvote is the same, delete the post vote
-                    const client = await db.connect();
-
-                    let vote, inc;
-                    try {
-                        if (deleteVote) {
-                            const queryDelPostVote = {
-                                text: `
-                                        DELETE FROM post_votes
-                                        WHERE   post_id=$1
-                                            AND username=$2;
-                                    `,
-                                values: [
-                                    post,
-                                    req.user.username
-                                ]
-                            };
-    
-                            await client.query(queryDelPostVote);
-    
-                            const queryUpPost = {
-                                text: `
-                                        UPDATE  posts
-                                        SET     score = score ${upvote ? '-' : '+'} 1
-                                        WHERE   post_id=$1
-                                    `,
-                                values: [ post ]
-                            };
-    
-                            await client.query(queryUpPost);
-
-                            vote = 0;
-                            inc = upvote ? -1 : 1;
-                        } else { // if the upvote is different, then change the vote of the user
-                            const queryUpPostVote = {
-                                text: `
-                                        UPDATE  post_votes
-                                        SET     upvote=$1
-                                        WHERE   post_id=$2
-                                            AND username=$3
-                                    `,
-                                values: [
-                                    upvote,
-                                    post,
-                                    req.user.username
-                                ]
-                            };
-    
-                            await db.query(queryUpPostVote);
-    
-                            const queryUpPost = {
-                                text: `
-                                        UPDATE  posts
-                                        SET     score = score ${upvote ? '+' : '-'} 2
-                                        WHERE   post_id=$1
-                                    `,
-                                values: [ post ]
-                            };
-                            
-                            await db.query(queryUpPost);
-
-                            vote = upvote ? 1 : -1;
-                            inc = upvote ? 2 : -2;
-                        }
-                            
-                        await db.query('COMMIT');
-                    } catch (err) {
-                        await client.query('ROLLBACK');
-                        throw err;
-                    } finally {
-                        client.release();
-                    }
-                    
-                    return res.status(200).send({ vote, inc });
-                }
-
                 throw err;
             } finally {
                 client.release();
             }
 
-            return res.status(201).send({
-                vote: upvote ? 1 : -1,
-                inc: upvote ? 1 : -1 }
-            );
+            return res.status(201).send({ vote, inc });
         } catch (err) {
+
+            // check if the post vote already exist
+            if (err.code === '23505' && err.constraint === 'pk_post_votes') {
+                const querySelPostVote = {
+                    text: `
+                        SELECT  upvote
+                        FROM    post_votes
+                        WHERE   post_id=$1
+                            AND username=$2
+                        LIMIT   1;
+                    `,
+                    values: [
+                        post,
+                        req.user.username
+                    ]
+                };
+
+                const resultPostVote = await db.query(querySelPostVote);
+                const postVote = resultPostVote.rows[0];
+
+                const deleteVote = postVote.upvote === upvote;
+
+                // if the upvote is the same, delete the post vote
+                const client = await db.connect();
+
+                try {
+                    if (deleteVote) {
+                        const queryDelPostVote = {
+                            text: `
+                                    DELETE FROM post_votes
+                                    WHERE   post_id=$1
+                                        AND username=$2;
+                                `,
+                            values: [
+                                post,
+                                req.user.username
+                            ]
+                        };
+
+                        await client.query(queryDelPostVote);
+
+                        const queryUpPost = {
+                            text: `
+                                    UPDATE  posts
+                                    SET     score = score ${upvote ? '-' : '+'} 1
+                                    WHERE   post_id=$1;
+                                `,
+                            values: [ post ]
+                        };
+
+                        await client.query(queryUpPost);
+
+                        vote = 0;
+                        inc = upvote ? -1 : 1;
+                    } else { // if the upvote is different, then change the vote of the user
+                        const queryUpPostVote = {
+                            text: `
+                                    UPDATE  post_votes
+                                    SET     upvote=$1
+                                    WHERE   post_id=$2
+                                        AND username=$3
+                                `,
+                            values: [
+                                upvote,
+                                post,
+                                req.user.username
+                            ]
+                        };
+
+                        await client.query(queryUpPostVote);
+
+                        const queryUpPost = {
+                            text: `
+                                    UPDATE  posts
+                                    SET     score = score ${upvote ? '+' : '-'} 2
+                                    WHERE   post_id=$1
+                                `,
+                            values: [ post ]
+                        };
+                        
+                        await client.query(queryUpPost);
+
+                        vote = upvote ? 1 : -1;
+                        inc = upvote ? 2 : -2;
+                    }
+                        
+                    await client.query('COMMIT');
+                } catch (err) {
+                    await client.query('ROLLBACK');
+                    console.log(err);
+                    return res.status(500).send();
+                } finally {
+                    client.release();
+                }
+
+                return res.status(200).send({ vote, inc });
+            }
 
             console.log(err);
 
