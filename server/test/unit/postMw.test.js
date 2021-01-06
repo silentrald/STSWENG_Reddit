@@ -1,8 +1,14 @@
 const {
     validateStationParam,
+<<<<<<< HEAD
     validatePostParam,
     validateStationPost,
     sanitizePostsQuery
+=======
+    sanitizePostsQuery,
+    validateSationPost,
+    validatePostParam
+>>>>>>> dev
 } = require('../../middlewares/postMw');
 
 const mockRequest = (data) => {

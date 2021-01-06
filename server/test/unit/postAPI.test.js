@@ -24,7 +24,7 @@ jest.mock('../../db', () => {
             };
 
             query.text = oneLineQuery(query.text);
-
+            
             if (query.text === 'SELECT * FROM posts WHERE post_id=$1 LIMIT 1;'
                 && query.values[0]) {
                 if (query.values[0] === 'paaaaaaaaaa1') {
