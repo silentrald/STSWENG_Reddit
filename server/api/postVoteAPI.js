@@ -52,6 +52,43 @@ const postVoteAPI = {
         const { upvote } = req.body;
 
         try {
+            // Check whether the user is a crewmate
+            const querySelPost = {
+                text: `
+                    SELECT  station_name
+                    FROM    posts
+                    WHERE   post_id=$1
+                    LIMIT   1;
+                `,
+                values: [ post ]
+            };
+
+            const { rows: posts, rowCount: postCount } = await db.query(querySelPost);
+            if (postCount === 0) {
+                return res.status(404).send();
+            }
+            
+            // Get the station of the post and check if the user is a
+            // crewmate of the station
+            const querySelCrewmate = {
+                text: `
+                    SELECT  *
+                    FROM    crewmates
+                    WHERE   username=$1
+                        AND station_name=$2
+                    LIMIT   1;
+                `,
+                values: [
+                    req.user.username,
+                    posts[0].station_name
+                ]
+            };
+
+            const { rowCount: crewmateCount } = await db.query(querySelCrewmate);
+            if (crewmateCount === 0) {
+                return res.status(403).send();
+            }
+
             const client = await db.connect();
 
             try {

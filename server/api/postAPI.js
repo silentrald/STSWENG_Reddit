@@ -65,6 +65,38 @@ const postAPI = {
     },
 
     /**
+     * Gets a post from a station
+     */
+    getStationPost: async (req, res) => {
+        const { post } = req.params;
+
+        try {
+            const querySelStation = {
+                text: `
+                    SELECT  *
+                    FROM    posts
+                    WHERE   post_id=$1
+                    LIMIT   1;
+                `,
+                values: [ post ]
+            };
+
+            const { rows: posts, rowCount } = await db.query(querySelStation);
+
+            if (rowCount < 1) {
+                // Post not found
+                return res.status(404).send();
+            }
+
+            return res.status(200).send({ post: posts[0] });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
+    /**
      * Gets all the posts from a given station
      */
     getStationPosts: async (req, res) => {
@@ -124,38 +156,6 @@ const postAPI = {
             const { rows: posts } = await db.query(queryStationPosts);
 
             return res.status(200).send({ posts });
-        } catch (err) {
-            console.log(err);
-
-            return res.status(500).send();
-        }
-    },
-
-    /**
-     * Gets a post from a station
-     */
-    getStationPost: async (req, res) => {
-        const { post } = req.params;
-
-        try {
-            const querySelStation = {
-                text: `
-                    SELECT  *
-                    FROM    posts
-                    WHERE   post_id=$1
-                    LIMIT   1;
-                `,
-                values: [ post ]
-            };
-
-            const { rows: posts, rowCount } = await db.query(querySelStation);
-
-            if (rowCount < 1) {
-                // Post not found
-                return res.status(404).send();
-            }
-
-            return res.status(200).send({ post: posts[0] });
         } catch (err) {
             console.log(err);
 

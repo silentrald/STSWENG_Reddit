@@ -18,6 +18,8 @@ const noLikePosts = [
 
 let crewmateToken;
 
+let deleteVotePosts = [];
+
 beforeAll(async () => {
     let res = await request(server)
         .post('/api/user/login')
@@ -55,35 +57,21 @@ describe('Station API', () => {
                 .set('Authorization', `Bearer ${crewmateToken}`);
             
             expect(statusCode).toEqual(200);
-            
         });
     });
-    //     describe(`GET ${url}/score/:post`, () => {
-    //         test('GOOD', async () => {
-    //             const {
-    //                 statusCode,
-    //                 body
-    //             } = await request(server).get(`${url}/score/${posts[0]}`);
-
-    //             expect(statusCode).toEqual(200);
-    //             expect(body.score).toEqual(expect.any(Number));
-    //         });
-
-    //         test('BAD: Invalid pattern', async () => {
-    //             const {
-    //                 statusCode,
-    //                 body
-    //             } = await request(server).get(`${url}/score/blahhhh`);
-
-    //             expect(statusCode).toEqual(403);
-    //             expect(body.errors).toEqual({
-    //                 post: 'pattern'
-    //             });
-    //         });
-    //     });
+    
+    // describe(`POST ${url}/:post`, () => {
+    //     test()
+    // });
 });
 
 afterAll(async () => {
+    for (let index in deleteVotePosts) {
+        await db.query({
+            text: 'DELETE FROM post_votes WHERE post_id=$1;',
+            values: [ deleteVotePosts[index] ]
+        });
+    }
     await db.end();
 
     await server.close();

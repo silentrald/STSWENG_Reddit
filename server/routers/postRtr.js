@@ -1,7 +1,7 @@
 const router = require('express')();
 const api = require('../api/postAPI');
 const loginMw = require('../middlewares/loginMw');
-const stationMw = require('../middlewares/stationMw');
+const queryMw = require('../middlewares/queryMw');
 const mw = require('../middlewares/postMw');
 
 // GET
@@ -23,9 +23,9 @@ router.get('/station/:station',
 
 router.post('/station/:station',
     loginMw.isAuth,
-    stationMw.userIsPartOfStation,
+    queryMw.userIsPartOfStation,
     mw.validateStationParam,
-    mw.validateSationPost,
+    mw.validateStationPost,
     api.postStationPost);
 
 // PATCH
