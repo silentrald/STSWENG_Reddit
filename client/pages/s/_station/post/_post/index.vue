@@ -23,6 +23,20 @@
         <h5 class="margin-bottom">
           COMMENTS ({{ post.comment_count }})
         </h5>
+        <div class="margin-bottom">
+          <div class="form-group">
+            <textarea
+              id="comment-text"
+              v-model="comment_text"
+              class="form-control comment-box"
+              placeholder="Write your comment here."
+              rows="5"
+            />
+          </div>
+          <button id="post" @click="postComment()">
+            Post
+          </button>
+        </div>
         <comment
           v-for="comment in comments"
           :id="comment.comment_id"
@@ -63,6 +77,7 @@ export default {
     return {
       post: {},
       comments: [],
+      comment_text: '',
       loading: true
     }
   },
@@ -114,6 +129,16 @@ export default {
       }
     },
 
+    async postComment () {
+      const res = await this.$axios.post(`/api/subpost/post/${this.$route.params.post}`, {
+        text: this.comment_text
+      })
+
+      const { comment } = res.data
+      this.comments.unshift(comment)
+      this.$set(this, 'comment_text', '')
+    },
+
     infiniteScroll ($state) {
       setTimeout(async () => {
         const { post } = this.$route.params
@@ -160,5 +185,11 @@ export default {
 
 .margin-bottom {
   margin-bottom: 16px;
+}
+
+.comment-box {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: #cccccc;
 }
 </style>

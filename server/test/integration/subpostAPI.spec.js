@@ -251,6 +251,146 @@ describe('Subpost API', () => {
             });
         });
     });
+
+    describe(`POST ${url}/post/:post`, () => {
+        let body = { text: 'Test comment' };
+        
+        beforeEach(() => {
+            body = { text: 'Test comment' };
+        });
+        
+        test('GOOD: Comment posted', async () => {
+            const { statusCode, body: data } = await request(server)
+                .post(`${url}/post/${posts[0]}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(body);
+            
+            expect(statusCode).toEqual(201);
+            expect(data.comment).toEqual(
+                expect.objectContaining({
+                    comment_id: expect.any(String),
+                    text: expect.any(String),
+                    score: expect.any(Number),
+                    author: expect.any(String),
+                    station_name: expect.any(String),
+                    timestamp_created: expect.any(String)
+                })
+            );
+        });
+        
+        test('BAD: Not logged in', async () => {
+            const { statusCode } = await request(server)
+                .post(`${url}/post/${posts[0]}`)
+                .send(body);
+            
+            expect(statusCode).toEqual(403);
+        });
+        
+        test('BAD: Bad post id', async () => {
+            const { statusCode, body: data } = await request(server)
+                .post(`${url}/post/abcdef`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(body);
+            
+            expect(statusCode).toEqual(403);
+            expect(data).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        post: 'pattern'
+                    })
+                })
+            );
+        });
+        
+        test('BAD: Nonexistent post', async () => {
+            const { statusCode, body: data } = await request(server)
+                .post(`${url}/post/pabcdefghijk`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(body);
+            
+            expect(statusCode).toEqual(403);
+            expect(data).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        post: 'required'
+                    })
+                })
+            );
+        });
+        
+        test('BAD: Comment not provided', async () => {
+            body = {};
+            const { statusCode, body: data } = await request(server)
+                .post(`${url}/post/${posts[0]}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(body);
+            
+            expect(statusCode).toEqual(403);
+            expect(data).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        text: 'required'
+                    })
+                })
+            );
+        });
+        
+        test('BAD: Comment not a string', async () => {
+            body = { text: 12345 };
+            const { statusCode, body: data } = await request(server)
+                .post(`${url}/post/${posts[0]}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(body);
+            
+            expect(statusCode).toEqual(403);
+            expect(data).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        text: 'type'
+                    })
+                })
+            );
+        });
+        
+        test('BAD: Empty comment', async () => {
+            body = { text: '' };
+            const { statusCode, body: data } = await request(server)
+                .post(`${url}/post/${posts[0]}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(body);
+            
+            expect(statusCode).toEqual(403);
+            expect(data).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        text: 'minLength'
+                    })
+                })
+            );
+        });
+        
+        test('BAD: Comment too long', async () => {
+            let text = '';
+            for (let i = 0; i < 101; i++) {
+                text += 'abcdefghij';
+            }    
+
+            body = { text };
+            const { statusCode, body: data } = await request(server)
+                .post(`${url}/post/${posts[0]}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(body);
+            
+            expect(statusCode).toEqual(403);
+            expect(data).toEqual(
+                expect.objectContaining({
+                    errors: expect.objectContaining({
+                        text: 'maxLength'
+                    })
+                })
+            );
+        });
+    });
 });
 
 afterAll(async () => {
