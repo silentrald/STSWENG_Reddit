@@ -2,6 +2,7 @@
   <div>
     <div class="post-container">
       <post
+        v-if="post"
         :id="post.post_id"
         :score="post.score"
         :author="post.author"
@@ -10,6 +11,7 @@
       >
         {{ post.text }}
       </post>
+      <post-single-lazyload v-else />
     </div>
     <div class="comment-container">
       <div v-if="loading">
@@ -75,7 +77,7 @@ const DEPTH = 3
 export default {
   data () {
     return {
-      post: {},
+      post: undefined,
       comments: [],
       comment_text: '',
       loading: true

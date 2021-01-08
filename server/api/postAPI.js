@@ -65,6 +65,38 @@ const postAPI = {
     },
 
     /**
+     * Gets a post from a station
+     */
+    getStationPost: async (req, res) => {
+        const { post } = req.params;
+
+        try {
+            const querySelStation = {
+                text: `
+                    SELECT  *
+                    FROM    posts
+                    WHERE   post_id=$1
+                    LIMIT   1;
+                `,
+                values: [ post ]
+            };
+
+            const { rows: posts, rowCount } = await db.query(querySelStation);
+
+            if (rowCount < 1) {
+                // Post not found
+                return res.status(404).send();
+            }
+
+            return res.status(200).send({ post: posts[0] });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
+    /**
      * Gets all the posts from a given station
      */
     getStationPosts: async (req, res) => {
@@ -131,38 +163,6 @@ const postAPI = {
         }
     },
 
-    /**
-     * Gets a post from a station
-     */
-    getStationPost: async (req, res) => {
-        const { post } = req.params;
-
-        try {
-            const querySelStation = {
-                text: `
-                    SELECT  *
-                    FROM    posts
-                    WHERE   post_id=$1
-                    LIMIT   1;
-                `,
-                values: [ post ]
-            };
-
-            const { rows: posts, rowCount } = await db.query(querySelStation);
-
-            if (rowCount < 1) {
-                // Post not found
-                return res.status(404).send();
-            }
-
-            return res.status(200).send({ post: posts[0] });
-        } catch (err) {
-            console.log(err);
-
-            return res.status(500).send();
-        }
-    },
-
     // POST
     /**
      * Adds a post from a user to a given station
@@ -193,9 +193,7 @@ const postAPI = {
                 ]
             };
 
-            console.log(queryInsPost);
             const resultPost = await db.query(queryInsPost);
-            console.log(resultPost);
             const postId = resultPost.rows[0].post_id;
 
             return res.status(201).send({ postId });

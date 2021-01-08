@@ -87,6 +87,25 @@ const postMw = {
     },
 
     /**
+     * Validates the object for adding a post.
+     * Properties: title, text, author, station_name
+     */
+    validateStationPost: (req, res, next) => {
+        // sanititze
+        ajv.validate(POST_S_SCHEMA, req.body);
+
+        // validate
+        const validate = ajv.validate(POST_V_SCHEMA, req.body);
+
+        if (!validate) {
+            const errors = ajvErrors(ajv);
+            return res.status(401).send({ errors });
+        }
+
+        next();
+    },
+
+    /**
      * Sanitizes the posts query object.
      * Properties: offset, limit, sort
      */
@@ -120,25 +139,6 @@ const postMw = {
             if (!TOP_REGEX.test(top)) {
                 req.query.top = undefined;
             }
-        }
-
-        next();
-    },
-
-    /**
-     * Validates the object for adding a post.
-     * Properties: title, text, author, station_name
-     */
-    validateSationPost: (req, res, next) => {
-        // sanititze
-        ajv.validate(POST_S_SCHEMA, req.body);
-
-        // validate
-        const validate = ajv.validate(POST_V_SCHEMA, req.body);
-
-        if (!validate) {
-            const errors = ajvErrors(ajv);
-            return res.status(401).send({ errors });
         }
 
         next();
