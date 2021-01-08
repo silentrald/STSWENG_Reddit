@@ -1,77 +1,190 @@
 process.env.JWT_SECRET = 'test-value'; // set the jwt token
 
-// const {
-//     getScore
-// } = require('../../api/postVoteAPI');
+const {
+    getPostVote,
+    postPostVote,
+} = require('../../api/postVoteAPI');
 
-// jest.mock('../../db', () => {
-//     /**
-//      * Converts a multiline queryText to a single line query
-//      * 
-//      * @param {string} queryText
-//      */
-//     // const oneLineQuery = (queryText) => queryText.trim().replace(/\n/g, ' ').replace(/ {2,}/g, ' ');
+jest.mock('../../db', () => {
+    /**
+     * Converts a multiline queryText to a single line query
+     * 
+     * @param {string} queryText
+     */
+    const oneLineQuery = (queryText) => queryText.trim().replace(/\n/g, ' ').replace(/ {2,}/g, ' ');
 
-//     return {
-//         connect: jest.fn(),
-//         query: jest.fn().mockImplementation((_query) => {
-//             // TODO: change this if added some functionality
-//             const result = {
-//                 rows: [
-//                     {
-//                         upvote: true,
-//                         count: 100
-//                     }, {
-//                         upvote: false,
-//                         count: 10
-//                     }
-//                 ],
-//                 rowCount: 2
-//             };
+    return {
+        connect: jest.fn().mockImplementation(() => {
+            return {
+                query: jest.fn().mockImplementation((query) => {
+                    let rows = [];
+                    let rowCount = 0;
+                    
+                    if (query !== 'BEGIN' && query !== 'COMMIT' && query !== 'ROLLBACK') {
+                        query.text = oneLineQuery(query.text);
 
-//             // query.text = oneLineQuery(query.text);
+                        if (query.values[0] === 'post-remove' ||
+                            query.values[0] === 'post-change') {
+                            if (query.text.startsWith('INSERT')){
+                                throw {
+                                    code: '23505',
+                                    constraint: 'pk_post_votes'
+                                };
+                            }
+                        }
+                    }
+                    
+                    return { rows, rowCount };
+                }),
+                release: jest.fn()
+            };
+        }),
+        query: jest.fn().mockImplementation((query) => {
+            let rows = [];
+            let rowCount = 0;
 
-//             return result;
-//         }),
-//         end: jest.fn(),
-//     };
-// });
+            query.text = oneLineQuery(query.text);
+            if (query.values[1] === 'username') {
+                if (query.values[0] === 'post-true') {
+                    rows = [{
+                        upvote: true
+                    }];
+                    rowCount = 1;
+                } else if (query.values[0] === 'post-false') {
+                    rows = [{
+                        upvote: false
+                    }];
+                    rowCount = 1;
+                } else if (query.values[0] === 'post-remove') {
+                    rows = [{
+                        upvote: true
+                    }];
+                    rowCount = 1;
+                } else if (query.values[0] === 'post-change') {
+                    rows = [{
+                        upvote: false
+                    }];
+                    rowCount = 1;
+                }
+            }
 
-// const mockRequest = (data) => {
-//     return data;
-// };
+            return { rows, rowCount };
+        }),
+        end: jest.fn(),
+    };
+});
+const db = require('../../db');
 
-// const mockResponse = () => {
-//     const res = {};
-//     res.status = jest.fn().mockReturnValue(res);
-//     res.send = jest.fn().mockReturnValue(res);
-//     return res;
-// };
+const mockRequest = (data) => {
+    return data;
+};
 
-// const posts = [
-//     'paaaaaaaaaa1',
-//     'paaaaaaaaaa2',
-//     'paaaaaaaaaa3'
-// ];
+const mockResponse = () => {
+    const res = {};
+    res.status = jest.fn().mockReturnValue(res);
+    res.send = jest.fn().mockReturnValue(res);
+    return res;
+};
 
 describe('Unit test: postVoteAPI.js', () => {
-    describe('API: getScore', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe('API: getPostVote', () => {
         test('GOOD', async () => {
-            // const req = mockRequest({
-            //     params: {
-            //         post: posts[0]
-            //     }
-            // });
-            // const res = mockResponse();
+            const req = mockRequest({
+                params: {
+                    post: 'post-true'
+                },
+                user: {
+                    username: 'username'
+                }
+            });
+            const res = mockResponse();
 
-            // await getScore(req, res);
+            await getPostVote(req, res);
 
-            // expect(res.status).toHaveBeenCalledWith(200);
-            // expect(res.send).toHaveBeenCalledWith(
-            //     expect.objectContaining({
-            //         score: expect.any(Number)
-            //     })
-            // );
+            expect(db.query).toHaveBeenCalledTimes(1);
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('API: postPostVote', () => {
+        test('GOOD', async () => {
+            const req = mockRequest({
+                params: {
+                    post: 'post-post'
+                },
+                body: {
+                    upvote: true
+                },
+                user: {
+                    username: 'username'
+                }
+            });
+            const res = mockResponse();
+
+            await postPostVote(req, res);
+            
+            const { query, release } = db.connect.mock.results[0].value;
+
+            expect(db.connect).toHaveBeenCalledTimes(1);
+            expect(query).toHaveBeenCalledTimes(4);
+            expect(release).toHaveBeenCalledTimes(1);
+            expect(res.status).toHaveBeenCalledWith(201);
+            expect(res.send).toHaveBeenCalledTimes(1);
+        });
+
+        test('GOOD: Remove post vote', async () => {
+            const req = mockRequest({
+                params: {
+                    post: 'post-remove'
+                },
+                body: {
+                    upvote: true
+                },
+                user: {
+                    username: 'username'
+                }
+            });
+            const res = mockResponse();
+
+            await postPostVote(req, res);
+            
+            const { query, release } = db.connect.mock.results[0].value;
+
+            expect(db.connect).toHaveBeenCalledTimes(2);
+            expect(query).toHaveBeenCalledTimes(3);
+            expect(release).toHaveBeenCalledTimes(1);
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledTimes(1);
+        });
+
+        test('GOOD: Remove post vote', async () => {
+            const req = mockRequest({
+                params: {
+                    post: 'post-change'
+                },
+                body: {
+                    upvote: true
+                },
+                user: {
+                    username: 'username'
+                }
+            });
+            const res = mockResponse();
+
+            await postPostVote(req, res);
+            
+            const { query, release } = db.connect.mock.results[0].value;
+
+            expect(db.connect).toHaveBeenCalledTimes(2);
+            expect(query).toHaveBeenCalledTimes(3);
+            expect(release).toHaveBeenCalledTimes(1);
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledTimes(1);
         });
     });
 });
