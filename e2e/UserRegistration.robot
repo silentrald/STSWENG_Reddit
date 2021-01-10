@@ -1,11 +1,11 @@
 *** Settings ***
 Library  SeleniumLibrary
-Library  SeleniumLibrary
 Resource  ../../Keywords/Common.robot
+
 *** Variables ***
 
 *** Test Cases ***
-Successful registration
+1.1 Successful registration
     [documentation]  User Registration
 
     Open Chrome
@@ -19,7 +19,7 @@ Successful registration
     Page Should Contain Element  xpath://*[@id="__layout"]/div/div/div
     Close Browser
 
-Username too short, Invalid email, Password too weak
+1.2 Username too short, Invalid email, Password too weak
     [documentation]  User Registration
 
     Open Chrome
@@ -35,7 +35,7 @@ Username too short, Invalid email, Password too weak
     Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[3]/div  Password is too weak
     Close Browser
 
-Username already taken
+1.3 Username already taken
     [documentation]  User Registration
 
     Open Chrome
@@ -50,7 +50,7 @@ Username already taken
     Element Text Should be  class:error  Username is already used
     Close Browser
 
-Password do not match
+1.4 Password do not match
     [documentation]  User Registration
 
     Open Chrome
