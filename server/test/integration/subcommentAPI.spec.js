@@ -111,7 +111,7 @@ describe('Subcomment API', () => {
             );
         });
 
-        describe('GOOD: sanitize offset query', async () => {
+        describe('GOOD: sanitize offset query', () => {
             test('Wrong Type', async () => {
                 query.offset = 'string';
                 const { statusCode, body } = await request(server)

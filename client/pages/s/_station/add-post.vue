@@ -132,7 +132,7 @@ export default {
     submit () {
       // Get values from form
       // if (this.validate() {
-      const { name } = this.$route.params
+      const { station: name } = this.$route.params
       const post = {
         ...this.post
       } // Deep clone
