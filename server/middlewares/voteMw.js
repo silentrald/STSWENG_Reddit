@@ -4,7 +4,6 @@ const voteMw = {
     /**
      * Validates the upvote body
      */
-    // TODO: Check the tests here
     validateUpvoteBody: (req, res, next) => {
         const { upvote } = req.body;
 
