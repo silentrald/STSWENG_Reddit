@@ -67,6 +67,39 @@ const queryMw = {
 
             return res.status(500).send();
         }
+    },
+
+    /**
+     * Gets the station name from a comment and sets
+     * it to the req body
+     */
+    // TODO: int and unit
+    getStationCommentParams: async (req, res, next) => {
+        const { comment } = req.params;
+
+        try {
+            const querySelComment = {
+                text: `
+                    SELECT  station_name
+                    FROM    comments
+                    WHERE   comment_id=$1
+                    LIMIT   1;
+                `,
+                values: [ comment ]
+            };
+
+            const { rows: comments, rowCount } = await db.query(querySelComment);
+            if (rowCount === 0) {
+                return res.status(404).send();
+            }
+
+            req.body.station = comments[0].station_name;
+            next();
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
     }
 };
 

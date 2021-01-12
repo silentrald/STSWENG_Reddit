@@ -1,6 +1,6 @@
 const {
-    validatePostParam
-} = require('../../middlewares/postVoteMw');
+    validateUpvoteBody
+} = require('../../middlewares/voteMw');
 
 const mockRequest = (data) => {
     return data;
@@ -17,47 +17,52 @@ const mockNext = () => {
     return jest.fn();
 };
 
-// REGEX
-// const POST_REGEX = /^p[A-Za-z0-9]{0,11}$/;
-
-// DATA
-const posts = [
-    'paaaaaaaaaa1',
-    'paaaaaaaaaa2',
-    'paaaaaaaaaa3'
-];
-
-describe('Unit Testing: postVoteMw', () => {
-    describe('Middleware: validatePostParam', () => {
+describe('', () => {
+    describe('Middleware: validateUpvoteBody', () => {
         test('GOOD', async () => {
             const req = mockRequest({
-                params: {
-                    post: posts[0]
+                body: {
+                    upvote: true
                 }
             });
             const res = mockResponse();
             const next = mockNext();
 
-            await validatePostParam(req, res, next);
+            await validateUpvoteBody(req, res, next);
 
             expect(next).toHaveBeenCalledTimes(1);
         });
 
+        test('BAD: Empty', async () => {
+            const req = mockRequest({ body: {} });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateUpvoteBody(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.send).toHaveBeenCalledWith({
+                errors: {
+                    upvote: 'type'
+                }
+            });
+        });
+
         test('BAD: Invalid format', async () => {
             const req = mockRequest({
-                params: {
-                    post: 'notagood'
+                body: {
+                    upvote: 100
                 }
             });
             const res = mockResponse();
             const next = mockNext();
 
-            await validatePostParam(req, res, next);
+            await validateUpvoteBody(req, res, next);
 
             expect(res.status).toHaveBeenCalledWith(403);
             expect(res.send).toHaveBeenCalledWith({
                 errors: {
-                    post: 'pattern'
+                    upvote: 'type'
                 }
             });
         });
