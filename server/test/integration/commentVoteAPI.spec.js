@@ -4,7 +4,7 @@ const server = require('../../app');
 
 const db = require('../../db');
 
-const url = '/api/post-vote';
+const url = '/api/comment-vote';
 
 const crewmateUser = {
     username: 'crewmate',
@@ -15,9 +15,9 @@ const imposterUser = {
     password: 'password'
 };
 
-const noLikePosts = [
-    'paaaaaaaaaa4',
-    'paaaaaaaaaa5'
+const noLikeComments = [
+    'caaaaaaaaaa1',
+    'caaaaaaaaaa2'
 ];
 
 let crewmateToken, imposterToken;
@@ -43,40 +43,40 @@ beforeAll(async () => {
     
     // captain2Token = res.body.token;
 
-    res = await request(server)
+    res = await request(server) 
         .post('/api/user/login')
         .send(imposterUser);
 
     imposterToken = res.body.token;
 });
 
-describe('Post Vote API', () => {
-    describe(`GET ${url}/:post`, () => {
+describe('Comment Vote API', () => {
+    describe(`GET ${url}/:comment`, () => {
         test('GOOD', async () => {
             const {
                 statusCode,
                 // body
             } = await request(server)
-                .get(`${url}/${noLikePosts[0]}`)
+                .get(`${url}/${noLikeComments[0]}`)
                 .set('Authorization', `Bearer ${crewmateToken}`);
             
             expect(statusCode).toEqual(200);
         });
 
-        test('BAD: post param', async () => {
+        test('BAD: comment param', async () => {
             const {
                 statusCode,
                 body
             } = await request(server)
-                .get(`${url}/apost`)
+                .get(`${url}/acomment`)
                 .set('Authorization', `Bearer ${crewmateToken}`);
             
             expect(statusCode).toEqual(403);
-            expect(body.errors.post).toEqual('pattern');
+            expect(body.errors.comment).toEqual('pattern');
         });
     });
     
-    describe(`POST ${url}/:post`, () => {
+    describe(`POST ${url}/:comment`, () => {
         describe('GOOD: Upvote Insert, Change to Downvote, Delete', () => {
             test('GOOD: Upvote Insert', async () => {
                 // INSERT
@@ -84,7 +84,7 @@ describe('Post Vote API', () => {
                     statusCode,
                     body
                 } = await request(server)
-                    .post(`${url}/${noLikePosts[0]}`)
+                    .post(`${url}/${noLikeComments[0]}`)
                     .set('Authorization', `Bearer ${crewmateToken}`)
                     .send({ upvote: true });
     
@@ -99,7 +99,7 @@ describe('Post Vote API', () => {
                     statusCode,
                     body
                 } = await request(server)
-                    .post(`${url}/${noLikePosts[0]}`)
+                    .post(`${url}/${noLikeComments[0]}`)
                     .set('Authorization', `Bearer ${crewmateToken}`)
                     .send({ upvote: false });
                 
@@ -114,7 +114,7 @@ describe('Post Vote API', () => {
                     statusCode,
                     body
                 } = await request(server)
-                    .post(`${url}/${noLikePosts[0]}`)
+                    .post(`${url}/${noLikeComments[0]}`)
                     .set('Authorization', `Bearer ${crewmateToken}`)
                     .send({ upvote: false });
                 
@@ -131,7 +131,7 @@ describe('Post Vote API', () => {
                     statusCode,
                     body
                 } = await request(server)
-                    .post(`${url}/${noLikePosts[0]}`)
+                    .post(`${url}/${noLikeComments[0]}`)
                     .set('Authorization', `Bearer ${crewmateToken}`)
                     .send({ upvote: false });
     
@@ -146,7 +146,7 @@ describe('Post Vote API', () => {
                     statusCode,
                     body
                 } = await request(server)
-                    .post(`${url}/${noLikePosts[0]}`)
+                    .post(`${url}/${noLikeComments[0]}`)
                     .set('Authorization', `Bearer ${crewmateToken}`)
                     .send({ upvote: true });
                 
@@ -161,7 +161,7 @@ describe('Post Vote API', () => {
                     statusCode,
                     body
                 } = await request(server)
-                    .post(`${url}/${noLikePosts[0]}`)
+                    .post(`${url}/${noLikeComments[0]}`)
                     .set('Authorization', `Bearer ${crewmateToken}`)
                     .send({ upvote: true });
                 
@@ -176,7 +176,7 @@ describe('Post Vote API', () => {
                 const {
                     statusCode
                 } = await request(server)
-                    .post(`${url}/${noLikePosts[0]}`)
+                    .post(`${url}/${noLikeComments[0]}`)
                     .send({ upvote: false });
                 
                 expect(statusCode).toEqual(403);
@@ -186,7 +186,7 @@ describe('Post Vote API', () => {
                 const {
                     statusCode
                 } = await request(server)
-                    .post(`${url}/${noLikePosts[0]}`)
+                    .post(`${url}/${noLikeComments[0]}`)
                     .set('Authorization', `Bearer ${imposterToken}`)
                     .send({ upvote: false });
                 
@@ -200,12 +200,12 @@ describe('Post Vote API', () => {
                     statusCode,
                     body
                 } = await request(server)
-                    .post(`${url}/apost`)
+                    .post(`${url}/acomment`)
                     .set('Authorization', `Bearer ${crewmateToken}`)
                     .send({ upvote: false });
                 
                 expect(statusCode).toEqual(403);
-                expect(body.errors.post).toEqual('pattern');
+                expect(body.errors.comment).toEqual('pattern');
             });
         });
         
@@ -215,7 +215,7 @@ describe('Post Vote API', () => {
                     statusCode,
                     body
                 } = await request(server)
-                    .post(`${url}/${noLikePosts[0]}`)
+                    .post(`${url}/${noLikeComments[0]}`)
                     .set('Authorization', `Bearer ${crewmateToken}`);
                 
                 expect(statusCode).toEqual(403);
@@ -227,7 +227,7 @@ describe('Post Vote API', () => {
                     statusCode,
                     body
                 } = await request(server)
-                    .post(`${url}/${noLikePosts[0]}`)
+                    .post(`${url}/${noLikeComments[0]}`)
                     .set('Authorization', `Bearer ${crewmateToken}`)
                     .send({ upvote: 100 });
                 
@@ -241,7 +241,7 @@ describe('Post Vote API', () => {
 afterAll(async () => {
     for (let index in deleteVotePosts) {
         await db.query({
-            text: 'DELETE FROM post_votes WHERE post_id=$1;',
+            text: 'DELETE FROM comment_votes WHERE comment_id=$1;',
             values: [ deleteVotePosts[index] ]
         });
     }

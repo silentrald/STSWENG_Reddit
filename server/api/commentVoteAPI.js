@@ -5,7 +5,6 @@ const commentVoteAPI = {
     /**
      * Gets the comment vote of the user
      */
-    // TODO: int and unit
     getCommentVote: async (req, res) => {
         const { comment } = req.params;
 
@@ -43,7 +42,6 @@ const commentVoteAPI = {
     /**
      * Creates a new comment vote
      */
-    // TODO: int and unit
     postCommentVote: async (req, res) => {
         const { comment } = req.params;
         const { upvote } = req.body;

@@ -73,7 +73,6 @@ const queryMw = {
      * Gets the station name from a comment and sets
      * it to the req body
      */
-    // TODO: int and unit
     getStationCommentParams: async (req, res, next) => {
         const { comment } = req.params;
 
