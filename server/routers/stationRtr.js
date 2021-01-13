@@ -19,7 +19,7 @@ router.get('/captains/:stationName',
 
 router.post('/info/:stationName',
     loginMw.isAuth,
-    stationMw.validateCreateStation,
+    stationMw.validateStationParam,
     stationMw.isCaptain,
     api.postUpdateInfo);
 

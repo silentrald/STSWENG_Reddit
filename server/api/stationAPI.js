@@ -23,14 +23,23 @@ const stationAPI = {
             // Optionally, if the user is logged in, another property, joined,
             // is added to indicate whether the user is joined or not.
             if (req.user) {
-                // TODO: this would better be just a COUNT() query
-                const querySelPassengers = {
-                    text: 'SELECT * FROM passengers WHERE username = $1 AND station_name = $2 LIMIT 1;',
+                const querySelCaptains = {
+                    text: 'SELECT * FROM captains WHERE username = $1 AND station_name = $2 LIMIT 1;',
                     values: [ req.user.username, stationName ]
                 };
 
-                const { rowCount } = await db.query(querySelPassengers);
-                result.joined = rowCount > 0;
+                const { rows: captainRows } = await db.query(querySelCaptains);
+                result.isCaptain = captainRows.length > 0;
+                result.joined = captainRows.length > 0;
+                if (!result.isCaptain) {
+                    const querySelPassengers = {
+                        text: 'SELECT * FROM passengers WHERE username = $1 AND station_name = $2 LIMIT 1;',
+                        values: [ req.user.username, stationName ]
+                    };
+    
+                    const { rows: passengerRows } = await db.query(querySelPassengers);
+                    result.joined = passengerRows.length > 0;
+                }
             }
             
             return res.status(200).send(result);
@@ -244,7 +253,7 @@ const stationAPI = {
         const { stationName } = req.params;
         const { rules, description } = req.body;
 
-        const client = db.connect();
+        const client = await db.connect();
 
         try {
             await client.query('BEGIN');
@@ -265,7 +274,7 @@ const stationAPI = {
                 });
             }
 
-            await db.query('COMMIT');
+            await client.query('COMMIT');
 
             return res.status(200).send();
         } catch (err) {
