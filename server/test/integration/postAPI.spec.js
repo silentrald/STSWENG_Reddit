@@ -1024,7 +1024,7 @@ describe('Station API', () => {
     });
 
     describe(`POST ${url}/station/:station`, () => {
-        beforeAll(() => {
+        beforeEach(() => {
             post = {
                 title: 'Sample Title',
                 text: 'Sample Text'

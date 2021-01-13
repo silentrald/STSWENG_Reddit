@@ -2,31 +2,11 @@
   <div class="comment">
     <div class="comment-content margin-bottom">
       <div class="comment-votes">
-        <div class="comment-upvote">
-          <img
-            src="/images/thumb-up.png"
-            width="24"
-            height="24"
-            :style="{
-              // TODO: change this
-              backgroundColor: 1 === 1 ? 'green' : 'none'
-            }"
-          >
-        </div>
-        <div class="comment-score">
-          {{ score }}
-        </div>
-        <div class="comment-downvote">
-          <img
-            src="/images/thumb-down.png"
-            width="24"
-            height="24"
-            :style="{
-              // TODO: change this
-              backgroundColor: -1 === -1 ? 'red' : 'none'
-            }"
-          >
-        </div>
+        <comment-vote
+          :id="id"
+          :score="score"
+          direction="col"
+        />
       </div>
       <div class="comment-text width-100">
         <div class="comment-info margin-bottom">
