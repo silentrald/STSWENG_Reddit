@@ -59,7 +59,7 @@ const stationMw = {
 
         const querySelCaptains = {
             text: `
-                SELECT COUNT(*) FROM captains
+                SELECT * FROM captains
                 WHERE username = $1 AND station_name = $2
                 LIMIT 1;
             `,
@@ -68,7 +68,7 @@ const stationMw = {
 
         const { rows } = await db.query(querySelCaptains); 
 
-        if (rows[0] === 0) {
+        if (rows.length === 0) {
             return res.status(403).send({
                 errors: {
                     stationName: 'isNotCaptain'
