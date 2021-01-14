@@ -75,13 +75,13 @@
                 </button>
               </div>
               <h3>s/{{ name }}</h3>
-              <p>{{ description }}</p>
+              <div v-html="markdownDescription" />
             </div>
           </div>
           <div id="station-rules" class="mt-2">
             <h4>Rules</h4>
             <div class="box">
-              {{ rules }}
+              <div v-html="markdownRules" />
             </div>
           </div>
           <div id="station-mods" class="mt-2">
@@ -149,7 +149,10 @@
 </template>
 
 <script>
+import DOMPurify from 'dompurify'
+import marked from 'marked'
 import postLazyload from '../../../components/post-lazyload.vue'
+
 export default {
   components: { postLazyload },
   data () {
@@ -165,6 +168,18 @@ export default {
       end: false,
       joined: false,
       isCaptain: false
+    }
+  },
+
+  computed: {
+    markdownDescription () {
+      const mdhtml = marked(this.description || '')
+      return DOMPurify.sanitize(mdhtml)
+    },
+
+    markdownRules () {
+      const mdhtml = marked(this.rules || '')
+      return DOMPurify.sanitize(mdhtml)
     }
   },
 
@@ -347,10 +362,6 @@ export default {
 #image-container {
   margin: 0 auto;
   width: 80px;
-}
-
-#station-name-desc h3, p {
-  text-align: center;
 }
 
 #station-dropdown {

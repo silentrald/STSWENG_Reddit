@@ -7,29 +7,45 @@
           <div v-if="errors.name" class="error">
             {{ errors.description }}
           </div>
-          <label for="description">Description</label>
-          <textarea
-            id="description"
-            v-model="station.description"
-            class="form-control"
-            placeholder="Write a brief, but concise description for your station."
-            rows="5"
-            @keydown="removeError('description')"
-          />
+          <div class="row">
+            <div class="col col-sm-6">
+              <label for="description">Description</label>
+              <textarea
+                id="description"
+                v-model="station.description"
+                class="form-control"
+                placeholder="Write a brief, but concise description for your station."
+                rows="5"
+                @keydown="removeError('description')"
+              />
+            </div>
+            <div class="col col-sm-6">
+              <label>Preview</label>
+              <div class="md-preview" v-html="markdownDescription" />
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <div v-if="errors.rules" class="error">
             {{ errors.description }}
           </div>
-          <label for="rules">Rules</label>
-          <textarea
-            id="rules"
-            v-model="station.rules"
-            class="form-control"
-            placeholder="Write down the rules of your station."
-            rows="5"
-            @keydown="removeError('rules')"
-          />
+          <div class="row">
+            <div class="col col-sm-6">
+              <label for="rules">Rules</label>
+              <textarea
+                id="rules"
+                v-model="station.rules"
+                class="form-control"
+                placeholder="Write down the rules of your station."
+                rows="5"
+                @keydown="removeError('rules')"
+              />
+            </div>
+            <div class="col col-sm-6">
+              <label>Preview</label>
+              <div class="md-preview" v-html="markdownRules" />
+            </div>
+          </div>
         </div>
         <button id="update" @click="validate()">
           UPDATE
@@ -46,6 +62,9 @@
 </template>
 
 <script>
+import DOMPurify from 'dompurify'
+import marked from 'marked'
+
 import Ajv from 'ajv'
 
 import ajvErrors from '@/helpers/ajvErrors'
@@ -108,6 +127,18 @@ export default {
   },
 
   middleware: ['auth'],
+
+  computed: {
+    markdownDescription () {
+      const mdhtml = marked(this.station.description || '')
+      return DOMPurify.sanitize(mdhtml)
+    },
+
+    markdownRules () {
+      const mdhtml = marked(this.station.rules || '')
+      return DOMPurify.sanitize(mdhtml)
+    }
+  },
 
   beforeMount () {
     this.loadPage()
@@ -206,4 +237,15 @@ input:focus, textarea:focus {
 .success {
   color: lime;
 }
+
+.md-preview {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  background: transparent;
+  color: white;
+  border: 2px solid #c4c4c4;
+  border-radius: 0.5rem;
+}
+
 </style>
