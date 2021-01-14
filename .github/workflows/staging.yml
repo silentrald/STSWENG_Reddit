@@ -107,7 +107,6 @@ jobs:
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
         JWT_SECRET: temp_secret
-        CLIENT_URL: http://localhost:3000
       working-directory: ./server
     
     - name: Delete Data ❌
