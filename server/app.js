@@ -17,10 +17,10 @@ if (process.env.NODE_ENV === 'development') {
     app.use(require('morgan')('dev')); // import morgan
 }
 
-// const corsOptions = {
-//     origin: process.env.CLIENT_URL,
-//     optionsSuccessStatus: 200
-// };
+const corsOptions = {
+    origin: process.env.CLIENT_URL,
+    optionsSuccessStatus: 200
+};
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
