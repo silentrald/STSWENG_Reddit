@@ -186,7 +186,7 @@ export default {
       const { station: name } = this.$route.params
 
       this.success = false
-      this.$axios.post(`http://localhost:5000/api/station/info/${name}`, {
+      this.$axios.post(`/api/station/info/${name}`, {
         ...info
       })
         .then((res) => {
