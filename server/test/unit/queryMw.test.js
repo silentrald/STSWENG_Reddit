@@ -1,6 +1,7 @@
 const {
     userIsPartOfStation,
-    getStationPostParams
+    getStationPostParams,
+    getStationCommentParams
 } = require('../../middlewares/queryMw');
 
 jest.mock('../../db', () => {
@@ -20,7 +21,7 @@ jest.mock('../../db', () => {
             query.text = oneLineQuery(query.text);
             if (query.values[0] === 'username' && query.values[1] === 'station') {
                 rowCount = 1;
-            } else if (query.values[0] === 'post') {
+            } else if (query.values[0] === 'post' || query.values[0] === 'comment') {
                 rows = [{
                     station_name: 'station'
                 }];
@@ -112,6 +113,28 @@ describe('Unit Testing: queryMw', () => {
             const next = mockNext();
 
             await getStationPostParams(req, res, next);
+
+            expect(req.body.station).toEqual('station');
+            expect(db.query).toHaveBeenCalledTimes(1);
+            expect(next).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('Middleware: getStationCommentParams', () => {
+        let query;
+
+        test('GOOD', async () => {
+            query = {
+                body: {},
+                params: {
+                    comment: 'comment'
+                }
+            };
+            const req = mockRequest(query);
+            const res = mockResponse();
+            const next = mockNext();
+
+            await getStationCommentParams(req, res, next);
 
             expect(req.body.station).toEqual('station');
             expect(db.query).toHaveBeenCalledTimes(1);
