@@ -10,7 +10,6 @@ if (!process.env.CI) {
 
 const app = express();
 
-const HOST = process.env.HOST || 'localhost';
 const PORT = process.env.PORT || 5000;
 
 // MIDDLEWARES
@@ -18,11 +17,11 @@ if (process.env.NODE_ENV === 'development') {
     app.use(require('morgan')('dev')); // import morgan
 }
 
-// const corsOptions = {
-//     origin: process.env.CLIENT_URL,
-//     optionsSuccessStatus: 200
-// };
-app.use(cors());
+const corsOptions = {
+    origin: process.env.CLIENT_URL,
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -48,7 +47,7 @@ app.use('/api/subpost', subpostRtr);
 app.use('/api/station', stationRtr);
 app.use('/api/user', userRtr);
 
-const server = app.listen(PORT, HOST, () => {
+const server = app.listen(PORT, () => {
     console.log(`Listening to port ${PORT}`);
 });
 
