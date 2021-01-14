@@ -282,7 +282,7 @@ jobs:
         sudo chmod 755 /usr/bin/chromedriver
 
     - name: Automated E2E test with Robot 🤖
-      run: robot UserRegistration.robot
+      run: robot *.robot
       working-directory: ./e2e
     
     - name: Stop Docker 📤
