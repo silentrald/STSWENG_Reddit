@@ -1,6 +1,6 @@
 *** Settings ***
 Library  SeleniumLibrary
-Resource  ../../Keywords/Common.robot
+Resource  /Keywords/Common.robot
 
 *** Variables ***
 
