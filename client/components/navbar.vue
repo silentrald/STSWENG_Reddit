@@ -21,11 +21,13 @@
         <div id="navbarResponsive" class="collapse navbar-collapse">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <div class="nav-link">
-                <img id="image" src="https://picsum.photos/24/24" width="24" height="24">
-                /{{ $auth.user.username }}
-                <span class="sr-only">(current)</span>
-              </div>
+              <nuxt-link :to="`/u/${$auth.user.username}`">
+                <div class="nav-link">
+                  <img id="image" src="https://picsum.photos/24/24" width="24" height="24">
+                  /{{ $auth.user.username }}
+                  <span class="sr-only">(current)</span>
+                </div>
+              </nuxt-link>
             </li>
             <li class="nav-item">
               <nuxt-link id="create-station" class="nav-link" to="/create-station">
