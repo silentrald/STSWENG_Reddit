@@ -75,12 +75,14 @@
                 </button>
               </div>
               <h3>s/{{ name }}</h3>
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <div v-html="markdownDescription" />
             </div>
           </div>
           <div id="station-rules" class="mt-2">
             <h4>Rules</h4>
             <div class="box">
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <div v-html="markdownRules" />
             </div>
           </div>

@@ -21,6 +21,7 @@
             </div>
             <div class="col col-sm-6">
               <label>Preview</label>
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="md-preview" v-html="markdownDescription" />
             </div>
           </div>
@@ -43,6 +44,7 @@
             </div>
             <div class="col col-sm-6">
               <label>Preview</label>
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="md-preview" v-html="markdownRules" />
             </div>
           </div>

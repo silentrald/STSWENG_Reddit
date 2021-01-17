@@ -4,7 +4,6 @@ const { ajvErrors } = require('./ajvHelper');
 const ajv = new Ajv({ allErrors: true, jsonPointers: true });
 require('ajv-keywords')(ajv, [ 'transform' ]);
 
-const LIMIT = 10;
 const STATION_NAME_REGEX = /^[A-Za-z0-9_-]+$/;
 const POST_NAME_REGEX = /^p[A-Za-z0-9]{0,11}$/;
 const SORT_REGEX = /^(ASC|DESC)$/;
@@ -111,25 +110,9 @@ const postMw = {
      */
     sanitizePostsQuery: (req, _res, next) => {
         const {
-            offset,
-            limit,
             sort,
             top
         } = req.query;
-
-        if (!offset ||
-            !Number.isInteger(parseInt(offset)) ||
-            offset < 0
-        ) {
-            req.query.offset = 0;
-        }
-
-        if (!limit ||
-            !Number.isInteger(parseInt(limit)) ||
-            limit < 1
-        ) {
-            req.query.limit = LIMIT;
-        }
 
         if (!sort || !SORT_REGEX.test(sort)) {
             req.query.sort = 'DESC';

@@ -82,7 +82,6 @@ describe('Station API', () => {
                 body
             } = await request(server).get(`${url}`);
             
-            expect(statusCode).toEqual(200);
             expect(body.posts).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
@@ -96,7 +95,8 @@ describe('Station API', () => {
                 ])
             );
             expect(body.posts.length).toEqual(LIMIT);
-
+            expect(statusCode).toEqual(200);
+        
             startingPost = body.posts[0];
         });
 
@@ -108,7 +108,6 @@ describe('Station API', () => {
                 .get(`${url}`)
                 .set('Authorization', crewmateToken);
             
-            expect(statusCode).toEqual(200);
             expect(body.posts).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
@@ -122,6 +121,7 @@ describe('Station API', () => {
                 ])
             );
             expect(body.posts.length).toEqual(LIMIT);
+            expect(statusCode).toEqual(200);
         });
 
         describe('GOOD: sanitize query offset', () => {

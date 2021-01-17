@@ -51,6 +51,37 @@ const stationAPI = {
     },
 
     /**
+     * Gets a list of stations depending on the
+     * filter string passed
+     */
+    // TODO: unit and int test  
+    getStationNames: async (req, res) => {
+        const { search } = req.query;
+
+        try {
+            const querySelStations = {
+                text: `
+                    SELECT  name
+                    FROM    stations
+                    WHERE   name ILIKE $1;
+                `,
+                values: [ search ? search : '%' ]
+            };
+
+            const { rows: stations, rowCount } = await db.query(querySelStations);
+            if (rowCount < 1) {
+                return res.status(404).send();
+            }
+
+            return res.status(200).send({ stations });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
+    /**
      * Gets the top stations
      */
     getTopStations: async (_req, res) => {
