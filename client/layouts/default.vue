@@ -6,10 +6,15 @@
 </template>
 
 <style>
+:root {
+  --red: #FF3232;
+  --black: #01021E;
+}
+
 body {
   font-family: 'Lato', sans-serif;
   color: #FFF;
-  background-color: #01021E;
+  background-color: var(--black);
 
   margin: 0;
   padding: 0;

@@ -75,7 +75,8 @@ export default {
   fontawesome: {
     icons: {
       solid: [
-        'faCheck'
+        'faCheck',
+        'faEllipsisV'
       ]
     }
   }
