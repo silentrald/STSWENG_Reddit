@@ -51,6 +51,18 @@ describe('Unit Testing: queryStringMw', () => {
             expect(req.query.search).toEqual('%valid%');
             expect(next).toHaveBeenCalledTimes(1);
         });
+
+        test('GOOD: invalid type', async () => {
+            query.search = [ 'hello' ];
+            const req = mockRequest({ query });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await sanitizeSearch(req, res, next);
+
+            expect(req.query.search).toEqual(undefined);
+            expect(next).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe('Middleware: sanitizeOffsetAndLimit', () => {

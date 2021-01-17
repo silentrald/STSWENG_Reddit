@@ -532,6 +532,36 @@ describe('Station API', () => {
                 expect(body.posts).toEqual(expect.anything());
             });
         });
+        
+        describe('GOOD: sanitize query search', () => {
+            test('Valid search', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        search: 'valid'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        'search[]': 'hello'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+        });
     });
 
     describe(`GET ${url}/station/:station`, () => {

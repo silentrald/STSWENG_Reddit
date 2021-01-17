@@ -2,6 +2,7 @@ process.env.JWT_SECRET = 'test-value'; // set the jwt token
 
 const {
     getStation,
+    getStationNames,
     getTopStations,
     getStationCaptains,
     postCreateStation
@@ -83,7 +84,10 @@ const mockQuery = query => {
             }
         ];
         result.rowCount = 1;
-    } 
+    } else if (query.text === 'SELECT name FROM stations WHERE name ILIKE $1 OFFSET $2 LIMIT $3;') {
+        result.rows = [{}];
+        result.rowCount = 1;
+    }
 
     return result;
 };
@@ -179,6 +183,33 @@ describe('Unit test: stationAPI.js', () => {
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.send).toHaveBeenCalledWith();
+        });
+    });
+
+    describe('API: getStationNames', () => {
+        let query = {};
+
+        beforeEach(() => {
+            query = {};
+        });
+
+        test('GOOD', async () => {
+            const req = mockRequest({ query });
+            const res = mockResponse();
+
+            await getStationNames(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        test('GOOD: search', async () => {
+            query.search = 'valid';
+            const req = mockRequest({ query });
+            const res = mockResponse();
+
+            await getStationNames(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
         });
     });
 

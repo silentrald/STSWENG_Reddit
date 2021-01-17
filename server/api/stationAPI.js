@@ -54,18 +54,27 @@ const stationAPI = {
      * Gets a list of stations depending on the
      * filter string passed
      */
-    // TODO: unit and int test  
     getStationNames: async (req, res) => {
-        const { search } = req.query;
+        const {
+            search,
+            offset,
+            limit
+        } = req.query;
 
         try {
             const querySelStations = {
                 text: `
                     SELECT  name
                     FROM    stations
-                    WHERE   name ILIKE $1;
+                    WHERE   name ILIKE $1
+                    OFFSET  $2
+                    LIMIT   $3;
                 `,
-                values: [ search ? search : '%' ]
+                values: [
+                    search ? search : '%',
+                    offset,
+                    limit
+                ]
             };
 
             const { rows: stations, rowCount } = await db.query(querySelStations);

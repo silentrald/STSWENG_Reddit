@@ -19,18 +19,27 @@ const userAPI = {
      * Gets the user depending on the search
      * filter provided
      */
-    // TODO: unit and int test
     getUserNames: async (req, res) => {
-        const { search } = req.query;
+        const {
+            search,
+            offset,
+            limit
+        } = req.query;
 
         try {
             const querySelUsers = {
                 text: `
                     SELECT  username
                     FROM    users
-                    WHERE   username ILIKE $1;
+                    WHERE   username ILIKE $1
+                    OFFSET  $2
+                    LIMIT   $3;
                 `,
-                values: [ search ? search : '%' ]
+                values: [
+                    search ? search : '%',
+                    offset,
+                    limit
+                ]
             };
 
             const { rows: users, rowCount } = await db.query(querySelUsers);

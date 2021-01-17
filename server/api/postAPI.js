@@ -5,7 +5,6 @@ const postAPI = {
     /**
      * Gets posts from all stations
      */
-    // TODO: Fix int and unit
     getPosts: async (req, res) => {
         const {
             offset,
