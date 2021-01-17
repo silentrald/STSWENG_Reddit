@@ -1,5 +1,6 @@
 const db = require('../db');
-const mailer = require('../mailer');
+const jwt = require('../modules/jwt');
+const mailer = require('../modules/mailer');
 
 const randomString = (n) => {
     const alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -16,7 +17,6 @@ const verficationAPI = {
     /**
      * Sends an email the the user
      */
-    // TODO: unit test
     postSendVerification: async (req, res) => {
         // Create Verification Link
         // Create a random string
@@ -68,7 +68,7 @@ const verficationAPI = {
 
 Verification Link: ${url}`;
 
-            await mailer.sendMail(body, req.user.email, 'Verfication Link');
+            await mailer.sendMail(body, req.user.email, 'Verification Link');
 
             return res.status(200).send();
         } catch (err) {
@@ -82,7 +82,7 @@ Verification Link: ${url}`;
      * Check if the verification link is valid then
      * verify the user
      */
-    // TODO: int and unit test
+    // TODO: int test
     postVerification: async (req, res) => {
         const { username, token } = req.body;
 
@@ -112,7 +112,7 @@ Verification Link: ${url}`;
             }
 
             // Check if it already expired
-            if (new Date() < verification.expires_at) {
+            if (new Date() > verification.expires_at) {
                 // Delete the verification
                 const queryDelVerification = {
                     text: `
@@ -163,7 +163,13 @@ Verification Link: ${url}`;
                 client.release();
             }
 
-            return res.status(200).send({});
+            if (req.user && !req.user.verified) {
+                req.user.verified = true;
+                const token = await jwt.signPromise(req.user);
+                return res.status(200).send({ token });
+            } else {
+                return res.status(200).send({});
+            }
         } catch (err) {
             console.log(err);
 

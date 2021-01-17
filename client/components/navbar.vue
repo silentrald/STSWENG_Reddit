@@ -20,7 +20,7 @@
       <div v-if="$auth.user">
         <div id="navbarResponsive" class="collapse navbar-collapse">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
+            <li class="nav-item d-flex align-items-center">
               <nuxt-link :to="`/u/${$auth.user.username}`">
                 <div class="nav-link">
                   <img id="image" src="https://picsum.photos/24/24" width="24" height="24">
@@ -28,6 +28,9 @@
                   <span class="sr-only">(current)</span>
                 </div>
               </nuxt-link>
+              <div v-if="$auth.user.verified">
+                <font-awesome-icon icon="check" title="Verified ✓" />
+              </div>
             </li>
             <li class="nav-item">
               <nuxt-link id="create-station" class="nav-link" to="/create-station">
@@ -62,6 +65,16 @@
     </div>
   </nav>
 </template>
+
+<script>
+export default {
+  created () {
+    console.log(this.$auth.$storage.getCookies())
+    console.log(this.$auth.$storage.getCookie('_token.local'))
+    console.log(this.$auth.strategy.name)
+  }
+}
+</script>
 
 <style scoped>
 .navbar {

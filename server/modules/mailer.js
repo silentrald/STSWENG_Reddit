@@ -10,7 +10,6 @@ const transporter = mailer.createTransport({
 });
 
 module.exports = {
-    // TODO: unit and int test
     sendMail: (text, to, subject) => {
         const msg = {
             from: 'ROCKET <rocket.sweng@gmail.com>',

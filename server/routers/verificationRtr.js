@@ -11,6 +11,7 @@ router.post('/',
     api.postSendVerification);
 
 router.post('/verify',
+    
     api.postVerification);
 
 // PATCH

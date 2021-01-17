@@ -33,10 +33,18 @@ export default {
       }
 
       try {
-        await this.$axios.post('/api/verification/verify', {
+        const { data } = await this.$axios.post('/api/verification/verify', {
           username,
           token
         })
+
+        if (data.token) {
+          // Set the current value to true
+          this.$auth.user.verified = true
+          // Change to token
+          this.$auth.$storage.setCookie(`_token.${this.$auth.strategy.name}`, `Bearer ${data.token}`)
+        }
+
         this.$set(this, 'success', true)
       } catch (err) {
         this.$set(this, 'msg', 'Verification Failed')
