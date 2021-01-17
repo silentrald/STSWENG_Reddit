@@ -152,7 +152,7 @@ export default {
       // Get values from form
       const station = this.station
 
-      this.$axios.post('http://localhost:5000/api/station/create', {
+      this.$axios.post('/api/station/create', {
         ...station
       })
         .then((res) => {

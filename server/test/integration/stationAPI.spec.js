@@ -359,6 +359,55 @@ describe('Station API', () => {
             );
         });
     });
+
+    describe(`POST ${url}/info/:name`, () => {
+        beforeEach(() => {
+            failStation = {
+                name: 'nontest',
+                description: 'Random description',
+                rules: 'No rules yet'
+            };
+        });
+
+        test('GOOD: edit station info', async () => {
+            const {
+                statusCode
+            } = await request(server).post(`${url}/info/${station.name}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send(station);
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        test('ERROR: nonexistent station', async () => {
+            const {
+                statusCode
+            } = await request(server).post(`${url}/captains/${failStation.name}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send(station);
+            
+            expect(statusCode).toEqual(404);
+        });
+
+        test('ERROR: no user token', async () => {
+            const {
+                statusCode
+            } = await request(server).post(`${url}/info/${station.name}`)
+                .send(station);
+            
+            expect(statusCode).toEqual(403);
+        });
+
+        test('ERROR: not captain of station', async () => {
+            const {
+                statusCode
+            } = await request(server).post(`${url}/info/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send(station);
+            
+            expect(statusCode).toEqual(403);
+        });
+    });
 });
 
 afterAll(async () => {

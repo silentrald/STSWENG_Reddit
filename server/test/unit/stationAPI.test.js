@@ -141,7 +141,8 @@ describe('Unit test: stationAPI.js', () => {
                     description: 'This is a test station',
                     rules: 'There are no rules'
                 }),
-                joined: false
+                joined: false,
+                isCaptain: false
             });
         });
         
@@ -161,7 +162,8 @@ describe('Unit test: stationAPI.js', () => {
                     description: 'This is a test station',
                     rules: 'There are no rules'
                 }),
-                joined: true
+                joined: true,
+                isCaptain: false
             });
         });
         
