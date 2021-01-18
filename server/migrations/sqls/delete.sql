@@ -1,4 +1,5 @@
 /* DELETE */
+DELETE FROM verifications;
 DELETE FROM user_reports;
 DELETE FROM station_reports;
 DELETE FROM comment_reports;
