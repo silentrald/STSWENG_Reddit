@@ -277,7 +277,7 @@ describe('Unit test: postAPI.js', () => {
 
             await deleteStationPost(req, res);
 
-            expect(res.status).toHaveBeenCalledWith(201);
+            expect(res.status).toHaveBeenCalledWith(204);
 
             expect(db.connect).toHaveBeenCalledTimes(1);
 
