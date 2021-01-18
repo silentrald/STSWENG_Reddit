@@ -1,6 +1,9 @@
 const db = require('../db');
 
 const queryMw = {
+    /**
+     * Responds with 'not_crew' if user is not a member of the station
+     */
     userIsPartOfStation: async (req, res, next) => {
         let { station } = req.body;
         if (!station) {
@@ -26,6 +29,42 @@ const queryMw = {
     
             if (rowCount === 0) {
                 return res.status(403).send({ error: 'not_crew' });
+            }
+    
+            next();
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
+    /**
+     * Responds with 'not_author' if user is not the author of the post
+     */
+    userIsAuthor: async (req, res, next) => {
+        const { username } = req.user;
+        const { post } = req.params;
+
+        try {
+            const queryGetAuthor = {
+                text: `
+                    SELECT  *
+                    FROM    posts
+                    WHERE   post_id=$1
+                        AND author=$2
+                    LIMIT 1;
+                `,
+                values: [ 
+                    post, 
+                    username 
+                ]
+            };
+
+            const { rowCount } = await db.query(queryGetAuthor);
+
+            if (rowCount === 0) {
+                return res.status(403).send({ error: 'not_author' });
             }
     
             next();
