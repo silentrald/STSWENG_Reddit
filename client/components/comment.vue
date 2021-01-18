@@ -10,17 +10,37 @@
       </div>
       <div class="comment-text width-100">
         <div class="comment-info margin-bottom">
-          Commented by {{ author }} on {{ formatDate(date) }}
+          Commented by /u/{{ author }} on {{ formatDate(date) }}
         </div>
-        <div class="comment-text margin-bottom">
-          {{ text }}
+        <div v-if="editting">
+          <div class="d-flex">
+            <textarea v-model="editText" class="w-100" />
+          </div>
+          <button class="float-right mt-2 ml-2" @click="saveEdit()">
+            SAVE
+          </button>
+          <button class="float-right mt-2 red" @click="cancelEditting()">
+            CANCEL
+          </button>
         </div>
-        <div
-          v-if="$auth.user"
-          class="reply"
-          @click="showSubcomment()"
-        >
-          Reply
+        <div v-else class="comment-text margin-bottom">
+          {{ commentText }}
+        </div>
+        <div v-if="!editting && !writeSubcomment" class="d-flex">
+          <div
+            v-if="$auth.user"
+            class="reply mr-4"
+            @click="showSubcomment()"
+          >
+            Reply
+          </div>
+          <div
+            v-if="$auth.user.username === author"
+            class="reply"
+            @click="editSubcomment()"
+          >
+            Edit
+          </div>
         </div>
         <div v-if="$auth.user && writeSubcomment">
           <textarea
@@ -85,17 +105,22 @@ export default {
     subcomments: {
       type: Array,
       required: true
-    },
-    tempSubcomment: {
-      type: String,
-      default: ''
     }
   },
 
   data () {
     return {
-      writeSubcomment: false
+      commentText: '',
+      writeSubcomment: false,
+      tempSubcomment: '',
+      editting: false,
+      saving: false,
+      editText: ''
     }
+  },
+
+  beforeMount () {
+    this.commentText = this.text
   },
 
   methods: {
@@ -107,6 +132,31 @@ export default {
       this.writeSubcomment = true
     },
 
+    editSubcomment () {
+      this.editText = this.commentText
+      this.editting = true
+    },
+
+    async saveEdit () {
+      if (this.saving) { return }
+      this.saving = true
+
+      try {
+        await this.$axios.patch(`/api/comment/${this.id}`, {
+          text: this.editText
+        })
+
+        this.commentText = this.editText
+        this.editting = false
+      } catch (_err) {}
+      this.saving = false
+    },
+
+    cancelEditting () {
+      this.editText = ''
+      this.editting = false
+    },
+
     async postSubcomment () {
       this.tempSubcomment = this.tempSubcomment.trim()
       if (!this.tempSubcomment) { return }
@@ -114,9 +164,8 @@ export default {
       const { station, post } = this.$route.params
 
       try {
-        const res = await this.$axios.post('/api/subcomment/create', {
-          parentPost: post,
-          parentComment: this.id,
+        const res = await this.$axios.post(`/api/comment/c/${this.id}`, {
+          post,
           text: this.tempSubcomment,
           station
         })
@@ -195,5 +244,10 @@ textarea:focus {
   outline: none;
   border: none;
   float: right;
+}
+
+.red {
+  border-color: var(--red);
+  color: var(--red);
 }
 </style>

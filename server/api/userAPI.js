@@ -15,6 +15,46 @@ const userAPI = {
             : res.status(403).send();
     },
 
+    /**
+     * Gets the user depending on the search
+     * filter provided
+     */
+    getUserNames: async (req, res) => {
+        const {
+            search,
+            offset,
+            limit
+        } = req.query;
+
+        try {
+            const querySelUsers = {
+                text: `
+                    SELECT  username
+                    FROM    users
+                    WHERE   username ILIKE $1
+                    OFFSET  $2
+                    LIMIT   $3;
+                `,
+                values: [
+                    search ? search : '%',
+                    offset,
+                    limit
+                ]
+            };
+
+            const { rows: users, rowCount } = await db.query(querySelUsers);
+            if (rowCount < 1) {
+                return res.status(404).send();
+            }
+
+            return res.status(200).send({ users });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
     // POST
     /**
      * Create a user and responds with a status 201.
@@ -48,7 +88,8 @@ const userAPI = {
             };
 
             await db.query(queryInsUser);
-
+            
+            // Send to the server that the account was created
             return res.status(201).send();
         } catch (err) {
             console.log(err);

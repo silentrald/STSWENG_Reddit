@@ -100,7 +100,7 @@ export default {
       this.$set(this, 'post', post)
 
       // Load subposts comments
-      res = await this.$axios.get(`/api/subpost/post/${postID}`)
+      res = await this.$axios.get(`/api/comment/post/${postID}`)
       const { subposts } = res.data
 
       for (let i = 0; i < subposts.length; i++) {
@@ -117,7 +117,7 @@ export default {
     },
 
     async loadSubcomments (currentComment, depth) {
-      const res = await this.$axios.get(`/api/subcomment/comment/${currentComment.comment_id}`)
+      const res = await this.$axios.get(`/api/comment/c/${currentComment.comment_id}`)
       const { subcomments } = res.data
       currentComment.subcomments = subcomments
 
@@ -133,7 +133,8 @@ export default {
     },
 
     async postComment () {
-      const res = await this.$axios.post(`/api/subpost/post/${this.$route.params.post}`, {
+      const res = await this.$axios.post(`/api/comment/post/${this.$route.params.post}`, {
+        station: this.station,
         text: this.comment_text
       })
 
@@ -150,7 +151,7 @@ export default {
           offset: this.comments.length
         }
 
-        const res = await this.$axios.get(`/api/subpost/post/${post}`, { params })
+        const res = await this.$axios.get(`/api/comment/post/${post}`, { params })
         const { subposts } = res.data
         if (subposts.length > 0) {
           for (const index in subposts) {
