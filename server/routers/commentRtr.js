@@ -42,4 +42,9 @@ router.patch('/:comment',
 
 // DELETE
 
+router.delete('/:comment',
+    loginMw.isAuth,
+    mw.validateCommentParams,
+    api.deleteComment);
+
 module.exports = router;
