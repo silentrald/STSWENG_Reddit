@@ -10,7 +10,7 @@
     "start": "node app",
     "dev": "npx nodemon app --exec \"npm run lint && node\"",
     "devtest": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent && node\"",
-    "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/postVote && node\"",
+    "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color test/integration/commentAPI && node\"",
     "devstemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/postVote test/unit/postVote && node\"",
     "lint": "eslint .",
     "test": "jest --runInBand --color --coverage",

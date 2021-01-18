@@ -164,9 +164,8 @@ export default {
       const { station, post } = this.$route.params
 
       try {
-        const res = await this.$axios.post('/api/subcomment/create', {
-          parentPost: post,
-          parentComment: this.id,
+        const res = await this.$axios.post(`/api/comment/c/${this.id}`, {
+          post,
           text: this.tempSubcomment,
           station
         })

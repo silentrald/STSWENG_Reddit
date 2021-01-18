@@ -66,16 +66,6 @@
   </nav>
 </template>
 
-<script>
-export default {
-  created () {
-    console.log(this.$auth.$storage.getCookies())
-    console.log(this.$auth.$storage.getCookie('_token.local'))
-    console.log(this.$auth.strategy.name)
-  }
-}
-</script>
-
 <style scoped>
 .navbar {
   background-color: #01021E;

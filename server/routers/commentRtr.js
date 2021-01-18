@@ -1,16 +1,42 @@
 const router = require('express')();
 const api = require('../api/commentAPI');
-const mw = require('../middlewares/subcommentMw');
+const mw = require('../middlewares/commentMw');
+const loginMw = require('../middlewares/loginMw');
+const postMw = require('../middlewares/postMw');
+const queryMw = require('../middlewares/queryMw');
 
 // GET
+router.get('/post/:post',
+    postMw.validatePostParam,
+    mw.sanitizeSubpostsQuery,
+    api.getSubposts);
+
+router.get('/c/:comment',
+    mw.validateCommentParams,
+    mw.sanitizeSubcommentsQuery,
+    api.getSubcomments);
 
 // POST
+router.post('/post/:post',
+    loginMw.isAuth,
+    postMw.validatePostParam,
+    mw.validateComment,
+    queryMw.userIsPartOfStation,
+    api.postSubpost);
+
+router.post('/c/:comment',
+    loginMw.isAuth,
+    mw.validateCommentParams,
+    postMw.validatePostBody,
+    mw.validateComment,
+    queryMw.userIsPartOfStation,
+    api.postSubcomment);
 
 // PATCH
 
-// TODO: validate text
 router.patch('/:comment',
     mw.validateCommentParams,
+    mw.validateComment,
     api.patchComment);
 
 // DELETE
