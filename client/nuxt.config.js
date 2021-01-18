@@ -69,5 +69,16 @@ export default {
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
+  },
+
+  // Config options for BootstrapVue
+  bootstrapVue: {
+    config: {
+      BModal: {
+        headerClass: 'background',
+        bodyClass: 'background',
+        footerClass: 'background'
+      }
+    }
   }
 }
