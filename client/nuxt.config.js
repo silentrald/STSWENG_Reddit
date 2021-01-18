@@ -81,14 +81,14 @@ export default {
         footerClass: 'background'
       }
     }
- },
-   
- fontawesome: {
-   icons: {
-     solid: [
-       'faCheck',
-       'faEllipsisV'
-     ]
-   }
- }
+  },
+
+  fontawesome: {
+    icons: {
+      solid: [
+        'faCheck',
+        'faEllipsisV'
+      ]
+    }
+  }
 }
