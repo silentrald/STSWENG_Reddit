@@ -20,6 +20,10 @@ body {
   padding: 0;
 }
 
+a {
+  color: white;
+}
+
 button {
   background: transparent;
   color: #00C0FF;

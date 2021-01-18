@@ -2,6 +2,7 @@ process.env.JWT_SECRET = 'test-value'; // set the jwt token
 
 const {
     getAuth,
+    getUserNames,
     postLogin,
     postRegisterUser
 } = require('../../api/userAPI');
@@ -45,6 +46,9 @@ jest.mock('../../db', () => {
                         constraint: 'users_email_key'
                     };
                 }
+                result.rowCount = 1;
+            } else if (query.text === 'SELECT username FROM users WHERE username ILIKE $1 OFFSET $2 LIMIT $3;') {
+                result.rows = [{}];
                 result.rowCount = 1;
             }
 
@@ -93,6 +97,35 @@ describe('Unit test: userAPI.js', () => {
             expect(res.status).toHaveBeenCalledWith(403);
             expect(res.send).toHaveBeenCalledWith();
         });
+    });
+
+    describe('API: getUserNames', () => {
+        let query = {};
+
+        beforeEach(() => {
+            query = {};
+        });
+
+        test('GOOD: no search', async () => {
+            const req = mockRequest({ query });
+            const res = mockResponse();
+
+            await getUserNames(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        test('GOOD: search', async () => {
+            query.search = 'valid';
+            const req = mockRequest({ query });
+            const res = mockResponse();
+
+            await getUserNames(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        
     });
 
     describe('API: postRegisterUser', () => {

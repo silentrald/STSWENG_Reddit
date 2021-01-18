@@ -2,18 +2,23 @@ const router = require('express')();
 const api = require('../api/stationAPI');
 const loginMw = require('../middlewares/loginMw');
 const stationMw = require('../middlewares/stationMw');
+const queryStrMw = require('../middlewares/queryStringMw');
 
 // GET
 
 router.get('/id/:stationName',
     api.getStation);
 
+router.get('/', 
+    queryStrMw.sanitizeSearch,
+    queryStrMw.sanitizeOffsetAndLimit,
+    api.getStationNames);
+
 router.get('/top',
     api.getTopStations);
 
 router.get('/captains/:stationName',
     api.getStationCaptains);
-
 
 // POST
 
