@@ -141,12 +141,10 @@ const queryMw = {
 
         const { rows } = await db.query(querySelComment); 
 
+        // non-existent comment is technically not 'deleted'
+        // because it has not been deleted
         if (rows.length === 0) {
-            return res.status(403).send({
-                errors: {
-                    comment: 'nonExistent'
-                }
-            });
+            return next();
         }
 
         const commentObj = rows[0];

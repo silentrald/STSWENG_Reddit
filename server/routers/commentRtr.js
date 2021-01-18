@@ -30,6 +30,7 @@ router.post('/c/:comment',
     postMw.validatePostBody,
     mw.validateComment,
     queryMw.userIsPartOfStation,
+    queryMw.commentNotDeleted,
     api.postSubcomment);
 
 // PATCH
