@@ -35,8 +35,9 @@ router.post('/c/:comment',
 // PATCH
 
 router.patch('/:comment',
+    loginMw.isAuth,
     mw.validateCommentParams,
-    mw.validateComment,
+    mw.validateText,
     api.patchComment);
 
 // DELETE

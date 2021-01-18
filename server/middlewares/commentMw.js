@@ -58,6 +58,9 @@ const commentMw = {
         next();
     },
 
+    /**
+     * Validates a comments text and station name
+     */
     validateComment: (req, res, next) => {
         let { text, station } = req.body;
 
@@ -112,12 +115,48 @@ const commentMw = {
         next();
     },
 
+    /**
+     * Validates the comment's text
+     */
+    validateText: (req, res, next) => {
+        let { text } = req.body;
+
+        // text
+        if (typeof(text) !== 'string') {
+            return res.status(403).send({
+                errors: {
+                    text: 'type'
+                }
+            });
+        }
+        
+        text = text.trimLeft();
+
+        if (text.length < 1) {
+            return res.status(403).send({
+                errors: {
+                    text: 'minLength'
+                }
+            });
+        } else if (text.length > 1000) {
+            return res.status(403).send({
+                errors: {
+                    text: 'maxLength'
+                }
+            });
+        }
+
+        req.body.text = text;
+
+        next();
+    },
+
     // SUBCOMMENTS
     /**
      * Sanitizes the subcomments query
      * properties: offset, limit
      */
-    sanitizeSubcommentsQuery: (req, res, next) => {
+    sanitizeSubcommentsQuery: (req, _res, next) => {
         const { offset, limit } = req.query;
 
         if (!offset ||

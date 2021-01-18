@@ -1,5 +1,6 @@
 const {
     validateComment,
+    validateText,
     sanitizeSubpostsQuery,
     validateCommentParams,
     sanitizeSubcommentsQuery
@@ -115,6 +116,106 @@ describe('Unit Testing: commentMw', () => {
             const next = mockNext();
 
             await validateComment(req, res, next);
+
+            expect(res.send).toHaveBeenCalledWith({
+                errors: {
+                    text: 'maxLength'
+                }
+            });
+            expect(res.status).toHaveBeenCalledWith(403);
+        });
+    });
+
+    describe('Middleware: validateText', () => {
+        let body = {};
+
+        beforeEach(() => {
+            body = {
+                text: 'This comment is good!'
+            };
+        });
+        
+        test('GOOD: Text supplied', async () => {
+            const req = mockRequest({
+                body
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateText(req, res, next);
+
+            expect(next).toHaveBeenCalledTimes(1);
+        });
+        
+        test('Text not a string', async () => {
+            body.text = 12345;
+            const req = mockRequest({
+                body
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateText(req, res, next);
+
+            expect(res.send).toHaveBeenCalledWith({
+                errors: expect.objectContaining({
+                    text: 'type'
+                })
+            });
+            expect(res.status).toHaveBeenCalledWith(403);
+        });
+        
+        test('Text not supplied', async () => {
+            delete body.text;
+            const req = mockRequest({
+                body
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateText(req, res, next);
+
+            expect(res.send).toHaveBeenCalledWith({
+                errors: expect.objectContaining({
+                    text: 'type'
+                })
+            });
+            expect(res.status).toHaveBeenCalledWith(403);
+        });
+        
+        test('Text empty', async () => {
+            body.text = '';
+            const req = mockRequest({
+                body
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateText(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.send).toHaveBeenCalledWith({
+                errors: expect.objectContaining({
+                    text: 'minLength'
+                })
+            });
+        });
+        
+        test('Text too long', async () => {
+            // dynamically create string because the comment will be too long
+            let text = '';
+            for (let i = 0; i < 101; i++) {
+                text += 'abcdefghij';
+            }
+
+            body.text = text;
+            const req = mockRequest({
+                body
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateText(req, res, next);
 
             expect(res.send).toHaveBeenCalledWith({
                 errors: {

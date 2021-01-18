@@ -280,6 +280,7 @@ describe('Comment API', () => {
                 })
             );
             expect(statusCode).toEqual(201);
+            commentsDelete.push(data.comment.comment_id);
         });
         
         test('BAD: Not logged in', async () => {
@@ -813,6 +814,130 @@ describe('Comment API', () => {
                 expect(body).toEqual({
                     errors: {
                         station: 'type'
+                    }
+                });
+                expect(statusCode).toEqual(403);
+            });
+        });
+    });
+
+    describe(`PATCH: ${url}/:comment`, () => {
+        let subcomment;
+
+        beforeEach(() => {
+            subcomment = {
+                text: 'Editted Comment'
+            };
+        });
+
+        test('GOOD: Author can edit a comment', async () => {
+            const { statusCode, body } = await request(server)
+                .patch(`${url}/${comments[0]}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(subcomment);
+            
+            expect(body).toEqual({});
+            expect(statusCode).toEqual(200);
+        });
+
+        test('BAD: Not existing comment', async () => {
+            const { statusCode, body } = await request(server)
+                .patch(`${url}/casdfadf`)
+                .set('Authorization', `Bearer ${imposterToken}`)
+                .send(subcomment);
+            
+            expect(body).toEqual({});
+            expect(statusCode).toEqual(404);
+        });
+
+        test('BAD: Not the author', async () => {
+            const { statusCode, body } = await request(server)
+                .patch(`${url}/${comments[0]}`)
+                .set('Authorization', `Bearer ${imposterToken}`)
+                .send(subcomment);
+            
+            expect(body).toEqual({ errors: { author: 'NOT' } });
+            expect(statusCode).toEqual(403);
+        });
+
+        test('BAD: No Auth', async () => {
+            const { statusCode } = await request(server)
+                .patch(`${url}/${comments[0]}`)
+                .send(subcomment);
+            
+            expect(statusCode).toEqual(403);
+        });
+
+        test('BAD: Wrong comment pattern', async () => {
+            const { statusCode, body } = await request(server)
+                .patch(`${url}/not-patte`)
+                .set('Authorization', `Bearer ${imposterToken}`)
+                .send(subcomment);
+            
+            expect(body).toEqual({ errors: { comment: 'pattern' } });
+            expect(statusCode).toEqual(403);
+        });
+
+        describe('BAD: text body', () => {
+            test('Empty', async () => {
+                subcomment.text = '';
+                const { statusCode, body } = await request(server)
+                    .patch(`${url}/casdfadf`)
+                    .set('Authorization', `Bearer ${imposterToken}`)
+                    .send(subcomment);
+                
+                expect(body).toEqual({
+                    errors: {
+                        text: 'minLength'
+                    }
+                });
+                expect(statusCode).toEqual(403);
+            });
+
+            test('Invalid Type', async () => {
+                subcomment.text = 1;
+                const { statusCode, body } = await request(server)
+                    .patch(`${url}/casdfadf`)
+                    .set('Authorization', `Bearer ${imposterToken}`)
+                    .send(subcomment);
+                
+                expect(body).toEqual({
+                    errors: {
+                        text: 'type'
+                    }
+                });
+                expect(statusCode).toEqual(403);
+            });
+
+            test('Undefined', async () => {
+                delete subcomment.text;
+                const { statusCode, body } = await request(server)
+                    .patch(`${url}/casdfadf`)
+                    .set('Authorization', `Bearer ${imposterToken}`)
+                    .send(subcomment);
+                
+                expect(body).toEqual({
+                    errors: {
+                        text: 'type'
+                    }
+                });
+                expect(statusCode).toEqual(403);
+            });
+
+            test('Too Long', async () => {
+                let text = '';
+                for (let i = 0; i < 100; i++) {
+                    text += 'aaaaaaaaaaa';
+                }
+                subcomment.text = text;
+                const { statusCode, body } = await request(server)
+                    .patch(`${url}/casdfadf`)
+                    .set('Authorization', `Bearer ${imposterToken}`)
+                    .send(subcomment);
+                
+                expect(body).toEqual({
+                    errors: {
+                        text: 'maxLength'
                     }
                 });
                 expect(statusCode).toEqual(403);

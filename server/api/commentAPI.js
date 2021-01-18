@@ -252,28 +252,54 @@ const commentAPI = {
     /**
      * Edits a post by the author
      */
-    // TODO: unit and int test
+    // TODO: int test
     patchComment: async (req, res) => {
         const { text } = req.body;
         const { comment } = req.params;
 
         try {
+            const querySelComment = {
+                text: `
+                    SELECT  author
+                    FROM    comments
+                    WHERE   comment_id=$1
+                    LIMIT   1;
+                `,
+                values: [ comment ]
+            };
+
+            const {
+                rows: comments,
+                rowCount: commentCount
+            } = await db.query(querySelComment);
+            if (commentCount < 1) {
+                console.log('Comment does not exist');
+                return res.status(404).send();
+            }
+
+            if (comments[0].author !== req.user.username) {
+                return res.status(403).send({
+                    errors: {
+                        author: 'NOT'
+                    }
+                });
+            }
+            
             const queryPtcComment = {
                 text: `
                     UPDATE  comments
                     SET     text=$1
-                    WHERE   comment_id=$2
-                        AND author=$3;
+                    WHERE   comment_id=$2;
                 `,
                 values: [
                     text,
-                    comment,
-                    req.user.username
+                    comment
                 ]
             };
 
             const { rowCount } = await db.query(queryPtcComment);
             if (rowCount < 1) {
+                console.log('No comment was updated');
                 return res.status(404).send();
             }
 

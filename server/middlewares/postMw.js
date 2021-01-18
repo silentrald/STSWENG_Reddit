@@ -89,7 +89,6 @@ const postMw = {
     /**
      * Validates the post parameter.
      */
-    // TODO: Unit and int test
     validatePostBody: (req, res, next) => {
         const { post } = req.body;
 

@@ -82,7 +82,6 @@ Verification Link: ${url}`;
      * Check if the verification link is valid then
      * verify the user
      */
-    // TODO: int test
     postVerification: async (req, res) => {
         const { username, token } = req.body;
 
