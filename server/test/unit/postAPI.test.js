@@ -4,7 +4,8 @@ const {
     getStationPosts,
     getPosts,
     getStationPost,
-    postStationPost
+    postStationPost,
+    deleteStationPost
 } = require('../../api/postAPI');
 
 jest.mock('../../db', () => {
@@ -16,7 +17,69 @@ jest.mock('../../db', () => {
     const oneLineQuery = (queryText) => queryText.trim().replace(/\n/g, ' ').replace(/ {2,}/g, ' ');
 
     return {
-        connect: jest.fn(),
+        connect: jest.fn().mockImplementation(() => ({
+            query: jest.fn().mockImplementation(query => {
+                if (query === 'BEGIN' || query === 'COMMIT' || query === 'ROLLBACK') {
+                    return;
+                }
+
+                let result = {
+                    rows: [],
+                    rowCount: 0
+                };
+    
+                query.text = oneLineQuery(query.text);
+
+                if (query.text === 'DELETE FROM comments_votes WHERE comment_id IN ( SELECT comment_id FROM subposts WHERE parent_post=$1 UNION SELECT comment_id FROM subcomments WHERE parent_post=$1 );'
+                    && query.values[0] === 'paaaaaaaaaa1') {
+                    result = {
+                        rows: [],
+                        rowCount: 0
+                    };
+                } else if (query.text === 'DELETE FROM comments WHERE comment_id IN ( SELECT comment_id FROM subcomments WHERE parent_post=$1 );'
+                    && query.values[0] === 'paaaaaaaaaa1') {
+                    result = {
+                        rows: [],
+                        rowCount: 0
+                    };
+                } else if (query.text === 'DELETE FROM comments WHERE comment_id IN ( SELECT comment_id FROM subposts WHERE parent_post=$1 );'
+                    && query.values[0] === 'paaaaaaaaaa1') {
+                    result = {
+                        rows: [],
+                        rowCount: 0
+                    };
+                } else if (query.text === 'DELETE FROM subcomments WHERE parent_post=$1;'
+                    && query.values[0] === 'paaaaaaaaaa1') {
+                    result = {
+                        rows: [],
+                        rowCount: 0
+                    };
+                } else if (query.text === 'DELETE FROM subposts WHERE parent_post=$1;'
+                    && query.values[0] === 'paaaaaaaaaa1') {
+                    result = {
+                        rows: [],
+                        rowCount: 0
+                    };
+                } else if (query.text === 'DELETE FROM post_votes WHERE post_id=$1;'
+                    && query.values[0] === 'paaaaaaaaaa1') {
+                    result = {
+                        rows: [],
+                        rowCount: 0
+                    };
+                } else if (query.text === 'DELETE FROM posts WHERE post_id=$1;'
+                    && query.values[0] === 'paaaaaaaaaa1') {
+                    result = {
+                        rows: [],
+                        rowCount: 0
+                    };
+                }
+
+                        
+    
+                return result;
+            }),
+            release: jest.fn()
+        })),
         query: jest.fn().mockImplementation(query => {
             const result = {
                 rows: [],
@@ -177,6 +240,82 @@ describe('Unit test: postAPI.js', () => {
 
             expect(res.status).toHaveBeenCalledWith(201);
             expect(db.query).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('API: deleteStationPost', () => {
+        let params, user;
+        let queries;
+
+        beforeAll(() => {
+            queries = {
+                delCommentVotes: 'DELETE FROM comment_votes WHERE comment_id IN ( SELECT comment_id FROM subposts WHERE parent_post=$1 UNION SELECT comment_id FROM subcomments WHERE parent_post=$1 );',
+                delSubcomments: 'DELETE FROM subcomments WHERE parent_post=$1;',
+                delCommentsFromSubcomments: 'DELETE FROM comments WHERE comment_id IN ( SELECT comment_id FROM subcomments WHERE parent_post=$1 );',
+                delSubposts: 'DELETE FROM subposts WHERE parent_post=$1;',
+                delCommentsFromSubposts: 'DELETE FROM comments WHERE comment_id IN ( SELECT comment_id FROM subposts WHERE parent_post=$1 );',
+                delPostVotes: 'DELETE FROM post_votes WHERE post_id=$1;',
+                delPost: 'DELETE FROM posts WHERE post_id=$1;'
+            };
+        });
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+
+            params = {
+                post: 'paaaaaaaaaa1'
+            };
+
+            user = {
+                username: 'crewmate'
+            };
+        });
+        
+        test('GOOD: Delete post', async () => {
+            const req = mockRequest({ params, user });
+            const res = mockResponse();
+
+            await deleteStationPost(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(201);
+
+            expect(db.connect).toHaveBeenCalledTimes(1);
+
+            const { query, release } = db.connect.mock.results[0].value;
+
+            expect(query).toHaveBeenCalledWith('BEGIN');
+            expect(query).toHaveBeenCalledWith({
+                text: queries.delCommentVotes,
+                values: [ params.post ]
+            });
+            expect(query).toHaveBeenCalledWith({
+                text: queries.delCommentsFromSubcomments,
+                values: [ params.post ]
+            });
+            expect(query).toHaveBeenCalledWith({
+                text: queries.delSubcomments,
+                values: [ params.post ]
+            });
+            expect(query).toHaveBeenCalledWith({
+                text: queries.delCommentsFromSubposts,
+                values: [ params.post ]
+            });
+            expect(query).toHaveBeenCalledWith({
+                text: queries.delSubposts,
+                values: [ params.post ]
+            });
+            expect(query).toHaveBeenCalledWith({
+                text: queries.delPostVotes,
+                values: [ params.post ]
+            });
+            expect(query).toHaveBeenCalledWith({
+                text: queries.delPost,
+                values: [ params.post ]
+            });
+            
+            expect(query).toHaveBeenCalledWith('COMMIT');
+
+            expect(release).toHaveBeenCalledTimes(1);
         });
     });
 });
