@@ -48,14 +48,14 @@
             Reply
           </div>
           <div
-            v-if="$auth.user.username === author"
+            v-if="$auth.user && $auth.user.username === author"
             class="reply mr-4"
             @click="editSubcomment()"
           >
             Edit
           </div>
           <div
-            v-if="$auth.user.username === author"
+            v-if="$auth.user && $auth.user.username === author"
             class="reply mr-4"
             @click="deleteSubcomment()"
           >
