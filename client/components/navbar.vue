@@ -30,11 +30,16 @@
       <div v-if="$auth.user">
         <div id="navbarResponsive" class="collapse navbar-collapse">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <div class="nav-link">
-                <img id="image" src="https://picsum.photos/24/24" width="24" height="24">
-                /{{ $auth.user.username }}
-                <span class="sr-only">(current)</span>
+            <li class="nav-item d-flex align-items-center">
+              <nuxt-link :to="`/u/${$auth.user.username}`">
+                <div class="nav-link">
+                  <img id="image" src="https://picsum.photos/24/24" width="24" height="24">
+                  /{{ $auth.user.username }}
+                  <span class="sr-only">(current)</span>
+                </div>
+              </nuxt-link>
+              <div v-if="$auth.user.verified">
+                <font-awesome-icon icon="check" title="Verified ✓" />
               </div>
             </li>
             <li class="nav-item">

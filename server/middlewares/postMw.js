@@ -86,6 +86,23 @@ const postMw = {
     },
 
     /**
+     * Validates the post parameter.
+     */
+    validatePostBody: (req, res, next) => {
+        const { post } = req.body;
+
+        if (!POST_NAME_REGEX.test(post)) {
+            return res.status(403).send({
+                errors: {
+                    post: 'pattern'
+                }
+            });
+        }
+
+        next();
+    },
+
+    /**
      * Validates the object for adding a post.
      * Properties: title, text, author, station_name
      */

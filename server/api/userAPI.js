@@ -88,7 +88,8 @@ const userAPI = {
             };
 
             await db.query(queryInsUser);
-
+            
+            // Send to the server that the account was created
             return res.status(201).send();
         } catch (err) {
             console.log(err);
