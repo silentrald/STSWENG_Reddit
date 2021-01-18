@@ -32,4 +32,11 @@ router.post('/station/:station',
 
 // DELETE
 
+router.delete('/:post',
+    loginMw.isAuth,
+    queryMw.userIsAuthor,
+    mw.validatePostParam,
+    api.deleteStationPost);
+
+
 module.exports = router;
