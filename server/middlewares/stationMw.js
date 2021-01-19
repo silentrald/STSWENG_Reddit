@@ -1,9 +1,9 @@
 const db = require('../db');
 
-const Ajv = require('ajv');
+const Ajv = require('ajv').default;
 const { ajvErrors } = require('./ajvHelper');
 
-const ajv = new Ajv({ allErrors: true, jsonPointers: true });
+const ajv = new Ajv({ allErrors: true });
 require('ajv-keywords')(ajv, [ 'transform' ]);
 
 const STATION_S_SCHEMA = 'ss';

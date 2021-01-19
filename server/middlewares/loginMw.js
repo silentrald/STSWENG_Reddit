@@ -1,7 +1,7 @@
-const Ajv = require('ajv');
+const Ajv = require('ajv').default;
 const jwt = require('../modules/jwt');
 
-const ajv = new Ajv({ allErrors: true, jsonPointers: true });
+const ajv = new Ajv({ allErrors: true });
 require('ajv-keywords')(ajv, [ 'transform' ]);
 
 const LOGIN_S_SCHEMA = 'ls';
