@@ -114,7 +114,7 @@ export default {
       writeSubcomment: false,
       tempSubcomment: '',
       editting: false,
-      saving: false,
+      sending: false,
       editText: ''
     }
   },
@@ -138,8 +138,8 @@ export default {
     },
 
     async saveEdit () {
-      if (this.saving) { return }
-      this.saving = true
+      if (this.sending) { return }
+      this.sending = true
 
       try {
         await this.$axios.patch(`/api/comment/${this.id}`, {
@@ -149,7 +149,8 @@ export default {
         this.commentText = this.editText
         this.editting = false
       } catch (_err) {}
-      this.saving = false
+
+      this.sending = false
     },
 
     cancelEditting () {
@@ -160,6 +161,9 @@ export default {
     async postSubcomment () {
       this.tempSubcomment = this.tempSubcomment.trim()
       if (!this.tempSubcomment) { return }
+
+      if (this.sending) { return }
+      this.sending = true
 
       const { station, post } = this.$route.params
 
@@ -174,6 +178,8 @@ export default {
         this.subcomments.push(subcomment)
         this.writeSubcomment = false
       } catch (err) {}
+
+      this.sending = false
     }
   }
 }

@@ -80,7 +80,8 @@ export default {
       post: undefined,
       comments: [],
       comment_text: '',
-      loading: true
+      loading: true,
+      submitting: false
     }
   },
 
@@ -132,6 +133,9 @@ export default {
     },
 
     async postComment () {
+      if (this.submitting) { return }
+      this.submitting = true
+
       try {
         const res = await this.$axios.post(`/api/comment/post/${this.$route.params.post}`, {
           station: this.$route.params.station,
@@ -139,9 +143,12 @@ export default {
         })
 
         const { comment } = res.data
+        // TODO: Fix this because of mutation of the props
         this.comments.unshift(comment)
         this.$set(this, 'comment_text', '')
       } catch (_err) {}
+
+      this.submitting = false
     },
 
     infiniteScroll ($state) {
