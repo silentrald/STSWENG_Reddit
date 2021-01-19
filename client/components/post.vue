@@ -79,8 +79,14 @@ export default {
   color: #aaaaaa;
 }
 
+.post-preview {
+  word-break: break-all;
+}
+
 .post-title {
   font-size: 1.5em;
   font-weight: 500;
+
+  word-break: break-all;
 }
 </style>
