@@ -124,8 +124,7 @@ const customErrorMsg = {
   email: {
     maxLength: 'Email is too long (max 256)',
     minLength: 'Email is too short (min 8)',
-    format: 'Email is invalid',
-    used: 'Username is already used'
+    format: 'Email is invalid'
   },
   password: {
     maxLength: 'Password is too long (max 256)',
