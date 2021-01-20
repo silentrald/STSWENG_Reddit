@@ -8,7 +8,7 @@
           direction="col"
         />
       </div>
-      <div class="comment-text width-100">
+      <div class="comment width-100">
         <div class="comment-info margin-bottom">
           Commented by /u/{{ author }} on {{ formatDate(date) }}
         </div>
@@ -212,6 +212,10 @@ export default {
   margin-left: 24px;
   padding-left: 16px;
   border-left: 1px solid #ffffff;
+}
+
+.comment-text {
+  word-break: break-all;
 }
 
 .reply {
