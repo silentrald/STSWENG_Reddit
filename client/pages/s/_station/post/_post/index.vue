@@ -132,14 +132,16 @@ export default {
     },
 
     async postComment () {
-      const res = await this.$axios.post(`/api/comment/post/${this.$route.params.post}`, {
-        station: this.station,
-        text: this.comment_text
-      })
+      try {
+        const res = await this.$axios.post(`/api/comment/post/${this.$route.params.post}`, {
+          station: this.$route.params.station,
+          text: this.comment_text
+        })
 
-      const { comment } = res.data
-      this.comments.unshift(comment)
-      this.$set(this, 'comment_text', '')
+        const { comment } = res.data
+        this.comments.unshift(comment)
+        this.$set(this, 'comment_text', '')
+      } catch (_err) {}
     },
 
     infiniteScroll ($state) {
