@@ -7,6 +7,9 @@ INSERT INTO users(username, password, email) VALUES
     ('imposter', '$2b$10$uIugTkePCOSCvKw.jccpAeBZ.b1IatDqh.Qt.dnzfpQY.ABeRGwIS', 'impostor@station.org'),
     ('captain2', '$2b$10$uIugTkePCOSCvKw.jccpAeBZ.b1IatDqh.Qt.dnzfpQY.ABeRGwIS', 'captain2@station.org');
 
+INSERT INTO users(username, password, email, fname, lname, gender, birthday, bio) VALUES
+    ('userInfo', '$2b$10$uIugTkePCOSCvKw.jccpAeBZ.b1IatDqh.Qt.dnzfpQY.ABeRGwIS', 'userinfo@station.org', 'FNAME', 'LNAME', 'm', '10-06-1999', 'Test bio');
+
 /* stations */
 INSERT INTO stations(name, description, rules, members) VALUES
     ('SampleStation', 'This is a test station', '1. Do not delete this', 2); /* captain1, crewmate */
