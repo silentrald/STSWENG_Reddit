@@ -4,7 +4,8 @@ const {
     getAuth,
     getUserNames,
     postLogin,
-    postRegisterUser
+    postRegisterUser,
+    getUser
 } = require('../../api/userAPI');
 
 jest.mock('../../db', () => {
@@ -126,6 +127,26 @@ describe('Unit test: userAPI.js', () => {
         });
 
         
+    });
+
+    // TODO: Create unit test for userAPI
+    describe('API: getUser', () => {
+        let params;
+
+        beforeEach(() => {
+            params = {
+                username: 'crewmate'
+            };
+        });
+
+        test('GOOD', async () => {
+            const req = mockRequest({ params });
+            const res = mockResponse();
+            
+            await getUser(req, res);
+
+            expect(res.status).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe('API: postRegisterUser', () => {
