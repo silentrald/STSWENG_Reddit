@@ -162,7 +162,6 @@ describe('User API', () => {
         });
     });
 
-    // TODO: Integration tests for getUser
     describe(`GET: ${url}/profile/:username`, () => {
         let username = 'crewmate';
 

@@ -1053,7 +1053,6 @@ describe('Station API', () => {
         });
     });
 
-    // TODO: Integration test for getUserPosts
     describe(`GET ${url}/user/:username`, () => {
         test('GOOD: without query', async () => {
             const {
@@ -1341,8 +1340,7 @@ describe('Station API', () => {
 
             expect(statusCode).toEqual(403);
         });
-        // TODO: 
-        // test('ERROR: User is not part of station');
+        // TODO: test('ERROR: User is not part of station');
 
         describe('ERROR: Title field', () => {
             test('Title wrong type', async () => {

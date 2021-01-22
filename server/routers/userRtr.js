@@ -13,7 +13,6 @@ router.get('/',
     queryStrMw.sanitizeOffsetAndLimit,
     api.getUserNames);
 
-// TODO: Add param sanitization
 router.get('/profile/:username',
     userMw.validateUserParam,
     api.getUser);

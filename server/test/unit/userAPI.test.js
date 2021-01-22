@@ -129,7 +129,6 @@ describe('Unit test: userAPI.js', () => {
         
     });
 
-    // TODO: Create unit test for userAPI
     describe('API: getUser', () => {
         let params;
 
