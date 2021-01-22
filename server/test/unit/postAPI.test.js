@@ -4,6 +4,7 @@ const {
     getStationPosts,
     getPosts,
     getStationPost,
+    getUserPosts,
     postStationPost
 } = require('../../api/postAPI');
 
@@ -148,6 +149,34 @@ describe('Unit test: postAPI.js', () => {
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.send).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('API: getUserPosts', () => {
+        let username = '';
+        let query = {};
+
+        beforeEach(() => {
+            username = 'crewmate';
+            query = {
+                offset: 0,
+                limit: 10
+            };
+        });
+        
+        test('GOOD', async () => {
+            const req = mockRequest({
+                params: { username },
+                query
+            });
+            const res = mockResponse();
+
+            await getUserPosts(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledWith({
+                posts: expect.arrayContaining([])
+            });
         });
     });
 
