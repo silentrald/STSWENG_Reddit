@@ -55,6 +55,41 @@ const userAPI = {
         }
     },
 
+    /**
+     * Gets the details of the user specified in the params, including their total fame
+     */
+    getUser: async (req, res) => {
+        const { username } = req.params;
+
+        try {
+            // Get user details
+            const queryGetUser = {
+                text: `
+                    SELECT  username, fname, lname, gender, birthday, bio, fame
+                    FROM    users
+                    WHERE   username=$1
+                    LIMIT   1;
+                `,
+                values: [ username ]
+            };
+            const result = await db.query(queryGetUser);
+
+            // Check if user exists
+            if (!result.rowCount) {
+                return res.status(404).send();
+            }
+
+            console.log(result);
+
+            return res.status(200).send({
+                user: result.rows[0] 
+            });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).send();
+        }
+    },
+
     // POST
     /**
      * Create a user and responds with a status 201.

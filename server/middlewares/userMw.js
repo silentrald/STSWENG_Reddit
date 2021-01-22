@@ -4,6 +4,8 @@ const { ajvErrors } = require('./ajvHelper');
 const ajv = new Ajv({ allErrors: true, jsonPointers: true });
 require('ajv-keywords')(ajv, [ 'transform' ]);
 
+const USER_NAME_REGEX = /^.{8,64}$/;
+
 const USER_S_SCHEMA = 'us';
 const USER_V_SCHEMA = 'uv';
 
@@ -63,6 +65,26 @@ const userMw = {
         if (!validate) {
             const errors = ajvErrors(ajv);
             return res.status(401).send({ errors });
+        }
+
+        next();
+    },
+
+    /**
+     * Validates the param for usernames and checks if it meets the 
+     * length requirement
+     */
+    validateUserParam: (req, res, next) => {
+        const { username } = req.params;
+
+        console.log(USER_NAME_REGEX.test(username));
+
+        if (!USER_NAME_REGEX.test(username)) {
+            return res.status(400).send({
+                errors: {
+                    username: 'pattern'
+                }
+            });
         }
 
         next();
