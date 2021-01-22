@@ -40,6 +40,11 @@ jest.mock('../../db', () => {
                     post_id: 'testingidlol'
                 };
                 result.rowCount = 1;
+            } else if (query.text == 'SELECT * FROM users WHERE username=$1 LIMIT 1' && query.values[0]) {
+                result.rows[0] = {
+                    username: 'crewmate'
+                };
+                result.rowCount = 1;
             }
 
             return result;
