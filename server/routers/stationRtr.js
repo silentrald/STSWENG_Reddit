@@ -3,6 +3,7 @@ const api = require('../api/stationAPI');
 const loginMw = require('../middlewares/loginMw');
 const stationMw = require('../middlewares/stationMw');
 const queryStrMw = require('../middlewares/queryStringMw');
+//const queryMw = require('../middlewares/queryMw');
 
 // GET
 
@@ -41,6 +42,12 @@ router.post('/join/:stationName',
 router.post('/leave/:stationName',
     loginMw.isAuth,
     stationMw.validateStationParam,
+    api.postLeaveStation);
+
+router.post('/roles/:stationName',
+    loginMw.isAuth,
+    stationMw.validateStationParam,
+    stationMw.isCaptain,
     api.postLeaveStation);
 
 // PATCH
