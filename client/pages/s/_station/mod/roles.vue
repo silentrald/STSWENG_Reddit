@@ -5,17 +5,22 @@
       <div class="col col-md-6">
         <h2>Captains</h2>
         <div>
-          <div v-for="captain in captains" :key="captain.username">
+          <div v-for="captain in captains" :key="`capt-${captain.username}`">
             <div class="capt-box">
               <nuxt-link :to="`/u/${captain.username}`" class="link">
                 u/{{ captain.username }}
               </nuxt-link>
-              <!--<div v-if="captain.username !== $auth.user.username">-->
-              <button class="remove" @click="removeCaptain(captain.username)">
-                &times;
-              </button>
-              <!--</div>-->
+              <div v-if="captain.username !== $auth.user.username">
+                <div class="remove">
+                  <button @click="removeCaptain(captain.username)">
+                    &times;
+                  </button>
+                </div>
+              </div>
             </div>
+          </div>
+          <div v-if="captError" class="error-box">
+            {{ captError }}
           </div>
         </div>
       </div>
@@ -28,8 +33,23 @@
             type="text"
             class="form-control"
             placeholder="Find users..."
-            @change="searchUser()"
+            @keyup="searchUser()"
           >
+          <div v-for="user in users" :key="`crew-${user.username}`">
+            <div class="user-box">
+              <nuxt-link :to="`/u/${user.username}`" class="link">
+                u/{{ user.username }}
+              </nuxt-link>
+              <div class="add">
+                <button @click="addCaptain(user.username)">
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-if="userError" class="error-box">
+            {{ userError }}
+          </div>
         </div>
       </div>
     </div>
@@ -42,7 +62,10 @@ export default {
   data () {
     return {
       captains: [],
-      username: ''
+      username: '',
+      users: [],
+      captError: null,
+      userError: null
     }
   },
 
@@ -64,25 +87,66 @@ export default {
     },
 
     async searchUser () {
+      this.userError = null
+
+      if (!this.username || this.username.length === 0) {
+        this.$set(this, 'users', [])
+        return
+      }
+
+      const { station: name } = this.$route.params
       try {
-        const { data } = await this.$axios.get('/api/user', {
+        const { data } = await this.$axios.get(`/api/station/members/${name}`, {
           params: {
-            search: this.searchQuery
+            search: this.username
           }
         })
         this.$set(this, 'users', data.users)
       } catch (err) {
         const { status } = err.response
+        this.$set(this, 'users', [])
         if (status === 404) {
-          if (this.users.length === 0) {
-            this.$set(this, 'users', undefined)
-          } else {}
+          this.userError = 'No users found'
+        } else {
+          this.userError = 'Something went wrong while fetching users'
         }
       }
     },
 
-    removeCaptain (capt) {
+    async addCaptain (username) {
+      const { station: name } = this.$route.params
+      try {
+        await this.$axios.post(`/api/station/roles/${name}`, {
+          type: 'grant',
+          username
+        })
+        await this.searchUser()
+        await this.loadPage()
+      } catch (err) {
+        const { status } = err.response
+        if (status === 403) {
+        } else {
+          this.captError = 'Something went wrong while adding captain'
+        }
+      }
+    },
 
+    async removeCaptain (username) {
+      const { station: name } = this.$route.params
+      try {
+        await this.$axios.post(`/api/station/roles/${name}`, {
+          type: 'revoke',
+          username
+        })
+        await this.searchUser()
+        await this.loadPage()
+      } catch (err) {
+        const { status } = err.response
+        if (status === 403) {
+        } else {
+          this.captError = 'Something went wrong while adding captain'
+        }
+      }
     }
   },
 
@@ -101,17 +165,65 @@ export default {
   position: relative;
 }
 
+.capt-box::after {
+  clear: both;
+  content: '\00A0';
+}
+
 .capt-box .link {
+  float: left;
   margin-right: auto;
   margin-left: 0;
 }
 
 .capt-box .remove {
+  float: right;
+}
+
+.capt-box .remove button {
   margin-left: auto;
   margin-right: 0;
   border: none;
   color: red;
   padding: 0.125em 1em;
+}
+
+.user-box {
+  padding: 0.5em 1em;
+  border: 1px solid rgb(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin-top: 0.5em;
+  position: relative;
+}
+
+.user-box .link {
+  float: left;
+  margin-right: auto;
+  margin-left: 0;
+}
+
+.user-box .add {
+  float: right;
+}
+
+.user-box .add button {
+  margin-left: auto;
+  margin-right: 0;
+  border: none;
+  color: green;
+  padding: 0.125em 1em;
+}
+
+.user-box::after {
+  clear: both;
+  content: '\00A0';
+}
+
+.error-box {
+  padding: 0.5em 1em;
+  border: 1px solid red;
+  margin-top: 1em;
+  border-radius: 4px;
 }
 
 input, input:focus, textarea, textarea:focus {

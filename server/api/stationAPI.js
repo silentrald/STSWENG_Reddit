@@ -139,6 +139,44 @@ const stationAPI = {
         }
     },
 
+    getCrewmates: async (req, res) => {
+        const {
+            search,
+            offset,
+            limit
+        } = req.query;
+        const { stationName } = req.params;
+
+        try {
+            const querySelUsers = {
+                text: `
+                    SELECT  username
+                    FROM    crewmates
+                    WHERE   username ILIKE $2 AND station_name = $1
+                    OFFSET  $3
+                    LIMIT   $4;
+                `,
+                values: [
+                    stationName,
+                    search ? search : '%',
+                    offset,
+                    limit
+                ]
+            };
+
+            const { rows: users, rowCount } = await db.query(querySelUsers);
+            if (rowCount < 1) {
+                return res.status(404).send();
+            }
+
+            return res.status(200).send({ users });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
     // POST
     postCreateStation: async (req, res) => {
         // Get values

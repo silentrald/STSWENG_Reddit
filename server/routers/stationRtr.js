@@ -21,6 +21,11 @@ router.get('/top',
 router.get('/captains/:stationName',
     api.getStationCaptains);
 
+router.get('/members/:stationName',
+    queryStrMw.sanitizeSearch,
+    queryStrMw.sanitizeOffsetAndLimit,
+    api.getCrewmates);
+
 // POST
 
 router.post('/info/:stationName',
@@ -48,7 +53,7 @@ router.post('/roles/:stationName',
     loginMw.isAuth,
     stationMw.validateStationParam,
     stationMw.isCaptain,
-    api.postLeaveStation);
+    api.postEditRoles);
 
 // PATCH
 
