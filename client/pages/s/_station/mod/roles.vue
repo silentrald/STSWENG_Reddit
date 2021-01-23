@@ -101,15 +101,15 @@ export default {
             search: this.username
           }
         })
-        this.$set(this, 'users', data.users)
-      } catch (err) {
-        const { status } = err.response
-        this.$set(this, 'users', [])
-        if (status === 404) {
-          this.userError = 'No users found'
+        if (data.users && data.users.length > 0) {
+          this.$set(this, 'users', data.users)
         } else {
-          this.userError = 'Something went wrong while fetching users'
+          this.$set(this, 'users', [])
+          this.userError = 'No users found'
         }
+      } catch (err) {
+        this.$set(this, 'users', [])
+        this.userError = 'Something went wrong while fetching users'
       }
     },
 

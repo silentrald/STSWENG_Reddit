@@ -148,6 +148,20 @@ const stationAPI = {
         const { stationName } = req.params;
 
         try {
+            const querySelStation = {
+                text: 'SELECT * FROM stations WHERE name = $1 LIMIT 1;',
+                values: [ stationName ]
+            };
+
+            const { rows: stations } = await db.query(querySelStation);
+            if (!stations || stations.length === 0) {
+                return res.status(404).send({
+                    errors: {
+                        stationName: 'nonexistent'
+                    }
+                });
+            }
+
             const querySelUsers = {
                 text: `
                     SELECT  username
@@ -164,10 +178,7 @@ const stationAPI = {
                 ]
             };
 
-            const { rows: users, rowCount } = await db.query(querySelUsers);
-            if (rowCount < 1) {
-                return res.status(404).send();
-            }
+            const { rows: users } = await db.query(querySelUsers);
 
             return res.status(200).send({ users });
         } catch (err) {
@@ -496,6 +507,7 @@ const stationAPI = {
                     });
                 }
             } else {
+                // IGNORE: this is already handled in the middleware
                 client.query('ROLLBACK');
                 return res.status(403).send({
                     errors: {
