@@ -52,6 +52,7 @@ router.post('/leave/:stationName',
 router.post('/roles/:stationName',
     loginMw.isAuth,
     stationMw.validateStationParam,
+    stationMw.validateRoles,
     stationMw.isCaptain,
     api.postEditRoles);
 
