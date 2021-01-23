@@ -35,6 +35,17 @@ let tmpUser2 = {
     bio: 'I like testing stuff just like my parent'
 };
 
+let tmpUser3 = {
+    username: 'temp-user-3',
+    password: 'Hello-p4ssword',
+    email: 'temp3@gmail.com',
+    fname: 'Temporary Jr.',
+    lname: 'User',
+    gender: 'm',
+    birthday: '2002-01-01',
+    bio: 'I like testing stuff just like my parent'
+};
+
 let failStation;
 let token, token2;
 
@@ -64,6 +75,10 @@ beforeAll(async () => {
         });
 
     token2 = res2.body.token;
+
+    await request(server)
+        .post(`${userUrl}/create`)
+        .send(tmpUser3);
 });
 
 describe('Station API', () => {
@@ -500,6 +515,44 @@ describe('Station API', () => {
         });
     });
 
+    describe(`GET: ${url}/members/:name`, () => {
+        test('GOOD: no search', async () => {
+            const {
+                statusCode,
+                // body
+            } = await request(server)
+                .get(`${url}/members/${station.name}`);
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        test('GOOD: search', async () => {
+            const {
+                statusCode,
+                // body
+            } = await request(server)
+                .get(`${url}/members/${station.name}`)
+                .query({
+                    search: 's'
+                });
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        test('GOOD: no users in search', async () => {
+            const {
+                statusCode,
+                // body
+            } = await request(server)
+                .get(`${url}/members/${station.name}`)
+                .query({
+                    search: 'SuP3R4Nd0m'
+                });
+            
+            expect(statusCode).toEqual(200);
+        });
+    });
+
     describe(`POST ${url}/info/:name`, () => {
         beforeEach(() => {
             failStation = {
@@ -548,11 +601,244 @@ describe('Station API', () => {
             expect(statusCode).toEqual(403);
         });
     });
+
+    describe(`POST ${url}/roles/:name`, () => {
+        beforeAll(async () => {
+            await request(server).post(`${url}/join/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send();
+        });
+
+        beforeEach(() => {
+            failStation = {
+                name: 'nontest',
+                description: 'Random description',
+                rules: 'No rules yet'
+            };
+        });
+
+        describe('GOOD: grant role', () => {
+            test('GOOD: grant role', async () => {
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'grant',
+                        username: tmpUser2.username
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('BAD: role already granted', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'grant',
+                        username: tmpUser2.username
+                    });
+                
+                expect(statusCode).toEqual(403);
+                expect(body).toEqual(expect.objectContaining({
+                    errors: expect.objectContaining({
+                        username: 'isCaptain'
+                    })
+                }));
+            });
+
+            test('BAD: grant role to same user', async () => {
+                const {
+                    statusCode, body
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'grant',
+                        username: tmpUser.username
+                    });
+                
+                expect(statusCode).toEqual(403);
+                expect(body).toEqual(expect.objectContaining({
+                    errors: expect.objectContaining({
+                        username: 'sameUser'
+                    })
+                }));
+            });
+
+            test('BAD: grant role to unjoined user', async () => {
+                const {
+                    statusCode, body
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'grant',
+                        username: tmpUser3.username
+                    });
+                
+                expect(statusCode).toEqual(403);
+                expect(body).toEqual(expect.objectContaining({
+                    errors: expect.objectContaining({
+                        username: 'notJoined'
+                    })
+                }));
+            });
+        });
+
+        describe('GOOD: revoke role', () => {
+            test('GOOD: revoke role', async () => {
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'revoke',
+                        username: tmpUser2.username
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('BAD: role already revoked', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'revoke',
+                        username: tmpUser2.username
+                    });
+                
+                expect(statusCode).toEqual(403);
+                expect(body).toEqual(expect.objectContaining({
+                    errors: expect.objectContaining({
+                        username: 'isNotCaptain'
+                    })
+                }));
+            });
+
+            test('BAD: revoke role from self', async () => {
+                const {
+                    statusCode, body
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'revoke',
+                        username: tmpUser.username
+                    });
+                
+                expect(statusCode).toEqual(403);
+                expect(body).toEqual(expect.objectContaining({
+                    errors: expect.objectContaining({
+                        username: 'sameUser'
+                    })
+                }));
+            });
+
+            test('BAD: revoke role from unjoined user', async () => {
+                const {
+                    statusCode, body
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'revoke',
+                        username: tmpUser3.username
+                    });
+                
+                expect(statusCode).toEqual(403);
+                expect(body).toEqual(expect.objectContaining({
+                    errors: expect.objectContaining({
+                        username: 'notJoined'
+                    })
+                }));
+            });
+        });
+
+        test('BAD: role type not a string', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).post(`${url}/roles/${station.name}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    type: 123,
+                    username: tmpUser2.username
+                });
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual(expect.objectContaining({
+                errors: expect.objectContaining({
+                    type: 'type'
+                })
+            }));
+        });
+
+        test('BAD: invalid role type', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).post(`${url}/roles/${station.name}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    type: 'ultimate',
+                    username: tmpUser2.username
+                });
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual(expect.objectContaining({
+                errors: expect.objectContaining({
+                    type: 'invalid'
+                })
+            }));
+        });
+
+        test('ERROR: nonexistent station', async () => {
+            const {
+                statusCode
+            } = await request(server).post(`${url}/captains/${failStation.name}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send(station);
+            
+            expect(statusCode).toEqual(404);
+        });
+
+        test('ERROR: no user token', async () => {
+            const {
+                statusCode
+            } = await request(server).post(`${url}/info/${station.name}`)
+                .send(station);
+            
+            expect(statusCode).toEqual(403);
+        });
+
+        test('ERROR: not captain of station', async () => {
+            const {
+                statusCode
+            } = await request(server).post(`${url}/info/${station.name}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .send(station);
+            
+            expect(statusCode).toEqual(403);
+        });
+    });
+
+    afterAll(async () => {
+        await request(server).post(`${url}/leave/${station.name}`)
+            .set('Authorization', `Bearer ${token2}`)
+            .send();
+    });
 });
 
 afterAll(async () => {
     await server.close();
 
+    await db.query({ 
+        text: 'DELETE FROM passengers WHERE username=$1',
+        values: [ tmpUser3.username ]
+    });
     await db.query({ 
         text: 'DELETE FROM passengers WHERE username=$1',
         values: [ tmpUser2.username ]
@@ -564,6 +850,10 @@ afterAll(async () => {
     await db.query({ 
         text: 'DELETE FROM stations WHERE name=$1',
         values: [ station.name ]
+    });
+    await db.query({ 
+        text: 'DELETE FROM users WHERE username=$1',
+        values: [ tmpUser3.username ]
     });
     await db.query({ 
         text: 'DELETE FROM users WHERE username=$1',
