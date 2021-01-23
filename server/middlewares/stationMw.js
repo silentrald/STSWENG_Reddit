@@ -144,7 +144,7 @@ const stationMw = {
 
         if (!validate) {
             const errors = ajvErrors(ajv);
-            return res.status(401).send({ errors });
+            return res.status(403).send({ errors });
         }
 
         if (req.body.type !== 'grant' && req.body.type !== 'revoke') {

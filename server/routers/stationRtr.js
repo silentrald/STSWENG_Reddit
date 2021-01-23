@@ -8,6 +8,7 @@ const queryStrMw = require('../middlewares/queryStringMw');
 // GET
 
 router.get('/id/:stationName',
+    stationMw.validateStationParam,
     api.getStation);
 
 router.get('/', 
@@ -19,9 +20,11 @@ router.get('/top',
     api.getTopStations);
 
 router.get('/captains/:stationName',
+    stationMw.validateStationParam,
     api.getStationCaptains);
 
 router.get('/members/:stationName',
+    stationMw.validateStationParam,
     queryStrMw.sanitizeSearch,
     queryStrMw.sanitizeOffsetAndLimit,
     api.getCrewmates);
