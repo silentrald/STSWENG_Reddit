@@ -48,6 +48,7 @@
           :date="comment.timestamp_created"
           :author="comment.author"
           :subcomments="comment.subcomments || []"
+          :deleted="comment.deleted"
         />
         <infinite-loading
           spinner="waveDots"

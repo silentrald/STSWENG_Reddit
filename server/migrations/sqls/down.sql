@@ -1,4 +1,5 @@
 /* PURGE */
+DROP TABLE IF EXISTS verifications;
 DROP TABLE IF EXISTS user_reports;
 DROP TABLE IF EXISTS station_reports;
 DROP TABLE IF EXISTS comment_reports;
