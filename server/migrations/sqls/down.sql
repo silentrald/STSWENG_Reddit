@@ -1,4 +1,5 @@
 /* PURGE */
+DROP TABLE IF EXISTS verifications;
 DROP TABLE IF EXISTS user_reports;
 DROP TABLE IF EXISTS station_reports;
 DROP TABLE IF EXISTS comment_reports;
@@ -17,7 +18,6 @@ DROP TABLE IF EXISTS passengers;
 DROP TABLE IF EXISTS stations;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS admins;
-DROP TABLE IF EXISTS verifications;
 
 DROP FUNCTION IF EXISTS comment_id;
 DROP SEQUENCE IF EXISTS comment_id_seq;
