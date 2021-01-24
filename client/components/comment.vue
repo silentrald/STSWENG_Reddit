@@ -5,12 +5,20 @@
         <comment-vote
           :id="id"
           :score="score"
+          :disabled="isDeleted"
           direction="col"
         />
       </div>
       <div class="comment-text width-100">
         <div class="comment-info margin-bottom">
-          Commented by /u/{{ author }} on {{ formatDate(date) }}
+          Commented by
+          <span v-if="!isDeleted">
+            <nuxt-link :to="`/u/${author}`">/u/{{ author }}</nuxt-link>
+          </span>
+          <span v-else>
+            /u/deleted
+          </span>
+          on {{ formatDate(date) }}
         </div>
         <div v-if="editting">
           <div class="d-flex">
@@ -24,9 +32,14 @@
           </button>
         </div>
         <div v-else class="comment-text margin-bottom">
-          {{ commentText }}
+          <div v-if="!isDeleted">
+            {{ commentText }}
+          </div>
+          <div v-else>
+            [deleted]
+          </div>
         </div>
-        <div v-if="!editting && !writeSubcomment" class="d-flex">
+        <div v-if="!isDeleted && !editting && !writeSubcomment" class="d-flex">
           <div
             v-if="$auth.user"
             class="reply mr-4"
@@ -35,11 +48,18 @@
             Reply
           </div>
           <div
-            v-if="$auth.user.username === author"
-            class="reply"
+            v-if="$auth.user && $auth.user.username === author"
+            class="reply mr-4"
             @click="editSubcomment()"
           >
             Edit
+          </div>
+          <div
+            v-if="$auth.user && $auth.user.username === author"
+            class="reply mr-4"
+            @click="deleteSubcomment()"
+          >
+            Delete
           </div>
         </div>
         <div v-if="$auth.user && writeSubcomment">
@@ -68,6 +88,7 @@
         :date="subcomment.timestamp_created"
         :author="subcomment.author"
         :subcomments="subcomment.subcomments || []"
+        :deleted="subcomment.deleted"
       />
     </div>
   </div>
@@ -105,6 +126,10 @@ export default {
     subcomments: {
       type: Array,
       required: true
+    },
+    deleted: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -115,12 +140,14 @@ export default {
       tempSubcomment: '',
       editting: false,
       saving: false,
-      editText: ''
+      editText: '',
+      isDeleted: false
     }
   },
 
   beforeMount () {
     this.commentText = this.text
+    this.isDeleted = this.deleted
   },
 
   methods: {
@@ -135,6 +162,14 @@ export default {
     editSubcomment () {
       this.editText = this.commentText
       this.editting = true
+    },
+
+    async deleteSubcomment () {
+      try {
+        await this.$axios.delete(`/api/comment/${this.id}`)
+        this.isDeleted = true
+        this.commentText = '[deleted]'
+      } catch (_err) {}
     },
 
     async saveEdit () {

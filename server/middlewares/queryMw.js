@@ -138,6 +138,64 @@ const queryMw = {
 
             return res.status(500).send();
         }
+    },
+
+    isCaptain: async (req, res, next) => {
+        const { stationName } = req.params;
+
+        const querySelCaptains = {
+            text: `
+                SELECT * FROM captains
+                WHERE username = $1 AND station_name = $2
+                LIMIT 1;
+            `,
+            values: [ req.user.username, stationName ]
+        };
+
+        const { rows } = await db.query(querySelCaptains); 
+
+        if (rows.length === 0) {
+            return res.status(403).send({
+                errors: {
+                    stationName: 'isNotCaptain'
+                }
+            });
+        }
+
+        next();
+    },
+
+    commentNotDeleted: async (req, res, next) => {
+        const { comment } = req.params;
+
+        const querySelComment = {
+            text: `
+                SELECT  *
+                FROM    comments
+                WHERE   comment_id=$1
+                LIMIT   1;
+            `,
+            values: [ comment ]
+        };
+
+        const { rows } = await db.query(querySelComment); 
+
+        // non-existent comment is technically not 'deleted'
+        // because it has not been deleted
+        if (rows.length === 0) {
+            return next();
+        }
+
+        const commentObj = rows[0];
+        if (commentObj.deleted) {
+            return res.status(403).send({
+                errors: {
+                    comment: 'deleted'
+                }
+            });
+        }
+
+        next();
     }
 };
 
