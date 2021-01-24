@@ -34,8 +34,9 @@
   },
   "homepage": "https://github.com/silentrald/STSWENG_Reddit#readme",
   "dependencies": {
-    "ajv": "^6.12.6",
-    "ajv-keywords": "^3.5.2",
+    "ajv": "^7.0.3",
+    "ajv-formats": "^1.5.1",
+    "ajv-keywords": "^4.0.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
