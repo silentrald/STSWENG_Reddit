@@ -1,6 +1,7 @@
 const {
     validateStationParam,
     validatePostParam,
+    validatePostBody,
     validateStationPost,
     sanitizePostsQuery
 } = require('../../middlewares/postMw');
@@ -19,8 +20,6 @@ const mockResponse = () => {
 const mockNext = () => {
     return jest.fn();
 };
-
-const LIMIT = 10;
 
 describe('Unit Testing: postMw', () => {
     describe('Middleware: validateStationParam', () => {
@@ -83,6 +82,41 @@ describe('Unit Testing: postMw', () => {
             const next = mockNext();
 
             await validatePostParam(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.send).toHaveBeenCalledWith({
+                errors: {
+                    post: 'pattern'
+                }
+            });
+        });
+    });
+
+    describe('Middleware: validatePostParam', () => {
+        test('GOOD', async () => {
+            const req = mockRequest({
+                body: {
+                    post: 'pdummydummy'
+                }
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validatePostBody(req, res, next);
+
+            expect(next).toHaveBeenCalledTimes(1);
+        });
+
+        test('BAD: pattern', async () => {
+            const req = mockRequest({
+                body: {
+                    post: 'Sample-post'
+                }
+            });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validatePostBody(req, res, next);
 
             expect(res.status).toHaveBeenCalledWith(403);
             expect(res.send).toHaveBeenCalledWith({
@@ -307,16 +341,12 @@ describe('Unit Testing: postMw', () => {
 
             expect(next).toHaveBeenCalledTimes(1);
             expect(req.query).toEqual({
-                offset: 0,
-                limit: LIMIT,
                 sort: 'DESC'
             });
         });
 
         test('GOOD: Valid query', async () => {
             query = {
-                offset: 1,
-                limit: 8,
                 sort: 'ASC'
             };
             const req = mockRequest({
@@ -329,100 +359,6 @@ describe('Unit Testing: postMw', () => {
 
             expect(next).toHaveBeenCalledTimes(1);
             expect(req.query).toEqual(query);
-        });
-
-        describe('GOOD: sanitize offset', () => {
-            test('Invalid type', async () => {
-                query.offset = 'hello';
-                const req = mockRequest({
-                    query
-                });
-                const res = mockResponse();
-                const next = mockNext();
-    
-                await sanitizePostsQuery(req, res, next);
-    
-                expect(next).toHaveBeenCalledTimes(1);
-                expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
-                    sort: 'DESC'
-                });
-            });
-
-            test('Negative Number', async () => {
-                query.offset = -2;
-                const req = mockRequest({
-                    query
-                });
-                const res = mockResponse();
-                const next = mockNext();
-    
-                await sanitizePostsQuery(req, res, next);
-    
-                expect(next).toHaveBeenCalledTimes(1);
-                expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
-                    sort: 'DESC'
-                });
-            });
-        });
-
-        describe('GOOD: sanitize limit', () => {
-            test('Invalid type', async () => {
-                query.limit = 'hello';
-                const req = mockRequest({
-                    query
-                });
-                const res = mockResponse();
-                const next = mockNext();
-    
-                await sanitizePostsQuery(req, res, next);
-    
-                expect(next).toHaveBeenCalledTimes(1);
-                expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
-                    sort: 'DESC'
-                });
-            });
-
-            test('Zero', async () => {
-                query.limit = 0;
-                const req = mockRequest({
-                    query
-                });
-                const res = mockResponse();
-                const next = mockNext();
-    
-                await sanitizePostsQuery(req, res, next);
-    
-                expect(next).toHaveBeenCalledTimes(1);
-                expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
-                    sort: 'DESC'
-                });
-            });
-
-            test('Negative Number', async () => {
-                query.limit = -2;
-                const req = mockRequest({
-                    query
-                });
-                const res = mockResponse();
-                const next = mockNext();
-    
-                await sanitizePostsQuery(req, res, next);
-    
-                expect(next).toHaveBeenCalledTimes(1);
-                expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
-                    sort: 'DESC'
-                });
-            });
         });
 
         describe('GOOD: sanitize sort', () => {
@@ -438,8 +374,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'ASC'
                 });
             });
@@ -456,8 +390,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC'
                 });
             });
@@ -474,8 +406,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC'
                 });
             });
@@ -492,8 +422,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC'
                 });
             });
@@ -512,8 +440,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC',
                     top: 'hour'
                 });
@@ -531,8 +457,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC',
                     top: 'day'
                 });
@@ -550,8 +474,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC',
                     top: 'week'
                 });
@@ -569,8 +491,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC',
                     top: 'month'
                 });
@@ -588,8 +508,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC',
                     top: 'year'
                 });
@@ -607,8 +525,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC',
                     top: 'all'
                 });
@@ -626,8 +542,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC'
                 });
             });
@@ -644,8 +558,6 @@ describe('Unit Testing: postMw', () => {
     
                 expect(next).toHaveBeenCalledTimes(1);
                 expect(req.query).toEqual({
-                    offset: 0,
-                    limit: LIMIT,
                     sort: 'DESC'
                 });
             });

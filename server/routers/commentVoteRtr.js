@@ -1,20 +1,20 @@
 const router = require('express')();
 const api = require('../api/commentVoteAPI');
 const loginMw = require('../middlewares/loginMw');
-const subcommentMw = require('../middlewares/subcommentMw');
+const commentMw = require('../middlewares/commentMw');
 const queryMw = require('../middlewares/queryMw');
 const voteMw = require('../middlewares/voteMw');
 
 // GET
 router.get('/:comment',
     loginMw.isAuth,
-    subcommentMw.validateCommentParams,
+    commentMw.validateCommentParams,
     api.getCommentVote);
 
 // POST
 router.post('/:comment',
     loginMw.isAuth,
-    subcommentMw.validateCommentParams,
+    commentMw.validateCommentParams,
     queryMw.getStationCommentParams,
     queryMw.userIsPartOfStation,
     voteMw.validateUpvoteBody,

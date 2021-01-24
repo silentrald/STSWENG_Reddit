@@ -14,7 +14,7 @@ const queryMw = {
                     FROM    passengers
                     WHERE   username = $1
                         AND station_name = $2
-                    LIMIT 1;
+                    LIMIT   1;
                 `,
                 values: [
                     req.user.username,
@@ -24,7 +24,7 @@ const queryMw = {
     
             const { rowCount } = await db.query(querySelPassengers);
     
-            if (rowCount === 0) {
+            if (rowCount < 1) {
                 return res.status(403).send({ error: 'not_crew' });
             }
     

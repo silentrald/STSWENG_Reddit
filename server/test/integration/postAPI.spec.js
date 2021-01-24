@@ -82,7 +82,6 @@ describe('Station API', () => {
                 body
             } = await request(server).get(`${url}`);
             
-            expect(statusCode).toEqual(200);
             expect(body.posts).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
@@ -96,7 +95,8 @@ describe('Station API', () => {
                 ])
             );
             expect(body.posts.length).toEqual(LIMIT);
-
+            expect(statusCode).toEqual(200);
+        
             startingPost = body.posts[0];
         });
 
@@ -108,7 +108,6 @@ describe('Station API', () => {
                 .get(`${url}`)
                 .set('Authorization', crewmateToken);
             
-            expect(statusCode).toEqual(200);
             expect(body.posts).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
@@ -122,6 +121,7 @@ describe('Station API', () => {
                 ])
             );
             expect(body.posts.length).toEqual(LIMIT);
+            expect(statusCode).toEqual(200);
         });
 
         describe('GOOD: sanitize query offset', () => {
@@ -526,6 +526,36 @@ describe('Station API', () => {
                     .get(`${url}`)
                     .query({
                         top: 'notvalid'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+        });
+        
+        describe('GOOD: sanitize query search', () => {
+            test('Valid search', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        search: 'valid'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(expect.anything());
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        'search[]': 'hello'
                     });
                 
                 expect(statusCode).toEqual(200);

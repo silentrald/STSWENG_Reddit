@@ -51,6 +51,46 @@ const stationAPI = {
     },
 
     /**
+     * Gets a list of stations depending on the
+     * filter string passed
+     */
+    getStationNames: async (req, res) => {
+        const {
+            search,
+            offset,
+            limit
+        } = req.query;
+
+        try {
+            const querySelStations = {
+                text: `
+                    SELECT  name
+                    FROM    stations
+                    WHERE   name ILIKE $1
+                    OFFSET  $2
+                    LIMIT   $3;
+                `,
+                values: [
+                    search ? search : '%',
+                    offset,
+                    limit
+                ]
+            };
+
+            const { rows: stations, rowCount } = await db.query(querySelStations);
+            if (rowCount < 1) {
+                return res.status(404).send();
+            }
+
+            return res.status(200).send({ stations });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
+    /**
      * Gets the top stations
      */
     getTopStations: async (_req, res) => {
