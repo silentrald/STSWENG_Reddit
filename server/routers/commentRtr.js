@@ -30,6 +30,7 @@ router.post('/c/:comment',
     postMw.validatePostBody,
     mw.validateComment,
     queryMw.userIsPartOfStation,
+    queryMw.commentNotDeleted,
     api.postSubcomment);
 
 // PATCH
@@ -38,8 +39,15 @@ router.patch('/:comment',
     loginMw.isAuth,
     mw.validateCommentParams,
     mw.validateText,
+    queryMw.commentNotDeleted,
     api.patchComment);
 
 // DELETE
+
+router.delete('/:comment',
+    loginMw.isAuth,
+    mw.validateCommentParams,
+    queryMw.commentNotDeleted,
+    api.deleteComment);
 
 module.exports = router;

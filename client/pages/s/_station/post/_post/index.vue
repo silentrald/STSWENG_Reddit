@@ -5,6 +5,7 @@
         v-if="post"
         :id="post.post_id"
         :score="post.score"
+        :station="post.station_name"
         :author="post.author"
         :date="post.timestamp_created"
         :title="post.title"
@@ -48,6 +49,7 @@
           :date="comment.timestamp_created"
           :author="comment.author"
           :subcomments="comment.subcomments || []"
+          :deleted="comment.deleted"
         />
         <infinite-loading
           spinner="waveDots"
