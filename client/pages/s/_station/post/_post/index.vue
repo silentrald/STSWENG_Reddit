@@ -5,6 +5,7 @@
         v-if="post"
         :id="post.post_id"
         :score="post.score"
+        :station="post.station_name"
         :author="post.author"
         :date="post.timestamp_created"
         :title="post.title"
