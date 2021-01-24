@@ -22,7 +22,7 @@
           >
         </div>
         <div class="form-group">
-          <label for="email">email</label>
+          <label for="email">Email</label>
           <div v-if="errors.email" class="error">
             {{ errors.email }}
           </div>
