@@ -307,13 +307,7 @@ const stationAPI = {
                 values: [ description, rules, stationName ]
             };
 
-            const { rowCount } = await client.query(queryUpdStation);
-            if (rowCount !== 1) {
-                return res.status(403).send({
-                    errors: { station: 'isCaptain' }
-                });
-            }
-
+            await client.query(queryUpdStation);
             await client.query('COMMIT');
 
             return res.status(200).send();

@@ -133,6 +133,7 @@ const commentAPI = {
             if (!subpostCreated) {
                 throw Error('Subpost not created.');
             }
+            await client.query('COMMIT');
 
             return res.status(201).send({ comment });
         } catch (err) {
@@ -309,9 +310,62 @@ const commentAPI = {
 
             return res.status(500).send();
         }
-    }
+    },
 
     // DELETE
+    deleteComment: async (req, res) => {
+        const { comment } = req.params;
+
+        try {
+            const querySelComment = {
+                text: `
+                    SELECT  author
+                    FROM    comments
+                    WHERE   comment_id=$1
+                    LIMIT   1;
+                `,
+                values: [ comment ]
+            };
+
+            const {
+                rows: comments,
+                rowCount: commentCount
+            } = await db.query(querySelComment);
+            if (commentCount < 1) {
+                console.log('Comment does not exist');
+                return res.status(404).send();
+            }
+
+            if (comments[0].author !== req.user.username) {
+                return res.status(403).send({
+                    errors: {
+                        author: 'NOT'
+                    }
+                });
+            }
+            
+            const queryDelComment = {
+                text: `
+                    UPDATE  comments
+                    SET     text = NULL, deleted = 't'
+                    WHERE   comment_id=$1;
+                `,
+                values: [ comment ]
+            };
+
+            const { rowCount } = await db.query(queryDelComment);
+            if (rowCount < 1) {
+                console.log('No comment was deleted');
+                return res.status(404).send();
+            }
+
+            return res.status(200).send();
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    }
 };
 
 module.exports = commentAPI;
