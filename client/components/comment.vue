@@ -5,22 +5,62 @@
         <comment-vote
           :id="id"
           :score="score"
+          :disabled="isDeleted"
           direction="col"
         />
       </div>
       <div class="comment-text width-100">
         <div class="comment-info margin-bottom">
-          Commented by {{ author }} on {{ formatDate(date) }}
+          Commented by
+          <span v-if="!isDeleted">
+            <nuxt-link :to="`/u/${author}`">/u/{{ author }}</nuxt-link>
+          </span>
+          <span v-else>
+            /u/deleted
+          </span>
+          on {{ formatDate(date) }}
         </div>
-        <div class="comment-text margin-bottom">
-          {{ text }}
+        <div v-if="editting">
+          <div class="d-flex">
+            <textarea v-model="editText" class="w-100" />
+          </div>
+          <button class="float-right mt-2 ml-2" @click="saveEdit()">
+            SAVE
+          </button>
+          <button class="float-right mt-2 red" @click="cancelEditting()">
+            CANCEL
+          </button>
         </div>
-        <div
-          v-if="$auth.user"
-          class="reply"
-          @click="showSubcomment()"
-        >
-          Reply
+        <div v-else class="comment-text margin-bottom">
+          <div v-if="!isDeleted">
+            {{ commentText }}
+          </div>
+          <div v-else>
+            [deleted]
+          </div>
+        </div>
+        <div v-if="!isDeleted && !editting && !writeSubcomment" class="d-flex">
+          <div
+            v-if="$auth.user"
+            class="reply mr-4"
+            @click="showSubcomment()"
+          >
+            Reply
+          </div>
+          <div
+            v-if="$auth.user && $auth.user.username === author"
+            class="reply mr-4"
+            @click="editSubcomment()"
+          >
+            Edit
+          </div>
+          <div
+            v-if="$auth.user && $auth.user.username === author"
+            class="reply mr-4"
+            @click="deleteSubcomment()"
+          >
+            Delete
+          </div>
         </div>
         <div v-if="$auth.user && writeSubcomment">
           <textarea
@@ -48,6 +88,7 @@
         :date="subcomment.timestamp_created"
         :author="subcomment.author"
         :subcomments="subcomment.subcomments || []"
+        :deleted="subcomment.deleted"
       />
     </div>
   </div>
@@ -86,16 +127,27 @@ export default {
       type: Array,
       required: true
     },
-    tempSubcomment: {
-      type: String,
-      default: ''
+    deleted: {
+      type: Boolean,
+      default: false
     }
   },
 
   data () {
     return {
-      writeSubcomment: false
+      commentText: '',
+      writeSubcomment: false,
+      tempSubcomment: '',
+      editting: false,
+      saving: false,
+      editText: '',
+      isDeleted: false
     }
+  },
+
+  beforeMount () {
+    this.commentText = this.text
+    this.isDeleted = this.deleted
   },
 
   methods: {
@@ -107,6 +159,39 @@ export default {
       this.writeSubcomment = true
     },
 
+    editSubcomment () {
+      this.editText = this.commentText
+      this.editting = true
+    },
+
+    async deleteSubcomment () {
+      try {
+        await this.$axios.delete(`/api/comment/${this.id}`)
+        this.isDeleted = true
+        this.commentText = '[deleted]'
+      } catch (_err) {}
+    },
+
+    async saveEdit () {
+      if (this.saving) { return }
+      this.saving = true
+
+      try {
+        await this.$axios.patch(`/api/comment/${this.id}`, {
+          text: this.editText
+        })
+
+        this.commentText = this.editText
+        this.editting = false
+      } catch (_err) {}
+      this.saving = false
+    },
+
+    cancelEditting () {
+      this.editText = ''
+      this.editting = false
+    },
+
     async postSubcomment () {
       this.tempSubcomment = this.tempSubcomment.trim()
       if (!this.tempSubcomment) { return }
@@ -114,9 +199,8 @@ export default {
       const { station, post } = this.$route.params
 
       try {
-        const res = await this.$axios.post('/api/subcomment/create', {
-          parentPost: post,
-          parentComment: this.id,
+        const res = await this.$axios.post(`/api/comment/c/${this.id}`, {
+          post,
           text: this.tempSubcomment,
           station
         })
@@ -159,6 +243,10 @@ export default {
   color: #aaaaaa;
 }
 
+.comment-text {
+  word-break: break-all;
+}
+
 .comment-indent {
   margin-left: 24px;
   padding-left: 16px;
@@ -195,5 +283,10 @@ textarea:focus {
   outline: none;
   border: none;
   float: right;
+}
+
+.red {
+  border-color: var(--red);
+  color: var(--red);
 }
 </style>

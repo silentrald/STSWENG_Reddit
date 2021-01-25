@@ -79,6 +79,9 @@ export default {
   border-radius: 5px;
   margin-bottom: 10px;
   padding: 20px 16px;
+  width: 100%;
+
+  word-wrap: break-word;
 
   display: flex;
 }
@@ -94,8 +97,16 @@ export default {
   text-decoration: none;
 }
 
+.post-preview {
+  /* word-wrap: break-word; */
+  word-break: break-all;
+}
+
 .post-title {
   font-size: 1.5em;
   font-weight: 500;
+
+  /* word-wrap: break-word; */
+  word-break: break-all;
 }
 </style>

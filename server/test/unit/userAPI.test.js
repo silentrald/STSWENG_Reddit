@@ -2,6 +2,7 @@ process.env.JWT_SECRET = 'test-value'; // set the jwt token
 
 const {
     getAuth,
+    getUserNames,
     postLogin,
     postRegisterUser
 } = require('../../api/userAPI');
@@ -45,6 +46,9 @@ jest.mock('../../db', () => {
                         constraint: 'users_email_key'
                     };
                 }
+                result.rowCount = 1;
+            } else if (query.text === 'SELECT username FROM users WHERE username ILIKE $1 OFFSET $2 LIMIT $3;') {
+                result.rows = [{}];
                 result.rowCount = 1;
             }
 
@@ -95,6 +99,35 @@ describe('Unit test: userAPI.js', () => {
         });
     });
 
+    describe('API: getUserNames', () => {
+        let query = {};
+
+        beforeEach(() => {
+            query = {};
+        });
+
+        test('GOOD: no search', async () => {
+            const req = mockRequest({ query });
+            const res = mockResponse();
+
+            await getUserNames(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        test('GOOD: search', async () => {
+            query.search = 'valid';
+            const req = mockRequest({ query });
+            const res = mockResponse();
+
+            await getUserNames(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        
+    });
+
     describe('API: postRegisterUser', () => {
         let body, db, queryText;
 
@@ -143,31 +176,6 @@ describe('Unit test: userAPI.js', () => {
             expect(res.send).toHaveBeenCalledWith({ 
                 errors: { 
                     username: 'used'
-                }
-            });
-
-            expect(db.query).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    text: queryText,
-                    values: expect.arrayContaining([
-                        body.username,
-                        body.email
-                    ])
-                })
-            );
-        });
-
-        test('BAD: Existing email', async () => {
-            body.email = 'username@gmail.com';
-            const req = mockRequest({ body });
-            const res = mockResponse();
-
-            await postRegisterUser(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(401);
-            expect(res.send).toHaveBeenCalledWith({ 
-                errors: { 
-                    email: 'used'
                 }
             });
 

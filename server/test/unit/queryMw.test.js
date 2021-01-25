@@ -1,7 +1,8 @@
 const {
     userIsPartOfStation,
     getStationPostParams,
-    getStationCommentParams
+    getStationCommentParams,
+    userIsAuthor
 } = require('../../middlewares/queryMw');
 
 jest.mock('../../db', () => {
@@ -26,6 +27,17 @@ jest.mock('../../db', () => {
                     station_name: 'station'
                 }];
                 rowCount = 1;
+            } else if (query.text === 'SELECT * FROM posts WHERE post_id=$1 AND author=$2 LIMIT 1;'
+                && query.values[0] === 'paaaaaaaaaa1' && query.values[1] === 'crewmate') {
+                rows = [{
+                    post_id: 'paaaaaaaaaa1',
+                    author: 'crewmate'
+                }];
+                rowCount = 1;
+            } else if (query.text === 'SELECT * FROM posts WHERE post_id=$1 AND author=$2 LIMIT 1;'
+                && query.values[0] === 'paaaaaaaaaa2' && query.values[1] === 'crewmate') {
+                rows = [];
+                rowCount = 0;
             }
 
             return { rows, rowCount };
@@ -139,6 +151,48 @@ describe('Unit Testing: queryMw', () => {
             expect(req.body.station).toEqual('station');
             expect(db.query).toHaveBeenCalledTimes(1);
             expect(next).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('Middleware: userIsAuthor', () => {
+        let query;
+
+        test('GOOD', async () => {
+            query = {
+                user: {
+                    username: 'crewmate'
+                },
+                params: {
+                    post: 'paaaaaaaaaa1'
+                }
+            };
+            const req = mockRequest(query);
+            const res = mockResponse();
+            const next = mockNext();
+
+            await userIsAuthor(req, res, next);
+
+            expect(db.query).toHaveBeenCalledTimes(1);
+            expect(next).toHaveBeenCalledTimes(1);
+        });
+
+        test('ERROR: User is not author', async () => {
+            query = {
+                user: {
+                    username: 'crewmate'
+                },
+                params: {
+                    post: 'paaaaaaaaaa2'
+                }
+            };
+            const req = mockRequest(query);
+            const res = mockResponse();
+            const next = mockNext();
+
+            await userIsAuthor(req, res, next);
+
+            expect(db.query).toHaveBeenCalledTimes(1);
+            expect(res.status).toHaveBeenCalledWith(403);
         });
     });
 });

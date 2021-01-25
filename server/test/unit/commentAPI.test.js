@@ -1,9 +1,12 @@
 process.env.JWT_SECRET = 'test-value'; // set the jwt token
 
 const {
-    getPostSubcomments,
-    postSubcomment
-} = require('../../api/subcommentAPI');
+    getSubposts,
+    getSubcomments,
+    // postSubpost,
+    postSubcomment,
+    patchComment
+} = require('../../api/commentAPI');
 
 jest.mock('../../db', () => {
     /**
@@ -73,6 +76,14 @@ jest.mock('../../db', () => {
                     }];
                     result.rowCount = 1;
                 }
+            } else if (query.text === 'UPDATE comments SET text=$1 WHERE comment_id=$2;') {
+                result.rows = 'INSERT 1 0';
+                result.rowCount = 1;
+            } else if (query.text === 'SELECT author FROM comments WHERE comment_id=$1 LIMIT 1;') {
+                result.rows = [{
+                    author: 'username'
+                }];
+                result.rowCount = 1;
             }
 
             return result;
@@ -94,6 +105,11 @@ const mockResponse = () => {
 
 // DATA
 const station = 'StationName';
+// const posts = {
+//     0: 'paaaaaaaaaa1',
+//     1: 'paaaaaaaaaa2',
+//     2: 'paaaaaaaaaa3'
+// };
 const comments = {
     0: 'caaaaaaaaaa1',
     1: 'caaaaaaaaaa2',
@@ -106,8 +122,9 @@ const crewmateUser = {
 
 // const oneLineQuery = (queryText) => queryText.trim().replace(/\n/g, ' ').replace(/ {2,}/g, ' ');
 
-describe('Unit Test: subcommentAPI', () => {
-    describe('API: getPostSubcomments', () => {
+describe('Unit Test: commentAPI', () => {
+    // SUBPOSTS
+    describe('API: getPostSubposts', () => {
         let params = {};
         let query = {};
 
@@ -128,7 +145,40 @@ describe('Unit Test: subcommentAPI', () => {
             });
             const res = mockResponse();
             
-            await getPostSubcomments(req, res);
+            await getSubposts(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    subposts: expect.any(Array)
+                })
+            );
+        });
+    });
+
+    // SUBCOMMENTS
+    describe('API: getSubcomments', () => {
+        let params = {};
+        let query = {};
+
+        beforeEach(() => {
+            params = {
+                post: 'paaaaaaaaaa1'
+            };
+            query = {
+                offset: 0,
+                limit: 7
+            };
+        });
+        
+        test('GOOD', async () => {
+            const req = mockRequest({
+                params,
+                query
+            });
+            const res = mockResponse();
+            
+            await getSubcomments(req, res);
 
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.send).toHaveBeenCalledWith(
@@ -139,33 +189,61 @@ describe('Unit Test: subcommentAPI', () => {
         });
     });
 
-    describe('API: postSubcomment', () => {
-        let subcomment, db;
-        let queries;
+    // describe('API: postSubpost', () => {
+    //     let subcomment, params, db;
 
-        beforeAll(() => {
-            queries = {
-                passenger: 'SELECT * FROM passengers WHERE username=$1 AND station_name=$2 LIMIT 1;',
-                comment: 'SELECT * FROM comments WHERE comment_id=$1 LIMIT 1;',
-                insComment: 'INSERT INTO comments(comment_id, text, author, station_name) VALUES(comment_id(), $1, $2, $3) RETURNING *;',
-                insSubcomment: 'INSERT INTO subcomments(parent_post, parent_comment, comment_id) VALUES($1, $2, $3);'
-            };
-        });
+    //     beforeEach(() => {
+    //         db = require('../../db');
+    //         subcomment = {
+    //             text: 'Default Subcomment 1',
+    //             station
+    //         };
+    //         params = {
+    //             post: posts[0]
+    //         };
+    //     });
+
+    //     test('GOOD', async () => {
+    //         const req = mockRequest({
+    //             body: subcomment,
+    //             user: crewmateUser,
+    //             params
+    //         });
+    //         const res = mockResponse();
+
+    //         await postSubpost(req, res);
+
+    //         expect(res.status).toHaveBeenCalledWith(201);
+
+    //         expect(db.connect).toHaveBeenCalledTimes(1);
+            
+    //         const { query, release } = db.connect.mock.results[0].value;
+
+    //         expect(query).toHaveBeenCalledTimes(4);
+    //         expect(release).toHaveBeenCalledTimes(1);
+    //     });
+    // });
+
+    describe('API: postSubcomment', () => {
+        let subcomment, params, db;
 
         beforeEach(() => {
             db = require('../../db');
             subcomment = {
                 parentPost: 'paaaaaaaaaa1',
-                parentComment: comments[0],
                 text: 'Default Subcomment 1',
                 station
+            };
+            params = {
+                comment: comments[0]
             };
         });
 
         test('GOOD', async () => {
             const req = mockRequest({
                 body: subcomment,
-                user: crewmateUser
+                user: crewmateUser,
+                params
             });
             const res = mockResponse();
 
@@ -173,64 +251,20 @@ describe('Unit Test: subcommentAPI', () => {
 
             expect(res.status).toHaveBeenCalledWith(201);
 
-            expect(db.query).toHaveBeenCalledWith({
-                text: queries.passenger,
-                values: [
-                    crewmateUser.username,
-                    station
-                ]
-            });
-            expect(db.query).toHaveBeenCalledWith({
-                text: queries.comment,
-                values: [ subcomment.parentComment ]
-            });
-
             expect(db.connect).toHaveBeenCalledTimes(1);
             
             const { query, release } = db.connect.mock.results[0].value;
-            
-            expect(query).toHaveBeenCalledWith('BEGIN');
-            expect(query).toHaveBeenCalledWith({
-                text: queries.insComment,
-                values: [
-                    subcomment.text,
-                    crewmateUser.username,
-                    subcomment.station
-                ]
-            });
-            expect(query).toHaveBeenCalledWith({
-                text: queries.insSubcomment,
-                values: expect.objectContaining([
-                    subcomment.parentPost,
-                    subcomment.parentComment,
-                    expect.any(String)
-                ])
-            });
-            expect(query).toHaveBeenCalledWith('COMMIT');
 
+            expect(query).toHaveBeenCalledTimes(4);
             expect(release).toHaveBeenCalledTimes(1);
         });
 
-        test('User not a passenger of the station', async () => {
-            const req = mockRequest({
-                body: subcomment,
-                user: 'not-user'
-            });
-            const res = mockResponse();
-
-            await postSubcomment(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(403);
-            expect(res.send).toHaveBeenCalledWith({
-                error: 'NOT_PSNGR'
-            });
-        });
-
         test('Parent comment does not exist', async () => {
-            subcomment.parentComment = 'cnotnotnot';
+            params.comment = 'cnotnotnot';
             const req = mockRequest({
                 body: subcomment,
-                user: crewmateUser
+                user: crewmateUser,
+                params
             });
             const res = mockResponse();
 
@@ -243,10 +277,11 @@ describe('Unit Test: subcommentAPI', () => {
         });
 
         test('Parent comment is not in the station', async () => {
-            subcomment.parentComment = 'canotherS';
+            params.comment = 'canotherS';
             const req = mockRequest({
                 body: subcomment,
-                user: crewmateUser
+                user: crewmateUser,
+                params
             });
             const res = mockResponse();
 
@@ -256,6 +291,33 @@ describe('Unit Test: subcommentAPI', () => {
             expect(res.send).toHaveBeenCalledWith({
                 error: 'INV_PRT_CMT'
             });
+        });
+    });
+
+    // PATCH
+    describe('API: patchComment', () => {
+        let body, params;
+
+        beforeAll(() => {
+            body = {
+                text: 'Edit Text'
+            };
+            params = {
+                comment: 'comment'
+            };
+        });
+
+        test('GOOD', async () => {
+            const req = mockRequest({
+                body,
+                user: { username: 'username' },
+                params
+            });
+            const res = mockResponse();
+
+            await patchComment(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
         });
     });
 });

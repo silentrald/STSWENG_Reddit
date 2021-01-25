@@ -17,14 +17,29 @@
         <span class="navbar-toggler-icon" />
       </button>
 
+      <div id="search-container">
+        <input id="search" v-model="searchInput" list="options" type="text" @keydown.enter="search">
+        <datalist id="options">
+          <option v-for="option in options" :key="option" :value="option">
+            {{ option }}
+          </option>
+        </datalist>
+        <button>Search</button>
+      </div>
+
       <div v-if="$auth.user">
         <div id="navbarResponsive" class="collapse navbar-collapse">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <div class="nav-link">
-                <img id="image" src="https://picsum.photos/24/24" width="24" height="24">
-                /{{ $auth.user.username }}
-                <span class="sr-only">(current)</span>
+            <li class="nav-item d-flex align-items-center">
+              <nuxt-link :to="`/u/${$auth.user.username}`">
+                <div class="nav-link">
+                  <img id="image" src="https://picsum.photos/24/24" width="24" height="24">
+                  /{{ $auth.user.username }}
+                  <span class="sr-only">(current)</span>
+                </div>
+              </nuxt-link>
+              <div v-if="$auth.user.verified">
+                <font-awesome-icon icon="check" title="Verified ✓" />
               </div>
             </li>
             <li class="nav-item">
@@ -60,6 +75,34 @@
     </div>
   </nav>
 </template>
+
+<script>
+export default {
+  data () {
+    return {
+      searchInput: '',
+      options: []
+    }
+  },
+
+  created () {
+    if (this.$route.path === '/search') {
+      this.$set(this, 'searchInput', this.$route.query.s)
+    }
+  },
+
+  methods: {
+    search () {
+      this.$router.push({
+        path: '/search',
+        query: {
+          s: this.searchInput
+        }
+      })
+    }
+  }
+}
+</script>
 
 <style scoped>
 .navbar {
