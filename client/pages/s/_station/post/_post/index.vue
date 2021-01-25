@@ -143,7 +143,7 @@ export default {
         const { comment } = res.data
         this.comments.unshift(comment)
         this.$set(this, 'comment_text', '')
-      } catch (_err) {}
+      } catch (err) {}
     },
 
     infiniteScroll ($state) {

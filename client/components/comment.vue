@@ -243,6 +243,10 @@ export default {
   color: #aaaaaa;
 }
 
+.comment-text {
+  word-break: break-all;
+}
+
 .comment-indent {
   margin-left: 24px;
   padding-left: 16px;
