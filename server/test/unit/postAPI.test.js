@@ -5,6 +5,7 @@ const {
     getPosts,
     getPost,
     postStationPost,
+    patchPost,
     deleteStationPost
 } = require('../../api/postAPI');
 
@@ -96,12 +97,23 @@ jest.mock('../../db', () => {
                     }];
                     result.rowCount = 1;
                 }
-            } else if (query.text == 'INSERT INTO posts(post_id, title, text, author, station_name) VALUES(post_id(), $1, $2, $3, $4) RETURNING post_id;' &&
+            } else if (query.text === 'INSERT INTO posts(post_id, title, text, author, station_name) VALUES(post_id(), $1, $2, $3, $4) RETURNING post_id;' &&
                 query.values[0] && query.values[1] && query.values[2] && query.values[3]) {
                 result.rows[0] = {
                     post_id: 'testingidlol'
                 };
                 result.rowCount = 1;
+            } else if (query.text === 'UPDATE posts SET (title, text) = ($2, $3) WHERE post_id=$1 RETURNING *;'
+                && query.values[0] && query.values[1] && query.values[2]) {
+                if (query.values[0] === 'paaaaaaaaaa1') {
+                    result.rows[0] = {
+                        post_id: 'paaaaaaaaaa1'
+                    };
+                    result.rowCount = 1;
+                } else {
+                    result.rows = [];
+                    result.rowCount = 0;
+                }
             }
 
             return result;
@@ -239,6 +251,46 @@ describe('Unit test: postAPI.js', () => {
             await postStationPost(req, res);
 
             expect(res.status).toHaveBeenCalledWith(201);
+            expect(db.query).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('API: patchPost', () => {
+        let body, params;
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+
+            body = {
+                post: {
+                    title: 'sample-title',
+                    text: 'sample-text',
+                }
+            };
+            params = {
+                post: 'paaaaaaaaaa1'
+            };
+        });
+        
+        test('GOOD: Update post with correct format', async () => {
+            const req = mockRequest({ body, params });
+            const res = mockResponse();
+
+            await patchPost(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(db.query).toHaveBeenCalledTimes(1);
+        });
+
+        test('ERROR: Post does not exist', async () => {
+            params.post = 'pfakepostid1';
+
+            const req = mockRequest({ body, params });
+            const res = mockResponse();
+
+            await patchPost(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
             expect(db.query).toHaveBeenCalledTimes(1);
         });
     });
