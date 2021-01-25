@@ -27,18 +27,28 @@
           COMMENTS ({{ post.comment_count }})
         </h5>
         <div class="margin-bottom">
-          <div class="form-group">
-            <textarea
-              id="comment-text"
-              v-model="comment_text"
-              class="form-control comment-box"
-              placeholder="Write your comment here."
-              rows="5"
-            />
+          <div v-if="$auth.user">
+            <div v-if="joined">
+              <div class="form-group">
+                <textarea
+                  id="comment-text"
+                  v-model="comment_text"
+                  class="form-control comment-box"
+                  placeholder="Write your comment here."
+                  rows="5"
+                />
+              </div>
+              <button id="post" @click="postComment()">
+                Post
+              </button>
+            </div>
+            <div v-else>
+              <p>You must be part of the station to comment.</p>
+            </div>
           </div>
-          <button id="post" @click="postComment()">
-            Post
-          </button>
+          <div v-else>
+            <p>You must be logged in to comment.</p>
+          </div>
         </div>
         <comment
           v-for="comment in comments"
@@ -83,7 +93,8 @@ export default {
       comments: [],
       comment_text: '',
       loading: true,
-      submitting: false
+      submitting: false,
+      joined: false
     }
   },
 
@@ -95,11 +106,16 @@ export default {
     async loadPage () {
       let res
       // Load post
-      const { post: postID } = this.$route.params
+      const { station: stationName, post: postID } = this.$route.params
       res = await this.$axios.get(`/api/post/${postID}`)
       const { post } = res.data
 
       this.$set(this, 'post', post)
+
+      res = await this.$axios.get(`/api/station/id/${stationName}`)
+      const { joined } = res.data
+
+      this.$set(this, 'joined', joined)
 
       // Load subposts comments
       res = await this.$axios.get(`/api/comment/post/${postID}`)
