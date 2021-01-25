@@ -133,6 +133,7 @@ const commentAPI = {
             if (!subpostCreated) {
                 throw Error('Subpost not created.');
             }
+            await client.query('COMMIT');
 
             return res.status(201).send({ comment });
         } catch (err) {
