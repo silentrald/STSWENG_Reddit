@@ -148,7 +148,7 @@ export default {
         // TODO: Fix this because of mutation of the props
         this.comments.unshift(comment)
         this.$set(this, 'comment_text', '')
-      } catch (_err) {}
+      } catch (err) {}
 
       this.submitting = false
     },
