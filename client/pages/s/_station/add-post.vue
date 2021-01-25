@@ -106,7 +106,8 @@ export default {
         title: '',
         text: ''
       },
-      errors: { }
+      errors: {},
+      submitting: false
     }
   },
 
@@ -129,32 +130,27 @@ export default {
       return true
     },
 
-    submit () {
-      // Get values from form
-      // if (this.validate() {
-      const { station: name } = this.$route.params
-      const post = {
-        ...this.post
-      } // Deep clone
+    async submit () {
+      if (this.submitting) { return }
+      this.submitting = true
 
-      this.$axios.post(`/api/post/station/${name}`, {
-        ...post
-      })
-        .then((res) => {
-          if (res.status !== 201) {
-            return
-          }
+      try {
+        const { station: name } = this.$route.params
+        const post = { ...this.post }
 
-          this.$router.push(`/s/${name}`)
-        })
-        .catch((err) => {
-          const { status, data } = err.response
+        const res = await this.$axios.post(`/api/post/station/${name}`, post)
+        if (res.status !== 201) { return }
 
-          if (status === 401) {
-            this.errors = customErrors(data.errors, customErrorMsg)
-          }
-        })
-      // }
+        this.$router.push(`/s/${name}`)
+      } catch (err) {
+        const { status, data } = err.response
+
+        if (status === 401) {
+          this.errors = customErrors(data.errors, customErrorMsg)
+        }
+      }
+
+      this.submitting = false
     }
   },
 
