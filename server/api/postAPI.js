@@ -86,9 +86,9 @@ const postAPI = {
     },
 
     /**
-     * Gets a post from a station
+     * Gets a post given the post_id
      */
-    getStationPost: async (req, res) => {
+    getPost: async (req, res) => {
         const { post } = req.params;
 
         try {
@@ -225,7 +225,10 @@ const postAPI = {
         }
     },
 
-    // PUT
+    // PATCH
+    patchStationPost: async (req, res) => {
+
+    },
 
     // DELETE
     /**
