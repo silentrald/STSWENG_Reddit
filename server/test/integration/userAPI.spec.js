@@ -593,24 +593,24 @@ describe('User API', () => {
                 );
             });
 
-            test('Register with an existing email', async () => {
-                failUser.email = user.email;
+            // test('Register with an existing email', async () => {
+            //     failUser.email = user.email;
 
-                const { 
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+            //     const { 
+            //         statusCode,
+            //         body
+            //     } = await request(server).post(`${url}/create`)
+            //         .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            email: 'used'
-                        })
-                    })
-                );
-            });
+            //     expect(statusCode).toEqual(401);
+            //     expect(body).toEqual(
+            //         expect.objectContaining({
+            //             errors: expect.objectContaining({
+            //                 email: 'used'
+            //             })
+            //         })
+            //     );
+            // });
 
             test('Register with an invalid email', async () => {
                 failUser.email = 'invalidemail';

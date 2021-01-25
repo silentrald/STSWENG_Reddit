@@ -24,13 +24,22 @@ a {
   color: white;
 }
 
-button {
+button, .modal-footer > .btn {
   background: transparent;
   color: #00C0FF;
 
   padding: 0.25rem 1rem;
   border: 2px solid #00C0FF;
   border-radius: 1rem;
+}
+
+.modal-footer > .btn-danger, .modal-footer > .btn-outline-danger {
+  color: #DC3545;
+  border-color: #DC3545;
+}
+
+.background {
+  background-color: #01021E;
 }
 
 /* input, input:focus {

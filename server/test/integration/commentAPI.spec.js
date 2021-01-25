@@ -21,6 +21,9 @@ const comments = {
     3: 'caaaaaaaaaa4' // another station
 };
 
+const deletedComment = 'caaaaaaaaab1';
+const deletedComment2 = 'caaaaaaaaab2';
+
 const captainUser = {
     username: 'captain1',
     password: 'password'
@@ -280,7 +283,7 @@ describe('Comment API', () => {
                 })
             );
             expect(statusCode).toEqual(201);
-            commentsDelete.push(data.comment.comment_id);
+            commentsDelete.push({ token: crewmateToken, data: data.comment.comment_id });
         });
         
         test('BAD: Not logged in', async () => {
@@ -601,7 +604,7 @@ describe('Comment API', () => {
                 })
             );
             expect(statusCode).toEqual(201);
-            commentsDelete.push(body.subcomment.comment_id);
+            commentsDelete.push({ token: crewmateToken, data: body.subcomment.comment_id });
         });
 
         test('GOOD: Captain can subcomment on a comment', async () => {
@@ -620,7 +623,7 @@ describe('Comment API', () => {
                 })
             );
             expect(statusCode).toEqual(201);
-            commentsDelete.push(body.subcomment.comment_id);
+            commentsDelete.push({ token: captainToken, data: body.subcomment.comment_id });
         });
     
         test('BAD: Parent Comment does not exist', async () => {
@@ -631,6 +634,20 @@ describe('Comment API', () => {
             
             expect(statusCode).toEqual(403);
             expect(body).toEqual({ error: 'PRT_CMT_NONE' });
+        });
+
+        test('BAD: Parent Comment is deleted', async () => {
+            const { statusCode, body } = await request(server)
+                .post(`${url}/c/${deletedComment}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(subcomment);
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual({
+                errors: expect.objectContaining({
+                    comment: 'deleted'
+                })
+            });
         });
 
         test('BAD: User is not a passenger of the station', async () => {
@@ -850,6 +867,20 @@ describe('Comment API', () => {
             expect(statusCode).toEqual(404);
         });
 
+        test('BAD: Comment is deleted', async () => {
+            const { statusCode, body } = await request(server)
+                .patch(`${url}/${deletedComment2}`)
+                .set('Authorization', `Bearer ${captainToken}`)
+                .send(subcomment);
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual({
+                errors: expect.objectContaining({
+                    comment: 'deleted'
+                })
+            });
+        });
+
         test('BAD: Not the author', async () => {
             const { statusCode, body } = await request(server)
                 .patch(`${url}/${comments[0]}`)
@@ -944,11 +975,85 @@ describe('Comment API', () => {
             });
         });
     });
+
+    describe(`DELETE: ${url}/:comment`, () => {
+        let subcomment;
+
+        beforeEach(() => {
+            subcomment = {
+                text: 'Editted Comment'
+            };
+        });
+
+        test('GOOD: Author can delete a comment', async () => {
+            const { token, data } = commentsDelete.shift();
+
+            const { statusCode, body } = await request(server)
+                .delete(`${url}/${data}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send(subcomment);
+            
+            expect(body).toEqual({});
+            expect(statusCode).toEqual(200);
+        });
+
+        test('BAD: Not existing comment', async () => {
+            const { statusCode, body } = await request(server)
+                .delete(`${url}/casdfadf`)
+                .set('Authorization', `Bearer ${imposterToken}`)
+                .send(subcomment);
+            
+            expect(body).toEqual({});
+            expect(statusCode).toEqual(404);
+        });
+
+        test('BAD: Comment is already deleted', async () => {
+            const { statusCode, body } = await request(server)
+                .delete(`${url}/${deletedComment2}`)
+                .set('Authorization', `Bearer ${captainToken}`)
+                .send(subcomment);
+            
+            expect(statusCode).toEqual(403);
+            expect(body).toEqual({
+                errors: expect.objectContaining({
+                    comment: 'deleted'
+                })
+            });
+        });
+
+        test('BAD: Not the author', async () => {
+            const { statusCode, body } = await request(server)
+                .delete(`${url}/${comments[0]}`)
+                .set('Authorization', `Bearer ${imposterToken}`)
+                .send(subcomment);
+            
+            expect(body).toEqual({ errors: { author: 'NOT' } });
+            expect(statusCode).toEqual(403);
+        });
+
+        test('BAD: No Auth', async () => {
+            const { statusCode } = await request(server)
+                .delete(`${url}/${comments[0]}`)
+                .send(subcomment);
+            
+            expect(statusCode).toEqual(403);
+        });
+
+        test('BAD: Wrong comment pattern', async () => {
+            const { statusCode, body } = await request(server)
+                .delete(`${url}/not-patte`)
+                .set('Authorization', `Bearer ${imposterToken}`)
+                .send(subcomment);
+            
+            expect(body).toEqual({ errors: { comment: 'pattern' } });
+            expect(statusCode).toEqual(403);
+        });
+    });
 });
 
 afterAll(async () => {
     for (let i in commentsDelete) {
-        const comment = commentsDelete[i];
+        const comment = commentsDelete[i].data;
 
         await db.query({
             text: `

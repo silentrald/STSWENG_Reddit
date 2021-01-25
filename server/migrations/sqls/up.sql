@@ -46,7 +46,7 @@ CREATE TYPE gender_enum AS ENUM ('f', 'm', 'o', 'p');
 CREATE TABLE IF NOT EXISTS users (
     username    VARCHAR(64)     PRIMARY KEY,
     password    VARCHAR(60)     NOT NULL,
-    email       VARCHAR(256)    NOT NULL UNIQUE,
+    email       VARCHAR(256)    NOT NULL,
     fname       VARCHAR(50)     DEFAULT '' NOT NULL,
     lname       VARCHAR(50)     DEFAULT '' NOT NULL,
     gender      gender_enum,

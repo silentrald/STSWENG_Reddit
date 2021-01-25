@@ -65,11 +65,15 @@ INSERT INTO comments(comment_id, text, author, station_name) VALUES
     ('caaaaaaaaaa3', '2nd comment by me as well', 'captain1', 'SampleStation'),
     ('caaaaaaaaaa4', 'Comment', 'captain2', 'SampleStation2');
 
+INSERT INTO comments(comment_id, text, author, station_name, deleted) VALUES
+    ('caaaaaaaaab1', NULL, 'captain2', 'SampleStation2', 't');
+
 INSERT INTO subposts(parent_post, comment_id) VALUES
     ('paaaaaaaaaa1', 'caaaaaaaaaa1'),
     ('paaaaaaaaaa1', 'caaaaaaaaaa2'),
     ('paaaaaaaaaa1', 'caaaaaaaaaa3'),
-    ('paaaaaaaaaa2', 'caaaaaaaaaa4');
+    ('paaaaaaaaaa2', 'caaaaaaaaaa4'),
+    ('paaaaaaaaaa2', 'caaaaaaaaab1');
 
 /* subcomments */
 INSERT INTO comments(comment_id, text, author, station_name) VALUES
@@ -81,7 +85,11 @@ INSERT INTO comments(comment_id, text, author, station_name) VALUES
     ('caaaaaaaaa10', 'More Comments5', 'captain1', 'SampleStation'),
     ('caaaaaaaaa11', 'More Comments6', 'captain1', 'SampleStation'),
     ('caaaaaaaaa12', 'More Comments7', 'captain1', 'SampleStation'),
-    ('caaaaaaaaa13', 'More Comments8', 'captain1', 'SampleStation');
+    ('caaaaaaaaa13', 'More Comments8', 'captain1', 'SampleStation'),
+    ('caaaaaaaaa14', 'More Comments9', 'captain1', 'SampleStation');
+
+INSERT INTO comments(comment_id, text, author, station_name, deleted) VALUES
+    ('caaaaaaaaab2', NULL, 'captain1', 'SampleStation', 't');
 
 INSERT INTO subcomments(parent_post, parent_comment, comment_id) VALUES
     ('paaaaaaaaaa1', 'caaaaaaaaaa1', 'caaaaaaaaaa5'),
@@ -92,7 +100,9 @@ INSERT INTO subcomments(parent_post, parent_comment, comment_id) VALUES
     ('paaaaaaaaaa1', 'caaaaaaaaaa7', 'caaaaaaaaa10'),
     ('paaaaaaaaaa1', 'caaaaaaaaaa7', 'caaaaaaaaa11'),
     ('paaaaaaaaaa1', 'caaaaaaaaaa1', 'caaaaaaaaa12'),
-    ('paaaaaaaaaa1', 'caaaaaaaaaa2', 'caaaaaaaaa13');
+    ('paaaaaaaaaa1', 'caaaaaaaaaa2', 'caaaaaaaaa13'),
+    ('paaaaaaaaaa1', 'caaaaaaaaaa2', 'caaaaaaaaab2'),
+    ('paaaaaaaaaa1', 'caaaaaaaaab2', 'caaaaaaaaa14');
 
 /* post_votes */
 INSERT INTO post_votes(username, post_id, upvote) VALUES

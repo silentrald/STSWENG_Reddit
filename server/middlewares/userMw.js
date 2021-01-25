@@ -1,7 +1,8 @@
-const Ajv = require('ajv');
+const Ajv = require('ajv').default;
 const { ajvErrors } = require('./ajvHelper');
 
-const ajv = new Ajv({ allErrors: true, jsonPointers: true });
+const ajv = new Ajv({ allErrors: true });
+require('ajv-formats')(ajv, [ 'email' ]);
 require('ajv-keywords')(ajv, [ 'transform' ]);
 
 const USER_NAME_REGEX = /^.{8,64}$/;
