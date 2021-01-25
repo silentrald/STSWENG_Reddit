@@ -262,10 +262,8 @@ describe('Unit test: postAPI.js', () => {
             jest.clearAllMocks();
 
             body = {
-                post: {
-                    title: 'sample-title',
-                    text: 'sample-text',
-                }
+                title: 'sample-title',
+                text: 'sample-text',
             };
             params = {
                 post: 'paaaaaaaaaa1'
