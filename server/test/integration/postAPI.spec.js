@@ -34,6 +34,11 @@ const crewmateUser = {
     username: 'crewmate',
     password: 'password'
 };
+
+const usernameUser = {
+    username: 'username',
+    password: 'password'
+};
 // const imposterUser = {
 //     username: 'imposter',
 //     password: 'password'
@@ -41,19 +46,26 @@ const crewmateUser = {
 
 let post;
 let testPostIds = [];
-let crewmateToken;
+let crewmateToken, usernameToken;
 let startingPost;
 let failStation;
+let testPostId;
 
 const POST_REGEX = /^p[A-Za-z0-9]{0,11}$/;
 const LIMIT = 10;
 
 beforeAll(async () => {
-    let res = await request(server)
+    let resCrewmate = await request(server)
         .post('/api/user/login')
         .send(crewmateUser);
     
-    crewmateToken = res.body.token;
+    crewmateToken = resCrewmate.body.token;
+
+    let resUsername = await request(server)
+        .post('/api/user/login')
+        .send(usernameUser);
+    
+    usernameToken = resUsername.body.token;
 
     // res = await request(server)
     //     .post('/api/user/login')
@@ -1071,9 +1083,17 @@ describe('Station API', () => {
             testPostIds.push(postId);
 
             expect(statusCode).toEqual(201);
+            const result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM posts WHERE post_id=$1;
+                `,
+                values: [ postId ]
+            });
+            expect(result.rowCount).toEqual(1);
         });
 
-        test('BAD: User is not logged in', async () => {
+        test('ERROR: User is not logged in', async () => {
             const { statusCode } = await request(server)
                 .post(`${url}/station/${station}`)
                 .send(post);
@@ -1269,14 +1289,350 @@ describe('Station API', () => {
                 );
             });
         });
+
+        afterAll(async () => {
+            await db.query({
+                text: 'DELETE FROM posts WHERE post_id = ANY($1)',
+                values: [ testPostIds ]
+            });
+        });
+    });
+
+    // TODO: 
+    describe(`DELETE ${url}/:post`, () => {
+        beforeEach(async () => {
+            post = {
+                title: 'Sample Title',
+                text: 'Sample Text'
+            };
+
+            const result = await db.query({
+                text: `
+                INSERT INTO posts(post_id, title, text, author, station_name) 
+                    VALUES(post_id(), $1, $2, $3, $4)
+                    RETURNING post_id;
+                `,
+                values: [ post.title, post.text, crewmateUser.username, station ]
+            });
+            testPostId = result.rows[0].post_id;
+        });
+
+        test('GOOD: Proper delete request', async () => {
+            const { statusCode } = await request(server)
+                .delete(`${url}/${testPostId}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send();
+
+            expect(statusCode).toEqual(204);
+            const result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM posts WHERE post_id=$1;
+                `,
+                values: [ testPostId ]
+            });
+            expect(result.rowCount).toEqual(0);
+        });
+
+        test('GOOD: Post votes are also deleted', async () => {
+            await db.query({
+                text: `
+                    INSERT INTO post_votes(username, upvote, post_id)
+                        VALUES($1, $2, $3);
+                `,
+                values: [
+                    crewmateUser.username,
+                    true,
+                    testPostId
+                ]
+            });
+
+            const { statusCode } = await request(server)
+                .delete(`${url}/${testPostId}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send();
+
+            expect(statusCode).toEqual(204);
+
+            let result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM posts WHERE post_id=$1;
+                `,
+                values: [ testPostId ]
+            });
+            expect(result.rowCount).toEqual(0);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM post_votes WHERE post_id=$1;
+                `,
+                values: [ testPostId ]
+            });
+            expect(result.rowCount).toEqual(0);
+        });
+
+        test('GOOD: Subposts are also deleted', async () => {
+            const comment = {
+                text: 'test comment',
+                score: 0,
+                author: crewmateUser.username,
+                station_name: station,
+            };
+
+            await db.query('BEGIN');
+            let result = await db.query({
+                text: `
+                    INSERT INTO comments(comment_id, text, score, author, station_name)
+                        VALUES(comment_id(), $1, $2, $3, $4)
+                        RETURNING comment_id;
+                `,
+                values: Object.values(comment)
+            });
+            const commentId = result.rows[0].comment_id;
+
+            await db.query({
+                text: `
+                    INSERT INTO subposts(comment_id, parent_post)
+                        VALUES($1, $2);
+                `,
+                values: [ commentId, testPostId ]
+            });
+            await db.query('COMMIT');
+
+            const { statusCode } = await request(server)
+                .delete(`${url}/${testPostId}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send();
+
+            expect(statusCode).toEqual(204);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM posts WHERE post_id=$1;
+                `,
+                values: [ testPostId ]
+            });
+            expect(result.rowCount).toEqual(0);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM comments WHERE comment_id=$1;
+                `,
+                values: [ commentId ]
+            });
+            expect(result.rowCount).toEqual(0);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM subposts WHERE parent_post=$1;
+                `,
+                values: [ testPostId ]
+            });
+            expect(result.rowCount).toEqual(0);
+        });
+
+        test('GOOD: Subposts and subcomments are also deleted', async () => {
+            const parentComment = {
+                text: 'test comment',
+                score: 0,
+                author: crewmateUser.username,
+                station_name: station,
+            };
+
+            const subcomment = {
+                text: 'test subcomment',
+                score: 0,
+                author: crewmateUser.username,
+                station_name: station,
+            };
+
+            await db.query('BEGIN');
+            let result = await db.query({
+                text: `
+                    INSERT INTO comments(comment_id, text, score, author, station_name)
+                        VALUES(comment_id(), $1, $2, $3, $4)
+                        RETURNING comment_id;
+                `,
+                values: Object.values(parentComment)
+            });
+            const parentCommentId = result.rows[0].comment_id;
+
+            await db.query({
+                text: `
+                    INSERT INTO subposts(comment_id, parent_post)
+                        VALUES($1, $2);
+                `,
+                values: [ parentCommentId, testPostId ]
+            });
+
+            result = await db.query({
+                text: `
+                    INSERT INTO comments(comment_id, text, score, author, station_name)
+                        VALUES(comment_id(), $1, $2, $3, $4)
+                        RETURNING comment_id;
+                `,
+                values: Object.values(subcomment)
+            });
+            const subcommentId = result.rows[0].comment_id;
+
+            await db.query({
+                text: `
+                    INSERT INTO subcomments(comment_id, parent_post, parent_comment)
+                        VALUES($1, $2, $3);
+                `,
+                values: [ subcommentId, testPostId, parentCommentId ]
+            });
+            await db.query('COMMIT');
+
+            const { statusCode } = await request(server)
+                .delete(`${url}/${testPostId}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send();
+
+            expect(statusCode).toEqual(204);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM posts WHERE post_id=$1;
+                `,
+                values: [ testPostId ]
+            });
+            expect(result.rowCount).toEqual(0);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM comments WHERE comment_id=$1;
+                `,
+                values: [ parentCommentId ]
+            });
+            expect(result.rowCount).toEqual(0);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM subposts WHERE parent_post=$1;
+                `,
+                values: [ testPostId ]
+            });
+            expect(result.rowCount).toEqual(0);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM subcomments WHERE parent_post=$1;
+                `,
+                values: [ testPostId ]
+            });
+            expect(result.rowCount).toEqual(0);
+        });
+
+        test('GOOD: Comment votes are also deleted', async () => {
+            const comment = {
+                text: 'test comment',
+                score: 1,
+                author: crewmateUser.username,
+                station_name: station,
+            };
+
+            await db.query('BEGIN');
+            let result = await db.query({
+                text: `
+                    INSERT INTO comments(comment_id, text, score, author, station_name)
+                        VALUES(comment_id(), $1, $2, $3, $4)
+                        RETURNING comment_id;
+                `,
+                values: Object.values(comment)
+            });
+            const commentId = result.rows[0].comment_id;
+
+            await db.query({
+                text: `
+                    INSERT INTO subposts(comment_id, parent_post)
+                        VALUES($1, $2);
+                `,
+                values: [ commentId, testPostId ]
+            });
+
+            await db.query({
+                text: `
+                    INSERT INTO comment_votes(username, upvote, comment_id)
+                        VALUES($1, $2, $3);
+                `,
+                values: [ crewmateUser.username, true, commentId ]
+            });
+            await db.query('COMMIT');
+
+            const { statusCode } = await request(server)
+                .delete(`${url}/${testPostId}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send();
+
+            expect(statusCode).toEqual(204);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM posts WHERE post_id=$1;
+                `,
+                values: [ testPostId ]
+            });
+            expect(result.rowCount).toEqual(0);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM comments WHERE comment_id=$1;
+                `,
+                values: [ commentId ]
+            });
+            expect(result.rowCount).toEqual(0);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM subposts WHERE parent_post=$1;
+                `,
+                values: [ testPostId ]
+            });
+            expect(result.rowCount).toEqual(0);
+
+            result = await db.query({
+                // TODO: Change into COUNT(*) instead?
+                text: `
+                    SELECT * FROM comment_votes WHERE comment_id=$1;
+                `,
+                values: [ commentId ]
+            });
+            expect(result.rowCount).toEqual(0);
+        });
+        
+        test('ERROR: User is not logged in', async () => {
+            const { statusCode } = await request(server)
+                .delete(`${url}/${testPostId}`)
+                .send();
+
+            expect(statusCode).toEqual(403);
+        });
+
+        test('ERROR: User is not author of post', async () => {
+            const { statusCode } = await request(server)
+                .delete(`${url}/${testPostId}`)
+                .set('Authorization', `Bearer ${usernameToken}`)
+                .send();
+
+            expect(statusCode).toEqual(403);
+        });
     });
 });
 
 afterAll(async () => {
-    await db.query({
-        text: 'DELETE FROM posts WHERE post_id = ANY($1)',
-        values: [ testPostIds ]
-    });
 
     await db.end();
 
