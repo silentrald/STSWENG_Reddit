@@ -36,8 +36,11 @@ router.post('/station/:station',
 // PATCH
 
 router.patch('/:post',
+    loginMw.isAuth,
     mw.validatePostParam,
-);
+    mw.validateStationPost,
+    queryMw.userIsAuthor,
+    api.patchPost);
 
 // DELETE
 
