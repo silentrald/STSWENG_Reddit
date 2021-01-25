@@ -33,6 +33,15 @@
         </template>
         <div>
           <b-dropdown-item
+            id="edit-post-button"
+            to="edit"
+            append
+          >
+            Edit
+          </b-dropdown-item>
+        </div>
+        <div>
+          <b-dropdown-item
             id="delete-post-button"
             v-b-modal.delete-post-modal
           >
