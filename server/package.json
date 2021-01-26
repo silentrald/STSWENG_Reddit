@@ -21,6 +21,7 @@
     "migrate-down": "node migrations/down",
     "db-delete": "node migrations/delete",
     "db-insert": "node migrations/insert",
+    "db-reset": "(node migrations/delete && node migrations/insert) & npx nodemon app --exec \"npm run lint && node\"",
     "semantic-release": "semantic-release"
   },
   "repository": {
