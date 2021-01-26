@@ -10,15 +10,15 @@ Suite Teardown  Close Browser
     Go To   http://localhost:3000/s/SampleStation
     Wait Until Page Contains Element  id:join-button
     Click Element   id:join-button
-    Page Should Contain Element     id:leave-button
+    Wait Until Page Contains Element  id:leave-button
     Go To   http://localhost:3000/s/SampleStation
-    Page Should Contain Element     id:leave-button
+    Wait Until Page Contains Element  id:leave-button
 
 5.2 Leaving Station
     Go To   http://localhost:3000/s/SampleStation
     Wait Until Page Contains Element  id:leave-button
     Click Element   id:leave-button
-    Page Should Contain Element     id:join-button
+    Wait Until Page Contains Element  id:join-button
     Go To   http://localhost:3000/s/SampleStation
-    Page Should Contain Element     id:join-button
+    Wait Until Page Contains Element  id:join-button
 *** Keywords ***
