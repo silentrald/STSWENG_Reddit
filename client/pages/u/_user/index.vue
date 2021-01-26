@@ -25,7 +25,7 @@
               </div>
             </div>
           </div>
-          <div id="user-info" class="mt-2">
+          <div id="user-info" class="my-2">
             <h3>User Information</h3>
             <div class="box p-lg-4">
               <div v-if="user.fname || user.lname || user.gender || user.birthday || user.bio">
@@ -51,6 +51,11 @@
               </div>
             </div>
           </div>
+          <nuxt-link v-if="isOwner" id="edit-info" class="nav-link" to="edit" append>
+            <button class="btn-block">
+              Edit Info
+            </button>
+          </nuxt-link>
         </div>
         <div v-if="loading" class="col-md-9 order-md-1">
           <post-lazyload />
@@ -101,7 +106,7 @@
 
 <script>
 import moment from 'moment'
-import postLazyload from '../../components/post-lazyload.vue'
+import postLazyload from '../../../components/post-lazyload.vue'
 
 export default {
   components: { postLazyload },
@@ -112,7 +117,8 @@ export default {
       user: {},
       posts: [],
       loading: true,
-      end: false
+      end: false,
+      isOwner: this.$route.params.user === this.$auth.user.username
     }
   },
   beforeMount () {
