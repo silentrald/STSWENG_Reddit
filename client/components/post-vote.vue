@@ -11,6 +11,7 @@
     <div class="score">
       {{ localScore }}
     </div>
+    <!--TODO: Seperate background from vote buttons and move options here -->
     <div class="downvote" @click="postVote(false)">
       <img
         src="/images/thumb-down.png"
@@ -115,9 +116,7 @@ export default {
 
 .vote-row {
   display: flex;
-
-  justify-content: flex-end;
-  background-color: #ffffff1a; /* 10% opacity */
+  justify-content: flex-end;/* 10% opacity */
   padding: 0.5rem;
   border-radius: 10px;
 }

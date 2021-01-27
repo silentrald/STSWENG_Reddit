@@ -5,6 +5,7 @@
         v-if="post"
         :id="post.post_id"
         :score="post.score"
+        :station="post.station_name"
         :author="post.author"
         :date="post.timestamp_created"
         :title="post.title"
@@ -48,6 +49,7 @@
           :date="comment.timestamp_created"
           :author="comment.author"
           :subcomments="comment.subcomments || []"
+          :deleted="comment.deleted"
         />
         <infinite-loading
           spinner="waveDots"
@@ -80,7 +82,8 @@ export default {
       post: undefined,
       comments: [],
       comment_text: '',
-      loading: true
+      loading: true,
+      submitting: false
     }
   },
 
@@ -99,7 +102,7 @@ export default {
       this.$set(this, 'post', post)
 
       // Load subposts comments
-      res = await this.$axios.get(`/api/subpost/post/${postID}`)
+      res = await this.$axios.get(`/api/comment/post/${postID}`)
       const { subposts } = res.data
 
       for (let i = 0; i < subposts.length; i++) {
@@ -116,7 +119,7 @@ export default {
     },
 
     async loadSubcomments (currentComment, depth) {
-      const res = await this.$axios.get(`/api/subcomment/comment/${currentComment.comment_id}`)
+      const res = await this.$axios.get(`/api/comment/c/${currentComment.comment_id}`)
       const { subcomments } = res.data
       currentComment.subcomments = subcomments
 
@@ -132,13 +135,22 @@ export default {
     },
 
     async postComment () {
-      const res = await this.$axios.post(`/api/subpost/post/${this.$route.params.post}`, {
-        text: this.comment_text
-      })
+      if (this.submitting) { return }
+      this.submitting = true
 
-      const { comment } = res.data
-      this.comments.unshift(comment)
-      this.$set(this, 'comment_text', '')
+      try {
+        const res = await this.$axios.post(`/api/comment/post/${this.$route.params.post}`, {
+          station: this.$route.params.station,
+          text: this.comment_text
+        })
+
+        const { comment } = res.data
+        // TODO: Fix this because of mutation of the props
+        this.comments.unshift(comment)
+        this.$set(this, 'comment_text', '')
+      } catch (err) {}
+
+      this.submitting = false
     },
 
     infiniteScroll ($state) {
@@ -149,7 +161,7 @@ export default {
           offset: this.comments.length
         }
 
-        const res = await this.$axios.get(`/api/subpost/post/${post}`, { params })
+        const res = await this.$axios.get(`/api/comment/post/${post}`, { params })
         const { subposts } = res.data
         if (subposts.length > 0) {
           for (const index in subposts) {

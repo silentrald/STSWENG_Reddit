@@ -6,22 +6,40 @@
 </template>
 
 <style>
+:root {
+  --red: #FF3232;
+  --black: #01021E;
+}
+
 body {
   font-family: 'Lato', sans-serif;
   color: #FFF;
-  background-color: #01021E;
+  background-color: var(--black);
 
   margin: 0;
   padding: 0;
 }
 
-button {
+a {
+  color: white;
+}
+
+button, .modal-footer > .btn {
   background: transparent;
   color: #00C0FF;
 
   padding: 0.25rem 1rem;
   border: 2px solid #00C0FF;
   border-radius: 1rem;
+}
+
+.modal-footer > .btn-danger, .modal-footer > .btn-outline-danger {
+  color: #DC3545;
+  border-color: #DC3545;
+}
+
+.background {
+  background-color: #01021E;
 }
 
 /* input, input:focus {

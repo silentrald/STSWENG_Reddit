@@ -5,7 +5,7 @@
         src="/images/thumb-up.png"
         width="24"
         height="24"
-        :class="upvoteClass"
+        :class="mergeClasses(upvoteClass, disabledClass)"
       >
     </div>
     <div class="score">
@@ -16,7 +16,7 @@
         src="/images/thumb-down.png"
         width="24"
         height="24"
-        :class="downvoteClass"
+        :class="mergeClasses(downvoteClass, disabledClass)"
       >
     </div>
   </div>
@@ -36,6 +36,10 @@ export default {
     direction: {
       type: String,
       default: ''
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -58,6 +62,12 @@ export default {
       return {
         downvoted: this.vote === -1
       }
+    },
+
+    disabledClass () {
+      return {
+        disabled: this.disabled
+      }
     }
   },
 
@@ -72,6 +82,10 @@ export default {
   },
 
   methods: {
+    mergeClasses (...classes) {
+      return classes.reduce((prev, next) => Object.assign(prev, next), {})
+    },
+
     async getVote () {
       try {
         const { data } = await this.$axios.get(`/api/comment-vote/${this.id}`)
@@ -83,7 +97,8 @@ export default {
     },
 
     async commentVote (upvote) {
-      if (this.voting) {
+      // ensure comment is not deleted before casting or reverting a vote
+      if (this.disabled || this.voting) {
         return
       }
       this.voting = true
@@ -134,11 +149,16 @@ export default {
 
 /* TODO: Change design here */
 .upvoted {
-  background-color: green;
+  filter: sepia(1) hue-rotate(45deg) saturate(20);
 }
 
 /* TODO: Chage design here */
 .downvoted {
-  background-color: red;
+  filter: sepia(1) saturate(20) hue-rotate(-90deg) saturate(20) hue-rotate(45deg);
 }
+
+img.disabled {
+  opacity: 50%;
+}
+
 </style>

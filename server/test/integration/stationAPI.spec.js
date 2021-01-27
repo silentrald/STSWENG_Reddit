@@ -221,6 +221,146 @@ describe('Station API', () => {
         });
     });
 
+    describe(`GET ${url}`, () => {
+        test('GOOD: no search', async () => {
+            const {
+                statusCode,
+                // body
+            } = await request(server)
+                .get(url);
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        test('GOOD: search', async () => {
+            const {
+                statusCode,
+                // body
+            } = await request(server)
+                .get(url)
+                .query({
+                    search: 's'
+                });
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        test('GOOD: invalid search', async () => {
+            const {
+                statusCode,
+                // body
+            } = await request(server)
+                .get(url)
+                .query({
+                    search: 'SuP3R4Nd0m'
+                });
+            
+            expect(statusCode).toEqual(404);
+        });
+
+        test('GOOD: Invalid Type', async () => {
+            const {
+                statusCode
+            } = await request(server)
+                .get(url)
+                .query({
+                    'search[]': 'hello'
+                });
+
+            expect(statusCode).toEqual(200);
+        });
+
+        describe('GOOD: sanitize query offset', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        offset: 2
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('Invalid Type', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        offset: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        offset: -2
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+        });
+
+        describe('GOOD: sanitize query limit', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 3
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.stations.length).toEqual(3);
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('Zero', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 0
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+        });
+    });
+
     describe(`GET ${url}/top`, () => {
         test('GOOD', async () => {
             const {
