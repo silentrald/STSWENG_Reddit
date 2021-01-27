@@ -11,11 +11,12 @@ Open Firefox
     Set Window Size  1980  720  true
 
 Open Chrome and Login
+    [Arguments]     ${username}  ${password}
     Open Chrome
     Click Element   id:login
     Wait Until Page Contains Element  id:username
-    Input Text  id:username  crewmate
-    Input Text  id:password  password
+    Input Text  id:username     ${username}
+    Input Text  id:password     ${password}
     Click Element   css:form > #login
     Wait Until Page Contains Element  id:logout
 
