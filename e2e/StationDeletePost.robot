@@ -9,8 +9,8 @@ Suite Setup     Open Chrome and Login
     Go To   http://localhost:3000/s/SampleStation
     Wait Until Element Is Visible   css:.post:nth-child(1) .post-title
     Click Element   css:.post:nth-child(1) .post-title
-    Wait Until Element Is Visible   id:__BVID__89__BV_toggle_
-    Click Element   id:__BVID__89__BV_toggle_
+    Wait Until Element Is Visible   css:.dropdown-toggle
+    Click Element   css:.dropdown-toggle
     Wait Until Element Is Visible   id:delete-post-button
     Click Element   id:delete-post-button
     Wait Until Element Is Visible   css:.btn-secondary
@@ -24,8 +24,8 @@ Suite Setup     Open Chrome and Login
     Go To   http://localhost:3000/s/SampleStation
     Wait Until Element Is Visible  css:.post:nth-child(1) .post-title
     Click Element   css:.post:nth-child(1) .post-title
-    Wait Until Element Is Visible  id:__BVID__89__BV_toggle_
-    Click Element   id:__BVID__89__BV_toggle_
+    Wait Until Element Is Visible  css:.dropdown-toggle
+    Click Element   css:.dropdown-toggle
     Wait Until Element Is Visible  id:delete-post-button
     Click Element   id:delete-post-button
     Wait Until Element Is Visible  css:.btn-outline-danger
