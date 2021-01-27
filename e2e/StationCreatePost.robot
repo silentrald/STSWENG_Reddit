@@ -1,7 +1,7 @@
 *** Settings ***
 Library  SeleniumLibrary
 Resource  ./Keywords/Common.robot
-Suite Setup     Open Chrome and Login
+Suite Setup     Open Chrome and Login   username=crewmate   password=password
 Test Setup      Join Station    station=SampleStation2
 Test Teardown   Leave Station   station=SampleStation2
 *** Variables ***
