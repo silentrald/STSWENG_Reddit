@@ -6,9 +6,7 @@ Suite Setup     Open Chrome and Login
 
 *** Test Cases ***
 9.1 Post deletion canceled
-    Go To   http://localhost:3000/s/SampleStation
-    Wait Until Element Is Visible   css:.post:nth-child(1) .post-title
-    Click Element   css:.post:nth-child(1) .post-title
+    Go To   http://localhost:3000/s/SampleStation/post/paaaaaaaaa16
     Wait Until Element Is Visible   css:.dropdown-toggle
     Click Element   css:.dropdown-toggle
     Wait Until Element Is Visible   id:delete-post-button
@@ -21,9 +19,7 @@ Suite Setup     Open Chrome and Login
     Wait Until Page Contains     Sample Title 16
 
 9.2 Post deletion confirmed
-    Go To   http://localhost:3000/s/SampleStation
-    Wait Until Element Is Visible  css:.post:nth-child(1) .post-title
-    Click Element   css:.post:nth-child(1) .post-title
+    Go To   http://localhost:3000/s/SampleStation/post/paaaaaaaaa16
     Wait Until Element Is Visible  css:.dropdown-toggle
     Click Element   css:.dropdown-toggle
     Wait Until Element Is Visible  id:delete-post-button
