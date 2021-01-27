@@ -14,17 +14,19 @@ Open Chrome and Login
     Open Chrome
     Click Element   id:login
     Wait Until Page Contains Element  id:username
-    Input Text  id:username  username
+    Input Text  id:username  crewmate
     Input Text  id:password  password
     Click Element   css:form > #login
     Wait Until Page Contains Element  id:logout
 
 Join Station
-    Go To   http://localhost:3000/s/SampleStation
+    [Arguments]     ${station}
+    Go To   http://localhost:3000/s/${station}
     Wait Until Page Contains Element  id:join-button
     Click Element   id:join-button
 
 Leave Station
-    Go To   http://localhost:3000/s/SampleStation
+    [Arguments]     ${station}
+    Go To   http://localhost:3000/s/${station}
     Wait Until Page Contains Element  id:leave-button
     Click Element   id:leave-button

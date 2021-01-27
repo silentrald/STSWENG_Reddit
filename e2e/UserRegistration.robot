@@ -32,7 +32,7 @@ Resource  ./Keywords/Common.robot
     Click Element  id:submit
     Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[1]/div  Username is too short (min 8)
     Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[2]/div  Email is invalid
-    Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[3]/div  Password is too weak
+    Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[3]/div  Password must contain atleast 1 uppercase, lowercase and number characters.
     Close Browser
 
 1.3 Username already taken

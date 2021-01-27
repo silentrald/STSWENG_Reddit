@@ -27,13 +27,13 @@ Resource  ./Keywords/Common.robot
     Input Text  id:username  username
     Input Text  id:password  password
     Click Element  xpath://html/body/div/div/div/div/div/form/button
-    Wait Until Page Contains Element  xpath://html/body/div/div/div/nav/div/div/div/ul/li[1]/div  6
+    Wait Until Page Contains Element  xpath://a/div
     Page Should Contain  /username
 
 2.3 Logout
     Click Element  id:logout
     Reload Page
-    #Page Should Not Contain  /username
+    # Page Should Not Contain  /username
     Page Should Contain Element  id:login
     Close Browser
 *** Keywords ***
