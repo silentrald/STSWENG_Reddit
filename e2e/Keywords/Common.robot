@@ -30,10 +30,12 @@ Open Chrome and Login
 
 Join Station
     Go To  http://localhost:3000/s/SampleStation
+    Wait Until Page Contains Element  id:join-button
     Click Element   id:join-button
 
 Leave Station
     Go To  http://localhost:3000/s/SampleStation
+    Wait Until Page Contains Element  id:leave-button
     Click Element   id:leave-button
 
 Open Post
