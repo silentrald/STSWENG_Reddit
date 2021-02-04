@@ -2,7 +2,11 @@
   <div class="post">
     <div class="post-text">
       <div class="post-info margin-bottom">
-        Posted by /u/{{ author }} on {{ formatDate(date) }}
+        Posted by
+        <nuxt-link :to="`/u/${author}`">
+          /u/{{ author }}
+        </nuxt-link>
+        on {{ formatDate(date) }}
       </div>
       <div class="post-title margin-bottom">
         {{ title }}
