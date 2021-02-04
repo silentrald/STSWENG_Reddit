@@ -3,7 +3,7 @@ process.env.JWT_SECRET = 'test-value'; // set the jwt token
 const {
     getStationPosts,
     getPosts,
-    getPost,
+    getUserPosts,
     postStationPost,
     patchPost,
     deleteStationPost
@@ -103,6 +103,11 @@ jest.mock('../../db', () => {
                     post_id: 'testingidlol'
                 };
                 result.rowCount = 1;
+            } else if (query.text == 'SELECT * FROM users WHERE username=$1 LIMIT 1' && query.values[0]) {
+                result.rows[0] = {
+                    username: 'crewmate'
+                };
+                result.rowCount = 1;
             } else if (query.text === 'UPDATE posts SET (title, text) = ($2, $3) WHERE post_id=$1 RETURNING *;'
                 && query.values[0] && query.values[1] && query.values[2]) {
                 if (query.values[0] === 'paaaaaaaaaa1') {
@@ -191,38 +196,31 @@ describe('Unit test: postAPI.js', () => {
         });
     });
 
-    describe('API: getPost', () => {
-        let post = '';
+    describe('API: getUserPosts', () => {
+        let username = '';
+        let query = {};
 
         beforeEach(() => {
-            post = 'paaaaaaaaaa1';
+            username = 'crewmate';
+            query = {
+                offset: 0,
+                limit: 10
+            };
         });
         
         test('GOOD', async () => {
             const req = mockRequest({
-                params: { post }
+                params: { username },
+                query
             });
             const res = mockResponse();
 
-            await getPost(req, res);
+            await getUserPosts(req, res);
 
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.send).toHaveBeenCalledWith({
-                post: expect.any(Object)
+                posts: expect.arrayContaining([])
             });
-        });
-
-        test('rowCount < 1', async () => {
-            post = 'paaaaa';
-            const req = mockRequest({
-                params: { post }
-            });
-            const res = mockResponse();
-
-            await getPost(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(404);
-            expect(res.send).toHaveBeenCalledTimes(1);
         });
     });
 
