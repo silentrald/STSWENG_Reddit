@@ -40,7 +40,7 @@ ${station}  SampleStation
     Input Text  id:comment-text  Comment Test Automation
     Click Element  id:post
     Reload Page
-    Page Should Contain  Comment Test Automation
+    Wait Until Page Contains  Comment Test Automation
 
 11.1 Create Subcomment - Member
     [documentation]  Test if a member can successfully add a subcomment
@@ -49,20 +49,20 @@ ${station}  SampleStation
     Input Text  class:subcomment-input  Subcomment Test Automation
     Click Element   class:send
     Reload Page
-    Page Should Contain  Subcomment Test Automation
+    Wait Until Page Contains  Subcomment Test Automation
     #Page Should Contain Element  xpath://div>div[@class='']
     #Element Should Contain  
     #//span[@class='select-all' and text()='Uncheck All']
     #Page Should Contain     Post title is required
 
 12.1 Edit Comment
-    [documentation]  Test if the author of a subcomment can edit their comment
+    [documentation]  Test if the author of a comment can edit their comment
 
     Click Element  xpath://html/body/div/div/div/div/div[2]/div/div[2]/div[1]/div[2]/div[3]/div[2]
     Input Text  class:w-100  Edited Comment
     Click Element  class:float-right
     Reload Page
-    Page Should Contain  Edited Comment
+    Wait Until Page Contains  Edited Comment
     Page Should Not Contain  Comment Test Automation
 
 12.2 Edit Subcomment
@@ -72,7 +72,7 @@ ${station}  SampleStation
     Input Text  class:w-100  Edited Subcomment
     Click Element  class:float-right
     Reload Page
-    Page Should Contain  Edited Subcomment
+    Wait Until Page Contains  Edited Subcomment
     Page Should Not Contain  Subcomment Test Automation
 
 #11.1 Create Subcomment - Non-Member
@@ -86,20 +86,20 @@ ${station}  SampleStation
     #[Teardown]  Reload Page
 
 13.1 Delete Comment
-    [documentation]  Test if the author of a subcomment can delete their comment
+    [documentation]  Test if the author of a comment can delete their comment
 
     Click Element  xpath://html/body/div/div/div/div/div[2]/div/div[2]/div[1]/div[2]/div[3]/div[3]
     Reload Page
+    Wait Until Page Contains  [deleted]
     Page Should Not Contain  Edited Comment
-    Page Should Contain  [deleted]
 
 13.2 Delete Subcomment
     [documentation]  Test if the author of a subcomment can delete their subcomment
 
     Click Element  xpath://html/body/div/div/div/div/div[2]/div/div[2]/div[2]/div/div/div[2]/div[3]/div[3]
     Reload Page
+    Wait Until Page Contains  [deleted]
     Page Should Not Contain  Edited Subcomment
-    Page Should Contain  [deleted]
     Leave Station  ${station}
     
 *** Keywords ***
