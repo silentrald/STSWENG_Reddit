@@ -663,7 +663,7 @@ describe('Station API', () => {
                 expect(statusCode).toEqual(403);
                 expect(body).toEqual(expect.objectContaining({
                     errors: expect.objectContaining({
-                        username: 'sameUser'
+                        username: 'isCaptain'
                     })
                 }));
             });
@@ -720,7 +720,7 @@ describe('Station API', () => {
                 }));
             });
 
-            test('BAD: revoke role from self', async () => {
+            test('BAD: revoke role from self when captains = 1', async () => {
                 const {
                     statusCode, body
                 } = await request(server).post(`${url}/roles/${station.name}`)
@@ -733,7 +733,7 @@ describe('Station API', () => {
                 expect(statusCode).toEqual(403);
                 expect(body).toEqual(expect.objectContaining({
                     errors: expect.objectContaining({
-                        username: 'sameUser'
+                        username: 'onlyCaptain'
                     })
                 }));
             });
@@ -754,6 +754,58 @@ describe('Station API', () => {
                         username: 'notJoined'
                     })
                 }));
+            });
+
+            test('GOOD: regrant role', async () => {
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'grant',
+                        username: tmpUser2.username
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('BAD: revoke role from self when captains > 1', async () => {
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'revoke',
+                        username: tmpUser.username
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('GOOD: regrant role II', async () => {
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token2}`)
+                    .send({
+                        type: 'grant',
+                        username: tmpUser.username
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('GOOD: revoke role II', async () => {
+                const {
+                    statusCode
+                } = await request(server).post(`${url}/roles/${station.name}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send({
+                        type: 'revoke',
+                        username: tmpUser2.username
+                    });
+                
+                expect(statusCode).toEqual(200);
             });
         });
 
