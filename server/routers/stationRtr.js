@@ -57,7 +57,7 @@ router.post('/roles/:stationName',
     loginMw.isAuth,
     stationMw.validateStationParam,
     stationMw.validateRoles,
-    stationMw.isCaptain,
+    queryMw.isCaptain,
     api.postEditRoles);
 
 // PATCH
