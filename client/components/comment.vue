@@ -205,8 +205,8 @@ export default {
           station
         })
         const { subcomment } = res.data
-        // TODO: Fix mutation problem
         this.subcomments.push(subcomment)
+        this.tempSubcomment = ''
         this.writeSubcomment = false
       } catch (err) {}
     }
