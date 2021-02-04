@@ -23,10 +23,6 @@ Open Chrome and Login
 Logout
     Click Element  id:logout
 
-Open Chrome and Login
-    Open Chrome
-    Login
-
 Join Station
     [Arguments]     ${station}
     Go To   http://localhost:3000/s/${station}
