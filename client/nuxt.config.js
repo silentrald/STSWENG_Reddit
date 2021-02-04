@@ -72,6 +72,17 @@ export default {
   build: {
   },
 
+  // Config options for BootstrapVue
+  bootstrapVue: {
+    config: {
+      BModal: {
+        headerClass: 'background',
+        bodyClass: 'background',
+        footerClass: 'background'
+      }
+    }
+  },
+
   fontawesome: {
     icons: {
       solid: [

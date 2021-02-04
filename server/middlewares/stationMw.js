@@ -1,9 +1,9 @@
-const db = require('../db');
+// const db = require('../db');
 
-const Ajv = require('ajv');
+const Ajv = require('ajv').default;
 const { ajvErrors } = require('./ajvHelper');
 
-const ajv = new Ajv({ allErrors: true, jsonPointers: true });
+const ajv = new Ajv({ allErrors: true });
 require('ajv-keywords')(ajv, [ 'transform' ]);
 
 const STATION_S_SCHEMA = 'ss';
@@ -87,31 +87,6 @@ ajv.addSchema({
 }, USERROLES_V_SCHEMA);
 
 const stationMw = {
-    isCaptain: async (req, res, next) => {
-        const { stationName } = req.params;
-
-        const querySelCaptains = {
-            text: `
-                SELECT * FROM captains
-                WHERE username = $1 AND station_name = $2
-                LIMIT 1;
-            `,
-            values: [ req.user.username, stationName ]
-        };
-
-        const { rows } = await db.query(querySelCaptains); 
-
-        if (rows.length === 0) {
-            return res.status(403).send({
-                errors: {
-                    stationName: 'isNotCaptain'
-                }
-            });
-        }
-
-        next();
-    },
-
     validateStationParam: (req, res, next) => {
         const { stationName } = req.params;
 

@@ -5,6 +5,7 @@ const server = require('../../app');
 const db = require('../../db');
 
 const url = '/api/comment-vote';
+const deletedComment = 'caaaaaaaaab2';
 
 const crewmateUser = {
     username: 'crewmate',
@@ -191,6 +192,26 @@ describe('Comment Vote API', () => {
                     .send({ upvote: false });
                 
                 expect(statusCode).toEqual(403);
+            });
+        });
+    
+        describe('BAD: Deleted', () => {
+            test('Comment is deleted', async () => {
+                // CHANGE
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .post(`${url}/${deletedComment}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send({ upvote: false });
+                
+                expect(statusCode).toEqual(403);
+                expect(body).toEqual({
+                    errors: expect.objectContaining({
+                        comment: 'deleted'
+                    })
+                });
             });
         });
         

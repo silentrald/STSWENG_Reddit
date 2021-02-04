@@ -1,7 +1,7 @@
-const Ajv = require('ajv');
+const Ajv = require('ajv').default;
 const { ajvErrors } = require('../../middlewares/ajvHelper');
 
-const ajv = new Ajv({ allErrors: true, jsonPointers: true });
+const ajv = new Ajv({ allErrors: true });
 
 ajv.addSchema({
     type: 'object',

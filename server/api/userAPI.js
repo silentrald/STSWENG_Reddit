@@ -101,13 +101,14 @@ const userAPI = {
                             username: 'used' // User is used
                         }
                     });
-                } else if (err.constraint === 'users_email_key') {
-                    return res.status(401).send({ 
-                        errors: {
-                            email: 'used' // Email is used
-                        }
-                    });
                 }
+                // else if (err.constraint === 'users_email_key') {
+                //     return res.status(401).send({ 
+                //         errors: {
+                //             email: 'used' // Email is used
+                //         }
+                //     });
+                // }
             }
 
             return res.status(500).send();

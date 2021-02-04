@@ -189,31 +189,6 @@ describe('Unit test: userAPI.js', () => {
                 })
             );
         });
-
-        test('BAD: Existing email', async () => {
-            body.email = 'username@gmail.com';
-            const req = mockRequest({ body });
-            const res = mockResponse();
-
-            await postRegisterUser(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(401);
-            expect(res.send).toHaveBeenCalledWith({ 
-                errors: { 
-                    email: 'used'
-                }
-            });
-
-            expect(db.query).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    text: queryText,
-                    values: expect.arrayContaining([
-                        body.username,
-                        body.email
-                    ])
-                })
-            );
-        });
     });
 
     describe('API: postLogin', () => {

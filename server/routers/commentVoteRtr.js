@@ -18,6 +18,7 @@ router.post('/:comment',
     queryMw.getStationCommentParams,
     queryMw.userIsPartOfStation,
     voteMw.validateUpvoteBody,
+    queryMw.commentNotDeleted,
     api.postCommentVote);
 
 // PATCH

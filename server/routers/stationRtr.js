@@ -2,6 +2,7 @@ const router = require('express')();
 const api = require('../api/stationAPI');
 const loginMw = require('../middlewares/loginMw');
 const stationMw = require('../middlewares/stationMw');
+const queryMw = require('../middlewares/queryMw');
 const queryStrMw = require('../middlewares/queryStringMw');
 //const queryMw = require('../middlewares/queryMw');
 
@@ -34,7 +35,7 @@ router.get('/members/:stationName',
 router.post('/info/:stationName',
     loginMw.isAuth,
     stationMw.validateStationParam,
-    stationMw.isCaptain,
+    queryMw.isCaptain,
     api.postUpdateInfo);
 
 router.post('/create',
