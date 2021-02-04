@@ -161,8 +161,12 @@ export default {
         })
 
         const { comment } = res.data
-        // TODO: Fix this because of mutation of the props
-        this.comments.unshift(comment)
+        const next = []
+        for (let i = 0; i < this.comments.length; i++) {
+          next.push(this.comments[i])
+        }
+        next.push(comment)
+        this.$set(this, 'comments', next)
         this.$set(this, 'comment_text', '')
       } catch (err) {}
 
