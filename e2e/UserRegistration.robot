@@ -7,7 +7,7 @@ Suite Setup  Open Chrome
 
 *** Test Cases ***
 1.1 Successful registration
-    [documentation]  User Registration
+    [documentation]  Test if valid inputs successfully register
     
     Click Element  id:signup
     Wait Until Page Contains Element  id:username
@@ -19,7 +19,7 @@ Suite Setup  Open Chrome
     Page Should Contain Element  xpath://*[@id="__layout"]/div/div/div
 
 1.21 Password too weak - No uppercase and number
-    [documentation]  User Registration
+    [documentation]  Test if error messages appear for weak passwords
 
     Reload Page
     Click Element  id:signup
@@ -32,7 +32,7 @@ Suite Setup  Open Chrome
     Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[3]/div  Password must contain atleast 1 uppercase, lowercase and number characters.
 
 1.22 Password too weak - No number
-    [documentation]  User Registration
+    [documentation]  Test if error messages appear for weak passwords
 
     Input Text  id:password  Password
     Input Text  id:cpassword  Password
@@ -40,7 +40,7 @@ Suite Setup  Open Chrome
     Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[3]/div  Password must contain atleast 1 uppercase, lowercase and number characters.
 
 1.23 Password too weak - No uppercase
-    [documentation]  User Registration
+    [documentation]  Test if error messages appear for weak passwords
 
     Input Text  id:password  password1
     Input Text  id:cpassword  password1
@@ -48,7 +48,7 @@ Suite Setup  Open Chrome
     Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[3]/div  Password must contain atleast 1 uppercase, lowercase and number characters.
 
 1.24 Password too weak - Has uppercase and number, but <8 characters
-    [documentation]  User Registration
+    [documentation]  Test if error messages appear for short passwords (less than 8 characters)
 
     Input Text  id:password  Pas1
     Input Text  id:cpassword  Pas1
@@ -56,7 +56,7 @@ Suite Setup  Open Chrome
     Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[3]/div  Password is too short (min 8)
 
 1.3 Username too short
-    [documentation]  User Registration
+    [documentation]  Test if error messages appear for short usernames (less than 7 characters)
 
     Reload Page
     Click Element  id:signup
@@ -70,7 +70,7 @@ Suite Setup  Open Chrome
 
 #to be changed
 1.41 Invalid email - [string]
-    [documentation]  User Registration
+    [documentation]  Test if error messages appear for invalid email (ex: rocket)
 
     Reload Page
     Click Element  id:signup
@@ -82,22 +82,24 @@ Suite Setup  Open Chrome
     Click Element  id:submit
     Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[2]/div  Email is invalid
 
-1.42 Invalid email - [string]@[string]
-    [documentation]  User Registration
+1.42 Invalid email - [string]@[string] 
+    [documentation]  Test if error messages appear for invalid email (ex: rocket@sweng)
 
+    Reload Page
     Input Text  id:email  dude@dude
     Click Element  id:submit
     Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[2]/div  Email is invalid
 
 1.43 Invalid email - [string]@[string].
-    [documentation]  User Registration
+    [documentation]  Test if error messages appear for invalid email (ex: rocket@sweng.)
 
+    Reload Page
     Input Text  id:email  dude@dude.
     Click Element  id:submit
     Element Text Should be  xpath://html/body/div/div/div/div/div/form/div[2]/div  Email is invalid
 
 1.5 Username already taken
-    [documentation]  User Registration
+    [documentation]  Test if error messages appear for username input if username is already in the database
 
     Reload Page
     Click Element  id:signup
@@ -111,7 +113,7 @@ Suite Setup  Open Chrome
     Element Text Should be  class:error  Username is already used
 
 1.6 Password do not match
-    [documentation]  User Registration
+    [documentation]  Test if error messages appear for unmatching passwords
 
     Reload Page
     Click Element  id:signup

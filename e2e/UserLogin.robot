@@ -7,7 +7,7 @@ Suite Setup  Open Chrome
 
 *** Test Cases ***
 2.1 Login Fail - Invalid Credentials
-    [documentation]  User Login
+    [documentation]  Test if login fails if the username is not registered in the database
     
     Click Element  id:login
     Wait Until Page Contains Element  id:username
@@ -18,7 +18,7 @@ Suite Setup  Open Chrome
     Element Text Should be  class:error  Invalid Credentials
 
 2.2 Login Success - Valid Credentials
-    [documentation]  User Login
+    [documentation]  Test if login succeeds if the username is registered in the database
 
     Input Text  id:username  username
     Input Text  id:password  password
@@ -28,7 +28,7 @@ Suite Setup  Open Chrome
     Page Should Contain  /username
 
 2.3 Logout
-    [documentation]  User Logout
+    [documentation]  Test if logout works properly
     
     Wait Until Page Contains Element  id:logout
     Click Element  id:logout
@@ -38,7 +38,7 @@ Suite Setup  Open Chrome
     
 
 2.4 Login with a fresh registration
-    [documentation]  User Login
+    [documentation]  Test if login will work for a freshly registered username
 
     Click Element  id:signup
     Wait Until Page Contains Element  id:username
@@ -49,7 +49,7 @@ Suite Setup  Open Chrome
     Click Element  id:submit
     Page Should Contain Element  xpath://*[@id="__layout"]/div/div/div
 
-    Reload Page
+    Reset
     Click Element  id:login
     Wait Until Page Contains Element  id:username
     Input Text  id:username  Fresh_Signup

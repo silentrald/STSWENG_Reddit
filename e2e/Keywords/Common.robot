@@ -39,5 +39,9 @@ Open Post
     Go To  http://localhost:3000/s/SampleStation/post/paaaaaaaaa14
 
 Join Station and Open Post
-    Join Station
+    [Arguments]     ${station}
+    Join Station  ${station}
     Open Post
+
+Reset
+    Go to  http://localhost:3000
