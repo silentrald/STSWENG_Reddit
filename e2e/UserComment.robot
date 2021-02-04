@@ -1,7 +1,7 @@
 *** Settings ***
 Library  SeleniumLibrary
 Resource  ./Keywords/Common.robot
-Suite Setup     Open Chrome and Login
+Suite Setup     Open Chrome and Login  username=username   password=password
 *** Variables ***
 
 *** Test Cases ***
