@@ -379,18 +379,31 @@ const stationAPI = {
         const { type, username } = req.body;
 
         // prevent captain from demoting themselves
-        if (username === req.user.username) {
-            return res.status(403).send({
-                errors: {
-                    username: 'sameUser'
-                }
-            });
-        }
+        // now the captain can demote themselves, as long as there is another captain
+        // to moderate the station
+        //if (username === req.user.username) {
+        //    return res.status(403).send({
+        //        errors: {
+        //            username: 'sameUser'
+        //        }
+        //    });
+        //}
 
         const client = await db.connect();
 
         try {
             await client.query('BEGIN');
+
+            const querySelAllCaptains = {
+                text: `
+                    SELECT *
+                    FROM captains
+                    WHERE station_name = $1
+                `,
+                values: [ stationName ]
+            };
+            const { rows: captains } = await client.query(querySelAllCaptains);
+            const moreCaptains = captains.length > 1;
 
             const querySelCaptains = {
                 text: `
@@ -401,8 +414,8 @@ const stationAPI = {
                 `,
                 values: [ stationName, username ]
             };
-            const { rows: captains } = await client.query(querySelCaptains);
-            const isCaptain = captains.length > 0;
+            const { rows: userCaptains } = await client.query(querySelCaptains);
+            const isCaptain = userCaptains.length > 0;
 
             const querySelCrewmates = {
                 text: `
@@ -467,6 +480,17 @@ const stationAPI = {
                         }
                     });
                 } else if (!isCrewmate && isCaptain) {
+                    // refuse if there is only one captain
+                    // and the captain attempted to remove themselves
+                    if (username === req.user.username && !moreCaptains) {
+                        client.query('ROLLBACK');
+                        return res.status(403).send({
+                            errors: {
+                                username: 'onlyCaptain'
+                            }
+                        });
+                    }
+
                     const queryDelCaptains = {
                         text: `
                             DELETE FROM captains

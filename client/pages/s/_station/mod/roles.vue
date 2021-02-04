@@ -10,7 +10,7 @@
               <nuxt-link :to="`/u/${captain.username}`" class="link">
                 u/{{ captain.username }}
               </nuxt-link>
-              <div v-if="captain.username !== $auth.user.username">
+              <div v-if="captains.length > 1">
                 <div class="remove">
                   <button @click="removeCaptain(captain.username)">
                     &times;
@@ -22,6 +22,16 @@
           <div v-if="captError" class="error-box">
             {{ captError }}
           </div>
+          <b-modal
+            id="remove-captain-modal"
+            centered
+            title="Confirm Removal"
+            ok-title="Remove"
+            ok-variant="outline-danger"
+            @ok="confirmSelfRemoval"
+          >
+            You cannot reverse this action unless another captain grants you captain status.
+          </b-modal>
         </div>
       </div>
       <div class="col col-md-6">
@@ -115,6 +125,7 @@ export default {
 
     async addCaptain (username) {
       const { station: name } = this.$route.params
+
       try {
         await this.$axios.post(`/api/station/roles/${name}`, {
           type: 'grant',
@@ -131,8 +142,37 @@ export default {
       }
     },
 
-    async removeCaptain (username) {
+    async confirmSelfRemoval (bvModalEvt) {
       const { station: name } = this.$route.params
+
+      bvModalEvt.preventDefault()
+      try {
+        this.$bvModal.hide('remove-captain-modal')
+        await this.doRemove(this.$auth.user.username)
+        this.$bvModal.msgBoxOk('You are no longer captain of this station.', {
+          centered: true,
+          okTitle: `Return to /s/${name}`,
+          noCloseOnEsc: true,
+          noCloseOnBackdrop: true,
+          hideHeaderClose: true
+        }).then(() => {
+          this.$router.push(`/s/${name}`)
+        })
+      } catch ({ response }) {
+      }
+    },
+
+    async removeCaptain (username) {
+      if (username === this.$auth.user.username) {
+        this.$bvModal.show('remove-captain-modal')
+      } else {
+        await this.doRemove(username)
+      }
+    },
+
+    async doRemove (username) {
+      const { station: name } = this.$route.params
+
       try {
         await this.$axios.post(`/api/station/roles/${name}`, {
           type: 'revoke',
