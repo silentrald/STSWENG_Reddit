@@ -86,9 +86,9 @@ const postAPI = {
     },
 
     /**
-     * Gets a post from a station
+     * Gets a post given the post_id
      */
-    getStationPost: async (req, res) => {
+    getPost: async (req, res) => {
         const { post } = req.params;
 
         try {
@@ -184,6 +184,60 @@ const postAPI = {
         }
     },
 
+    /**
+     * Gets all the posts form a given user
+     */
+    getUserPosts: async (req, res) => {
+        const { username } = req.params;
+        const { offset, limit } = req.query;
+
+        const queryUser = {
+            text: `
+                SELECT  *
+                FROM    users
+                WHERE   username=$1
+                LIMIT   1
+            `,
+            values: [
+                username
+            ]
+        };
+
+        const queryUserPosts = {
+            text: `
+                SELECT      *
+                FROM        posts
+                WHERE       author=$1
+                ORDER BY    timestamp_created DESC
+                OFFSET      $2
+                LIMIT       $3;
+            `,
+            values: [ 
+                username,
+                offset,
+                limit
+            ]
+        };
+
+        try {
+            const { rowCount } = await db.query(queryUser);
+
+            if (!rowCount) {
+                return res.status(404).send();
+            }
+
+            const result = await db.query(queryUserPosts);
+
+            return res.status(200).send({
+                posts: result.rows
+            });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).send();
+        }
+        
+    },
+
     // POST
     /**
      * Adds a post from a user to a given station
@@ -225,7 +279,40 @@ const postAPI = {
         }
     },
 
-    // PUT
+    // PATCH
+    patchPost: async (req, res) => {
+        const { post: postId } = req.params;
+        const { title, text } = req.body;
+
+        const queryUpdatePost = {
+            text: `
+                UPDATE      posts
+                SET         (title, text)
+                    =       ($2, $3)
+                WHERE       post_id=$1
+                RETURNING   *;
+            `,
+            values: [
+                postId,
+                title,
+                text
+            ]
+        };
+
+        try {
+            const resultPost = await db.query(queryUpdatePost);
+
+            if (!resultPost.rowCount) {
+                return res.status(404).send();
+            }
+
+            return res.status(200).send({ post: resultPost.rows[0] });
+        } catch (err) {
+            console.log(err);            
+
+            return res.status(500).send();
+        }
+    },
 
     // DELETE
     /**
