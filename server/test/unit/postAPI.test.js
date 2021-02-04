@@ -3,7 +3,6 @@ process.env.JWT_SECRET = 'test-value'; // set the jwt token
 const {
     getStationPosts,
     getPosts,
-    getStationPost,
     getUserPosts,
     postStationPost,
     patchPost,
@@ -194,41 +193,6 @@ describe('Unit test: postAPI.js', () => {
             expect(res.send).toHaveBeenCalledWith({
                 posts: expect.arrayContaining([])
             });
-        });
-    });
-
-    describe('API: getPost', () => {
-        let post = '';
-
-        beforeEach(() => {
-            post = 'paaaaaaaaaa1';
-        });
-        
-        test('GOOD', async () => {
-            const req = mockRequest({
-                params: { post }
-            });
-            const res = mockResponse();
-
-            await getPost(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.send).toHaveBeenCalledWith({
-                post: expect.any(Object)
-            });
-        });
-
-        test('rowCount < 1', async () => {
-            post = 'paaaaa';
-            const req = mockRequest({
-                params: { post }
-            });
-            const res = mockResponse();
-
-            await getPost(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(404);
-            expect(res.send).toHaveBeenCalledTimes(1);
         });
     });
 
