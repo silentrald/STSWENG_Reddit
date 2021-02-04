@@ -3,6 +3,7 @@ const api = require('../api/postAPI');
 const loginMw = require('../middlewares/loginMw');
 const queryMw = require('../middlewares/queryMw');
 const queryStrMw = require('../middlewares/queryStringMw');
+const userMw = require('../middlewares/userMw');
 const mw = require('../middlewares/postMw');
 
 // GET
@@ -23,6 +24,11 @@ router.get('/station/:station',
     queryStrMw.sanitizeSearch,
     queryStrMw.sanitizeOffsetAndLimit,
     api.getStationPosts);
+
+router.get('/user/:username',
+    userMw.validateUserParam,
+    queryStrMw.sanitizeOffsetAndLimit,
+    api.getUserPosts);
 
 // POST
 
