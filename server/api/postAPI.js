@@ -86,9 +86,9 @@ const postAPI = {
     },
 
     /**
-     * Gets a post from a station
+     * Gets a post given the post_id
      */
-    getStationPost: async (req, res) => {
+    getPost: async (req, res) => {
         const { post } = req.params;
 
         try {
@@ -225,7 +225,40 @@ const postAPI = {
         }
     },
 
-    // PUT
+    // PATCH
+    patchPost: async (req, res) => {
+        const { post: postId } = req.params;
+        const { title, text } = req.body;
+
+        const queryUpdatePost = {
+            text: `
+                UPDATE      posts
+                SET         (title, text)
+                    =       ($2, $3)
+                WHERE       post_id=$1
+                RETURNING   *;
+            `,
+            values: [
+                postId,
+                title,
+                text
+            ]
+        };
+
+        try {
+            const resultPost = await db.query(queryUpdatePost);
+
+            if (!resultPost.rowCount) {
+                return res.status(404).send();
+            }
+
+            return res.status(200).send({ post: resultPost.rows[0] });
+        } catch (err) {
+            console.log(err);            
+
+            return res.status(500).send();
+        }
+    },
 
     // DELETE
     /**
