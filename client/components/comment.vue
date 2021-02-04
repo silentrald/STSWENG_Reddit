@@ -206,6 +206,7 @@ export default {
         })
         const { subcomment } = res.data
         this.subcomments.push(subcomment)
+
         this.tempSubcomment = ''
         this.writeSubcomment = false
       } catch (err) {}
