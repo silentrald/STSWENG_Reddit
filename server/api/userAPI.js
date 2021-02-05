@@ -65,7 +65,7 @@ const userAPI = {
             // Get user details
             const queryGetUser = {
                 text: `
-                    SELECT  username, fname, lname, gender, birthday, bio, fame
+                    SELECT  username, fname, lname, gender, to_char(birthday, 'YYYY-MM-DD') AS birthday, bio, fame
                     FROM    users
                     WHERE   username=$1
                     LIMIT   1;
@@ -196,9 +196,49 @@ const userAPI = {
 
             return res.status(500).send();
         }
-    }
+    },
 
     // PATCH
+
+    /**
+     * Updates the details of the user as specified
+     * in the req body. Required fields:
+     * fname, lname, bio, birthday, gender
+     */
+    patchUser: async (req, res) => {
+        const profile = req.body;
+
+        const queryUpdateUser = {
+            text: `
+                UPDATE      users
+                SET         (fname, lname, gender, birthday, bio)
+                    =       ($2, $3, $4, $5, $6)
+                WHERE       username=$1
+                RETURNING   username;
+            `,
+            values: [
+                req.params.username,
+                profile.fname,
+                profile.lname,
+                profile.gender,
+                profile.birthday,
+                profile.bio
+            ]
+        };
+
+        try {
+            const result = await db.query(queryUpdateUser);
+            console.log(result);
+            if (!result.rowCount) {
+                return res.status(404).send();
+            }
+
+            return res.status(200).send();
+        } catch (err) {
+            console.log(err);
+            return res.status(500).send();
+        }
+    }
 
     // DELETE
 };

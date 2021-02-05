@@ -4,6 +4,7 @@ const mw = require('../middlewares/userMw');
 const queryStrMw = require('../middlewares/queryStringMw');
 const loginMw = require('../middlewares/loginMw');
 const userMw = require('../middlewares/userMw');
+//const queryMw = require('../middlewares/queryMw');
 
 // GET
 router.get('/auth', api.getAuth);
@@ -30,6 +31,11 @@ router.post('/login',
     api.postLogin);
 
 // PATCH
+
+router.patch('/profile/:username',
+    loginMw.isAuth,
+    mw.validateUserProfile,
+    api.patchUser);
 
 // DELETE
 
