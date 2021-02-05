@@ -16,7 +16,7 @@ router.get('/',
     
 router.get('/:post',
     mw.validatePostParam,
-    api.getStationPost);
+    api.getPost);
 
 router.get('/station/:station',
     mw.validateStationParam,
@@ -40,6 +40,13 @@ router.post('/station/:station',
     api.postStationPost);
 
 // PATCH
+
+router.patch('/:post',
+    loginMw.isAuth,
+    mw.validatePostParam,
+    mw.validateStationPost,
+    queryMw.userIsAuthor,
+    api.patchPost);
 
 // DELETE
 

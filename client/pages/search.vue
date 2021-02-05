@@ -51,7 +51,7 @@
 
           <div id="posts">
             <h1>Posts</h1>
-            <div v-if="users === undefined">
+            <div v-if="posts === undefined">
               No posts found :&lt;
             </div>
             <div v-else>
@@ -154,6 +154,7 @@ export default {
             search: this.searchQuery
           }
         })
+
         this.$set(this, 'posts', data.posts)
       } catch (err) {
         const { status } = err.response
