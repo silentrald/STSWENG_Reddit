@@ -38,7 +38,12 @@
                   rows="5"
                 />
               </div>
-              <button id="post" @click="postComment()">
+              <button
+                id="post"
+                :title="!(comment_text && comment_text.length > 0) ? 'Comment should not be blank' : ''"
+                :disabled="!(comment_text && comment_text.length > 0)"
+                @click="postComment()"
+              >
                 Post
               </button>
             </div>
@@ -225,5 +230,11 @@ export default {
   background-color: rgba(255, 255, 255, 0.1);
   color: white;
   border-color: #cccccc;
+}
+
+#post[disabled] {
+  color: #aaaaaa;
+  border-color: #aaaaaa;
+  opacity: 80%;
 }
 </style>

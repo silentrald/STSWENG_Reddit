@@ -24,7 +24,9 @@
             {{ option }}
           </option>
         </datalist>
-        <button>Search</button>
+        <button @click="search">
+          Search
+        </button>
       </div>
 
       <div v-if="$auth.user">

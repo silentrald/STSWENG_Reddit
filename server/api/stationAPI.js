@@ -139,6 +139,55 @@ const stationAPI = {
         }
     },
 
+    getCrewmates: async (req, res) => {
+        const {
+            search,
+            offset,
+            limit
+        } = req.query;
+        const { stationName } = req.params;
+
+        try {
+            const querySelStation = {
+                text: 'SELECT * FROM stations WHERE name = $1 LIMIT 1;',
+                values: [ stationName ]
+            };
+
+            const { rows: stations } = await db.query(querySelStation);
+            if (!stations || stations.length === 0) {
+                return res.status(404).send({
+                    errors: {
+                        stationName: 'nonexistent'
+                    }
+                });
+            }
+
+            const querySelUsers = {
+                text: `
+                    SELECT  username
+                    FROM    crewmates
+                    WHERE   username ILIKE $2 AND station_name = $1
+                    OFFSET  $3
+                    LIMIT   $4;
+                `,
+                values: [
+                    stationName,
+                    search ? search : '%',
+                    offset,
+                    limit
+                ]
+            };
+
+            const { rows: users } = await db.query(querySelUsers);
+
+            return res.status(200).send({ users });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
     // POST
     postCreateStation: async (req, res) => {
         // Get values
@@ -311,6 +360,179 @@ const stationAPI = {
             await client.query('COMMIT');
 
             return res.status(200).send();
+        } catch (err) {
+            try {
+                await client.query('ROLLBACK');
+            } catch (rollbackErr) {
+                console.log(rollbackErr);
+            }
+
+            console.log(err);
+            return res.status(500).send();
+        } finally {
+            client.release();
+        }
+    },
+
+    postEditRoles: async (req, res) => {
+        const { stationName } = req.params;
+        const { type, username } = req.body;
+
+        // prevent captain from demoting themselves
+        // now the captain can demote themselves, as long as there is another captain
+        // to moderate the station
+        //if (username === req.user.username) {
+        //    return res.status(403).send({
+        //        errors: {
+        //            username: 'sameUser'
+        //        }
+        //    });
+        //}
+
+        const client = await db.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            const querySelAllCaptains = {
+                text: `
+                    SELECT *
+                    FROM captains
+                    WHERE station_name = $1
+                `,
+                values: [ stationName ]
+            };
+            const { rows: captains } = await client.query(querySelAllCaptains);
+            const moreCaptains = captains.length > 1;
+
+            const querySelCaptains = {
+                text: `
+                    SELECT *
+                    FROM captains
+                    WHERE station_name = $1 AND username = $2
+                    LIMIT 1
+                `,
+                values: [ stationName, username ]
+            };
+            const { rows: userCaptains } = await client.query(querySelCaptains);
+            const isCaptain = userCaptains.length > 0;
+
+            const querySelCrewmates = {
+                text: `
+                    SELECT *
+                    FROM crewmates
+                    WHERE station_name = $1 AND username = $2
+                    LIMIT 1
+                `,
+                values: [ stationName, username ]
+            };
+            const { rows: crewmates } = await client.query(querySelCrewmates);
+            const isCrewmate = crewmates.length > 0;
+
+            if (type === 'grant') {
+                if (isCrewmate && !isCaptain) {
+                    const queryDelCrewmates = {
+                        text: `
+                            DELETE FROM crewmates
+                            WHERE station_name = $1 AND username = $2
+                        `,
+                        values: [ stationName, username ]
+                    };
+                    const { rowCount: delCrewmates } = await client.query(queryDelCrewmates);
+                    if (delCrewmates === 0) throw Error('Failed to delete crewmate');
+
+                    const queryInsCaptains = {
+                        text: `
+                            INSERT INTO captains
+                            (station_name, username, date_join)
+                            VALUES ($1, $2, $3)
+                        `,
+                        values: [ stationName, username, crewmates[0].date_join ]
+                    };
+                    const { rowCount: insCaptains } = await client.query(queryInsCaptains);
+                    if (insCaptains === 0) throw Error('Failed to insert captain');
+
+                    await client.query('COMMIT');
+                    return res.status(200).send();
+                } else if (!isCrewmate && isCaptain) {
+                    client.query('ROLLBACK');
+                    return res.status(403).send({
+                        errors: {
+                            username: 'isCaptain'
+                        }
+                    });
+                } else if (isCaptain && isCrewmate) {
+                    throw Error('user is both captain and crewmate');
+                } else {
+                    client.query('ROLLBACK');
+                    return res.status(403).send({
+                        errors: {
+                            username: 'notJoined'
+                        }
+                    });
+                }
+            } else if (type === 'revoke') {
+                if (isCrewmate && !isCaptain) {
+                    client.query('ROLLBACK');
+                    return res.status(403).send({
+                        errors: {
+                            username: 'isNotCaptain'
+                        }
+                    });
+                } else if (!isCrewmate && isCaptain) {
+                    // refuse if there is only one captain
+                    // and the captain attempted to remove themselves
+                    if (username === req.user.username && !moreCaptains) {
+                        client.query('ROLLBACK');
+                        return res.status(403).send({
+                            errors: {
+                                username: 'onlyCaptain'
+                            }
+                        });
+                    }
+
+                    const queryDelCaptains = {
+                        text: `
+                            DELETE FROM captains
+                            WHERE station_name = $1 AND username = $2
+                        `,
+                        values: [ stationName, username ]
+                    };
+                    const { rowCount: delCaptains } = await client.query(queryDelCaptains);
+                    if (delCaptains === 0) throw Error('Failed to delete captain');
+
+                    const queryInsCrewmates = {
+                        text: `
+                            INSERT INTO crewmates
+                            (station_name, username, date_join)
+                            VALUES ($1, $2, $3)
+                        `,
+                        values: [ stationName, username, captains[0].date_join ]
+                    };
+                    const { rowCount: insCrewmates } = await client.query(queryInsCrewmates);
+                    if (insCrewmates === 0) throw Error('Failed to insert crewmate');
+
+                    await client.query('COMMIT');
+                    return res.status(200).send();
+                } else if (isCaptain && isCrewmate) {
+                    throw Error('user is both captain and crewmate');
+                } else {
+                    client.query('ROLLBACK');
+                    return res.status(403).send({
+                        errors: {
+                            username: 'notJoined'
+                        }
+                    });
+                }
+            } else {
+                // IGNORE: this is already handled in the middleware
+                client.query('ROLLBACK');
+                return res.status(403).send({
+                    errors: {
+                        type: 'invalid'
+                    }
+                });
+            }
         } catch (err) {
             try {
                 await client.query('ROLLBACK');
