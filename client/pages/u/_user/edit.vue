@@ -33,8 +33,17 @@
         <b-form-group description="Gender">
           <b-form-select v-model="user.gender" :options="genderOptions" class="form-control" />
         </b-form-group>
-        <b-form-group description="Date">
-          <b-form-input type="date" />
+        <b-form-group description="Birthday">
+          <div v-if="errors.birthday" class="error">
+            {{ errors.birthday }}
+          </div>
+          <b-form-input
+            v-model="user.birthday"
+            type="date"
+            dark="true"
+            :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
+            locale="en"
+          />
         </b-form-group>
         <b-form-group description="Bio">
           <div v-if="errors.bio" class="error">
@@ -70,8 +79,8 @@ import customErrors from '@/helpers/customErrors'
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 require('ajv-keywords')(ajv, ['transform'])
 
-const USER_S_SCHEMA = 'us'
-const USER_V_SCHEMA = 'uv'
+const USER_PROFILE_S_SCHEMA = 'ups'
+const USER_PROFILE_V_SCHEMA = 'upv'
 
 ajv.addSchema({
   type: 'object',
@@ -86,7 +95,7 @@ ajv.addSchema({
       transform: ['trim']
     }
   }
-}, USER_S_SCHEMA)
+}, USER_PROFILE_S_SCHEMA)
 
 ajv.addSchema({
   type: 'object',
@@ -104,13 +113,16 @@ ajv.addSchema({
       maxLength: 200
     },
     birthday: {
-      type: 'string',
-      format: 'date',
-      formatMaximum: new Date().toString
+      type: ['string', 'null'],
+      format: 'date'
+    },
+    gender: {
+      type: ['string', 'null'],
+      pattern: '^[mfop]$'
     }
   },
   required: []
-}, USER_V_SCHEMA)
+}, USER_PROFILE_V_SCHEMA)
 
 const customErrorMsg = {
   fname: {
@@ -133,7 +145,7 @@ export default {
         fname: '',
         lname: '',
         gender: null,
-        birthday: '',
+        birthday: null,
         bio: ''
       },
       errors: {},
@@ -161,8 +173,8 @@ export default {
 
     // TODO: update this validate
     validate () {
-      ajv.validate(USER_S_SCHEMA, this.user)
-      const validate = ajv.validate(USER_V_SCHEMA, this.user)
+      ajv.validate(USER_PROFILE_S_SCHEMA, this.user)
+      const validate = ajv.validate(USER_PROFILE_V_SCHEMA, this.user)
 
       if (!validate) {
         this.errors = customErrors(ajvErrors(ajv), customErrorMsg)
@@ -179,7 +191,7 @@ export default {
         const { user: username } = this.$route.params
         const user = { ...this.user }
 
-        const res = await this.$axios.patch(`/api/post/station/${username}`, user)
+        const res = await this.$axios.patch(`/api/user/profile/${username}`, user)
         if (res.status !== 200) { return }
 
         this.$router.push(`/u/${username}`)
@@ -196,10 +208,11 @@ export default {
 
     async getUser () {
       try {
-        const { user } = this.$route.params
+        const { user: username } = this.$route.params
 
-        const res = await this.$axios.get(`/api/user/profile/${user}`)
-        this.$set(this, 'user', res.data.user)
+        const res = await this.$axios.get(`/api/user/profile/${username}`)
+        const { user } = res.data
+        this.$set(this, 'user', user)
       } catch (err) {
         const { status } = err.response
 
