@@ -179,8 +179,8 @@ describe('User API', () => {
                     fame: expect.any(Number)
                 })
             });
-            expect(res.body.user.gender === null || res.body.user.gender instanceof Boolean).toBeTruthy();
-            expect(res.body.user.birthday === null || res.body.user.birthday instanceof Boolean).toBeTruthy();
+            expect(res.body.user.gender === null || typeof res.body.user.gender === 'string').toBeTruthy();
+            expect(res.body.user.birthday === null || typeof res.body.user.birthday === 'string').toBeTruthy();
         });
 
         test('ERROR: User does not exist', async () => {
@@ -1217,6 +1217,71 @@ describe('User API', () => {
                 .set('Authorization', 'Bearer just-a-random-token');
             
             expect(statusCode).toEqual(403);
+        });
+    });
+
+    describe(`PATCH: ${url}/profile/:username`, () => {
+        const patchTestUser = {
+            username: 'patchTestName',
+            password: 'Password123', 
+            email: 'testmail@station.org',
+            fname: 'Test Fname',
+            lname: 'Test Lname',
+            gender: 'm',
+            birthday: '2002-03-05',
+            bio: 'test bio'
+        };
+
+        let resPatchTestName, patchTestNameToken;
+
+        beforeEach(async () => {
+            await db.query({
+                text: `
+                    DELETE FROM users WHERE username=$1;
+                `,
+                values: [patchTestUser.username]
+            });
+            await request(server)
+                .post(`${url}/create`)
+                .send(patchTestUser);
+
+            resPatchTestName = await request(server)
+                .post(`${url}/login`)
+                .send({
+                    username: patchTestUser.username,
+                    password: patchTestUser.password
+                });
+            
+            patchTestNameToken = resPatchTestName.body.token;
+        });
+
+        test('GOOD: Valid details', async () => {
+            const { statusCode } = await request(server)
+                .patch(`${url}/user/profile/${patchTestUser.username}`)
+                .set('Authorization', `Bearer ${patchTestNameToken}`)
+                .send(patchTestUser);
+
+            expect(statusCode).toEqual(200);
+            const result = await db.query({
+                text: `
+                    SELECT * FROM users
+                    WHERE (username, fname, lname, gender, birthday, bio)
+                        = ($1, $2, $3, $4, $5, $6);
+                `,
+                values: [ patchTestUser.username, patchTestUser.fname, patchTestUser.lname, patchTestUser.gender, patchTestUser.birthday, patchTestUser.bio ]
+            });
+            expect(result.rowCount).toEqual(1);
+        });
+        test.todo('ERROR: Not logged in');
+        test.todo('ERROR: Not owner of profile');
+
+        afterEach(async () => {
+            await db.query({
+                text: `
+                    DELETE FROM users WHERE username=$1;
+                `,
+                values: [ user.username ]
+            });
         });
     });
 });

@@ -1,6 +1,7 @@
 const { 
     validateRegisterUser,
-    validateUserParam
+    validateUserParam,
+    validateUserProfile
 } = require('../../middlewares/userMw');
 
 const mockRequest = (data) => {
@@ -334,6 +335,236 @@ describe('Unit test: userMw.js', () => {
                 }
             });
             expect(next).toHaveBeenCalledTimes(0);
+        });
+    });
+
+    describe('Middleware: validateUserProfile', () => {
+        let body;
+        beforeEach(() => {
+            body = {
+                fname: 'Test First Name',
+                lname: 'Test Last Name',
+                bio: 'Test Bio',
+                birthday: '2000-03-03',
+                gender: 'm'
+            };
+        });
+
+        test('GOOD: All values filled', async () => {
+            const req = mockRequest({ body });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateUserProfile(req, res, next);
+
+            expect(next).toHaveBeenCalledTimes(1);
+        });
+
+        describe('ERROR: Missing values',  () => {
+            test('Missing fname', async () => {
+                delete body.fname;
+
+                const req = mockRequest({ body });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await validateUserProfile(req, res, next);
+    
+                expect(res.status).toHaveBeenCalledWith(401);
+                expect(res.send).toHaveBeenCalledWith({
+                    errors: {
+                        fname: 'required'
+                    }
+                });
+                expect(next).toHaveBeenCalledTimes(0);
+            });
+
+            test('Missing lname', async () => {
+                delete body.lname;
+
+                const req = mockRequest({ body });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await validateUserProfile(req, res, next);
+    
+                expect(res.status).toHaveBeenCalledWith(401);
+                expect(res.send).toHaveBeenCalledWith({
+                    errors: {
+                        lname: 'required'
+                    }
+                });
+                expect(next).toHaveBeenCalledTimes(0);
+            });
+
+            test('Missing bio', async () => {
+                delete body.bio;
+
+                const req = mockRequest({ body });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await validateUserProfile(req, res, next);
+    
+                expect(res.status).toHaveBeenCalledWith(401);
+                expect(res.send).toHaveBeenCalledWith({
+                    errors: {
+                        bio: 'required'
+                    }
+                });
+                expect(next).toHaveBeenCalledTimes(0);
+            });
+
+            test('Missing birthday', async () => {
+                delete body.birthday;
+
+                const req = mockRequest({ body });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await validateUserProfile(req, res, next);
+    
+                expect(res.status).toHaveBeenCalledWith(401);
+                expect(res.send).toHaveBeenCalledWith({
+                    errors: {
+                        birthday: 'required'
+                    }
+                });
+                expect(next).toHaveBeenCalledTimes(0);
+            });
+
+            test('Missing gender', async () => {
+                delete body.gender;
+
+                const req = mockRequest({ body });
+                const res = mockResponse();
+                const next = mockNext();
+    
+                await validateUserProfile(req, res, next);
+    
+                expect(res.status).toHaveBeenCalledWith(401);
+                expect(res.send).toHaveBeenCalledWith({
+                    errors: {
+                        gender: 'required'
+                    }
+                });
+                expect(next).toHaveBeenCalledTimes(0);
+            });
+        });
+
+        describe('ERROR: Invalid format',  () => {
+            describe('fname', () => {
+                test('Too long', async () => {
+                    body.fname = 'aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa TOO LONG';
+
+                    const req = mockRequest({ body });
+                    const res = mockResponse();
+                    const next = mockNext();
+
+                    await validateUserProfile(req, res, next);
+
+                    expect(res.status).toHaveBeenCalledWith(401);
+                    expect(res.send).toHaveBeenCalledWith({
+                        errors: {
+                            fname: 'maxLength'
+                        }
+                    });
+                });
+
+                test('Invalid type', async () => {
+                    body.fname = 0;
+
+                    const req = mockRequest({ body });
+                    const res = mockResponse();
+                    const next = mockNext();
+
+                    await validateUserProfile(req, res, next);
+
+                    expect(res.status).toHaveBeenCalledWith(401);
+                    expect(res.send).toHaveBeenCalledWith({
+                        errors: {
+                            fname: 'type'
+                        }
+                    });
+                });
+            });
+
+            describe('lname', () => {
+                test('Too long', async () => {
+                    body.lname = 'aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa TOO LONG';
+
+                    const req = mockRequest({ body });
+                    const res = mockResponse();
+                    const next = mockNext();
+
+                    await validateUserProfile(req, res, next);
+
+                    expect(res.status).toHaveBeenCalledWith(401);
+                    expect(res.send).toHaveBeenCalledWith({
+                        errors: {
+                            lname: 'maxLength'
+                        }
+                    });
+                });
+
+                test('Invalid type', async () => {
+                    body.lname = 0;
+
+                    const req = mockRequest({ body });
+                    const res = mockResponse();
+                    const next = mockNext();
+
+                    await validateUserProfile(req, res, next);
+
+                    expect(res.status).toHaveBeenCalledWith(401);
+                    expect(res.send).toHaveBeenCalledWith({
+                        errors: {
+                            lname: 'type'
+                        }
+                    });
+                });
+            });
+
+            describe('bio', () => {
+                test('Too long', async () => {
+                    body.bio = `
+                        aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa TOO LONG
+                        aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa TOO LONG
+                        aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa TOO LONG
+                        aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa aaaaaaaaa TOO LONG
+                    `;
+
+                    const req = mockRequest({ body });
+                    const res = mockResponse();
+                    const next = mockNext();
+
+                    await validateUserProfile(req, res, next);
+
+                    expect(res.status).toHaveBeenCalledWith(401);
+                    expect(res.send).toHaveBeenCalledWith({
+                        errors: {
+                            bio: 'maxLength'
+                        }
+                    });
+                });
+
+                test('Invalid type', async () => {
+                    body.bio = 0;
+
+                    const req = mockRequest({ body });
+                    const res = mockResponse();
+                    const next = mockNext();
+
+                    await validateUserProfile(req, res, next);
+
+                    expect(res.status).toHaveBeenCalledWith(401);
+                    expect(res.send).toHaveBeenCalledWith({
+                        errors: {
+                            bio: 'type'
+                        }
+                    });
+                });
+            });
         });
     });
 });
