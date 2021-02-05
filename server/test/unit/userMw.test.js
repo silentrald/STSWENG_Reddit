@@ -1,4 +1,7 @@
-const { validateRegisterUser } = require('../../middlewares/userMw');
+const { 
+    validateRegisterUser,
+    validateUserParam
+} = require('../../middlewares/userMw');
 
 const mockRequest = (data) => {
     return data;
@@ -258,6 +261,79 @@ describe('Unit test: userMw.js', () => {
                 });
                 expect(next).toHaveBeenCalledTimes(0);
             });
+        });
+    });
+
+    describe('Middleware: validateUserParam', () => {
+        let params;
+        beforeEach(() => {
+            params = {
+                username: 'valid_example'
+            };
+        });
+
+        test('GOOD', async () => {
+            const req = mockRequest({ params });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateUserParam(req, res, next);
+            
+            expect(next).toHaveBeenCalledTimes(1);
+        });
+
+        test('ERROR: Empty Username', async () => {
+            params.username = '';
+
+            const req = mockRequest({ params });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateUserParam(req, res, next);
+            
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.send).toHaveBeenCalledWith({
+                errors: {
+                    username: 'pattern'
+                }
+            });
+            expect(next).toHaveBeenCalledTimes(0);
+        });
+
+        test('ERROR: Username too short', async () => {
+            params.username = 'short';
+
+            const req = mockRequest({ params });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateUserParam(req, res, next);
+            
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.send).toHaveBeenCalledWith({
+                errors: {
+                    username: 'pattern'
+                }
+            });
+            expect(next).toHaveBeenCalledTimes(0);
+        });
+
+        test('ERROR: Username too long', async () => {
+            params.username = 'aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa a';
+            console.log(params);
+            const req = mockRequest({ params });
+            const res = mockResponse();
+            const next = mockNext();
+
+            await validateUserParam(req, res, next);
+            
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.send).toHaveBeenCalledWith({
+                errors: {
+                    username: 'pattern'
+                }
+            });
+            expect(next).toHaveBeenCalledTimes(0);
         });
     });
 });

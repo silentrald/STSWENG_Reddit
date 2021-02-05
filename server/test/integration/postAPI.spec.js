@@ -48,7 +48,7 @@ let post;
 let testPostIds = [];
 let crewmateToken, usernameToken;
 let startingPost;
-let failStation;
+let failStation, failUser;
 let testPostId;
 
 const POST_REGEX = /^p[A-Za-z0-9]{0,11}$/;
@@ -1065,6 +1065,266 @@ describe('Station API', () => {
         });
     });
 
+    describe(`GET ${url}/user/:username`, () => {
+        test('GOOD: without query', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).get(`${url}/user/${crewmateUser.username}`);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.posts).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        post_id: expect.stringMatching(POST_REGEX),
+                        title: expect.any(String),
+                        text: expect.any(String),
+                        author: expect.any(String),
+                        deleted: expect.any(Boolean),
+                        timestamp_created: expect.any(String)
+                    })
+                ])
+            );
+            expect(body.posts.length).toEqual(LIMIT);
+
+            startingPost = body.posts[0];
+        });
+
+        describe('GOOD: sanitize query offset', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        offset: 2
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).not.toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Invalid Type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        offset: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        offset: -2
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+
+        describe('GOOD: sanitize query limit', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        limit: 3
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(3);
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Zero', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        limit: 0
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+
+        test('BAD: User does not exist', async() => {
+            const {
+                statusCode
+            } = await request(server)
+                .get(`${url}/user/NotAUser`);
+            
+            expect(statusCode).toEqual(404);
+        });
+
+        describe('BAD: username params', () => {
+            test('Username too short', async() => {
+                failUser = 'fake';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${failUser}`);
+                
+                expect(statusCode).toEqual(400);
+                expect(body).toEqual({
+                    errors: {
+                        username: 'pattern'
+                    }
+                });
+            });
+
+            test('Username too long', async() => {
+                failUser = 'aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa a';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${failUser}`);
+                
+                expect(statusCode).toEqual(400);
+                expect(body).toEqual({
+                    errors: {
+                        username: 'pattern'
+                    }
+                });
+            });
+        });
+    });
+
     describe(`POST ${url}/station/:station`, () => {
         beforeEach(() => {
             post = {
@@ -1100,8 +1360,7 @@ describe('Station API', () => {
 
             expect(statusCode).toEqual(403);
         });
-        // TODO: 
-        // test('ERROR: User is not part of station');
+        // TODO: test('ERROR: User is not part of station');
 
         describe('ERROR: Title field', () => {
             test('Title wrong type', async () => {

@@ -184,6 +184,60 @@ const postAPI = {
         }
     },
 
+    /**
+     * Gets all the posts form a given user
+     */
+    getUserPosts: async (req, res) => {
+        const { username } = req.params;
+        const { offset, limit } = req.query;
+
+        const queryUser = {
+            text: `
+                SELECT  *
+                FROM    users
+                WHERE   username=$1
+                LIMIT   1
+            `,
+            values: [
+                username
+            ]
+        };
+
+        const queryUserPosts = {
+            text: `
+                SELECT      *
+                FROM        posts
+                WHERE       author=$1
+                ORDER BY    timestamp_created DESC
+                OFFSET      $2
+                LIMIT       $3;
+            `,
+            values: [ 
+                username,
+                offset,
+                limit
+            ]
+        };
+
+        try {
+            const { rowCount } = await db.query(queryUser);
+
+            if (!rowCount) {
+                return res.status(404).send();
+            }
+
+            const result = await db.query(queryUserPosts);
+
+            return res.status(200).send({
+                posts: result.rows
+            });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).send();
+        }
+        
+    },
+
     // POST
     /**
      * Adds a post from a user to a given station
