@@ -7,6 +7,9 @@
       <b-nav-item :active="activeTab === 'main'" to="." :append="isIndex">
         MAIN
       </b-nav-item>
+      <b-nav-item :active="activeTab === 'roles'" to="roles" :append="isIndex">
+        ROLES
+      </b-nav-item>
       <b-nav-item :active="activeTab === 'info'" to="info" :append="isIndex">
         INFO
       </b-nav-item>
