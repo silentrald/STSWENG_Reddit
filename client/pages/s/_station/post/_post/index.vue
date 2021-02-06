@@ -40,8 +40,8 @@
               </div>
               <button
                 id="post"
-                :title="!(comment_text && comment_text.length > 0) ? 'Comment should not be blank' : ''"
-                :disabled="!(comment_text && comment_text.length > 0)"
+                :title="!commentIsNotEmpty ? 'Comment should not be blank' : ''"
+                :disabled="!commentIsNotEmpty"
                 @click="postComment()"
               >
                 Post
@@ -100,6 +100,13 @@ export default {
       loading: true,
       submitting: false,
       joined: false
+    }
+  },
+
+  computed: {
+    commentIsNotEmpty () {
+      const comment = this.comment_text
+      return comment && typeof comment === 'string' && comment.trim().length > 0
     }
   },
 
@@ -173,7 +180,15 @@ export default {
         next.push(comment)
         this.$set(this, 'comments', next)
         this.$set(this, 'comment_text', '')
-      } catch (err) {}
+      } catch (err) {
+        this.$bvModal.msgBoxOk('Your comment could not be uploaded.', {
+          centered: true,
+          okTitle: 'Failed to post comment',
+          noCloseOnEsc: true,
+          noCloseOnBackdrop: true,
+          hideHeaderClose: true
+        })
+      }
 
       this.submitting = false
     },
