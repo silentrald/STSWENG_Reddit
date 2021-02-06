@@ -41,7 +41,7 @@
         </div>
         <div v-if="!isDeleted && !editting && !writeSubcomment" class="d-flex">
           <div
-            v-if="$auth.user"
+            v-if="$auth.user && joined"
             class="reply mr-4"
             @click="showSubcomment()"
           >
@@ -149,13 +149,20 @@ export default {
       editText: '',
       isDeleted: false,
       sending: false,
-      subcommentError: undefined
+      subcommentError: undefined,
+      joined: false
     }
   },
 
-  beforeMount () {
+  async beforeMount () {
     this.commentText = this.text
     this.isDeleted = this.deleted
+
+    // Check if user is joined to enable replies
+    const res = await this.$axios.get(`/api/station/id/${this.$route.params.station}`)
+    const { joined } = res.data
+
+    this.$set(this, 'joined', joined)
   },
 
   methods: {
