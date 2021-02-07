@@ -72,109 +72,109 @@ jobs:
           - 5432:5432
 
     steps:
-    - name: Checkout 🛎
-      uses: actions/checkout@v2
+      - name: Checkout 🛎
+        uses: actions/checkout@v2
 
-    - name: Use Node.js ${{ matrix.node-version }} 😊
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }} 😊
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Get yarn cache directory path 🛠
-      id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Get yarn cache directory path 🛠
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
 
-    - name: Cache node_modules 📦
-      uses: actions/cache@v2
-      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+      - name: Cache node_modules 📦
+        uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-    - name: Install Packages 📦
-      run: yarn
-      working-directory: ./server
+      - name: Install Packages 📦
+        run: yarn
+        working-directory: ./server
 
-    # - name: Build
-    #   run: npm run build --if-present
-    #   working-directory: ./server
+      # - name: Build
+      #   run: npm run build --if-present
+      #   working-directory: ./server
 
-    - name: Linter 👌
-      run: yarn lint
-      working-directory: ./server
+      - name: Linter 👌
+        run: yarn lint
+        working-directory: ./server
 
-    - name: Migrate Up 🔺
-      run: yarn migrate-up
-      env:
-        NODE_ENV: development
-        POSTGRES_USER: stsweng_user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-      working-directory: ./server
+      - name: Migrate Up 🔺
+        run: yarn migrate-up
+        env:
+          NODE_ENV: development
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        working-directory: ./server
 
-    - name: Insert Data 🔖
-      run: yarn db-insert
-      env:
-        NODE_ENV: development
-        POSTGRES_USER: stsweng_user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-      working-directory: ./server
+      - name: Insert Data 🔖
+        run: yarn db-insert
+        env:
+          NODE_ENV: development
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        working-directory: ./server
 
-    - name: Unit Tests (Jest) 🧪
-      run: yarn test-unit
-      env:
-        NODE_ENV: development
-        POSTGRES_USER: stsweng_user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-        JWT_SECRET: temp_secret
-      working-directory: ./server
-    
-    - name: Integration Tests (Jest) 🧪
-      run: yarn test-int
-      env:
-        NODE_ENV: development
-        POSTGRES_USER: stsweng_user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-        JWT_SECRET: temp_secret
-      working-directory: ./server
-    
-    - name: Delete Data ❌
-      run: yarn db-delete
-      env:
-        NODE_ENV: development
-        POSTGRES_USER: stsweng_user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-      working-directory: ./server
+      - name: Unit Tests (Jest) 🧪
+        run: yarn test-unit
+        env:
+          NODE_ENV: development
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          JWT_SECRET: temp_secret
+        working-directory: ./server
 
-    - name: Migrate Down 🔻
-      run: yarn migrate-down
-      env:
-        NODE_ENV: development
-        POSTGRES_USER: stsweng_user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-      working-directory: ./server
-    
+      - name: Integration Tests (Jest) 🧪
+        run: yarn test-int
+        env:
+          NODE_ENV: development
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          JWT_SECRET: temp_secret
+        working-directory: ./server
+
+      - name: Delete Data ❌
+        run: yarn db-delete
+        env:
+          NODE_ENV: development
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        working-directory: ./server
+
+      - name: Migrate Down 🔻
+        run: yarn migrate-down
+        env:
+          NODE_ENV: development
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        working-directory: ./server
+
   e2e:
-    needs: [ nuxt_client, express_server ]
+    needs: [nuxt_client, express_server]
 
     runs-on: ${{ matrix.os }}
 
@@ -197,116 +197,119 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    
+
     steps:
-    - name: Checkout 🛎
-      uses: actions/checkout@v2
+      - name: Checkout 🛎
+        uses: actions/checkout@v2
 
-    - name: Use Node.js ${{ matrix.node-version }} 😊
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }} 😊
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Get yarn cache directory path 🛠
-      id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Get yarn cache directory path 🛠
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
 
-    - name: Cache node_modules 📦
-      uses: actions/cache@v2
-      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-    
-    # Initiate docker
-    - name: Initialize Docker 📤
-      run: |
-        docker-compose build
-        docker-compose up -d
-    
-    - name: Install Node Postgres
-      run: yarn add pg
-      working-directory: ./server
+      - name: Cache node_modules 📦
+        uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-    - name: Migrate Up 🔺
-      run: yarn migrate-up
-      env:
-        NODE_ENV: development
-        POSTGRES_USER: stsweng_user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-      working-directory: ./server
+      # Initiate docker
+      - name: Initialize Docker 📤
+        run: |
+          docker-compose build
+          docker-compose up -d
 
-    - name: Insert Data 🔖
-      run: yarn db-insert
-      env:
-        NODE_ENV: development
-        POSTGRES_USER: stsweng_user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-      working-directory: ./server
+      - name: Install Node Postgres
+        run: yarn add pg
+        working-directory: ./server
 
-    # Automation testing
-    - name: Install Python 🐍
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-        architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-    
-    - name: Install Robot Framework Packages 🤖
-      run: |
-        pip install robotframework
-        pip install --upgrade robotframework-seleniumlibrary
-        pip install webdriver-manager
-        pip install chromedriver
-      working-directory: ./e2e
-    
-    - name: Install Chrome Browser 🥽
-      run: |
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo apt install ./google-chrome-stable_current_amd64.deb
-    
-    - name: Install chromedriver 🥽
-      run: |
-        wget https://chromedriver.storage.googleapis.com/87.0.4280.88/chromedriver_linux64.zip
-        unzip chromedriver_linux64.zip
-        sudo cp chromedriver /usr/bin/chromedriver
-        sudo chown root /usr/bin/chromedriver
-        sudo chmod +x /usr/bin/chromedriver
-        sudo chmod 755 /usr/bin/chromedriver
+      - name: Migrate Up 🔺
+        run: yarn migrate-up
+        env:
+          NODE_ENV: development
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        working-directory: ./server
 
-    - name: Automated E2E test with Robot 🤖
-      run: robot *.robot
-      working-directory: ./e2e
-    
-    - name: Stop Docker 📤
-      run: |
-        docker-compose down
-    
-    - name: Delete Data ❌
-      run: yarn db-delete
-      env:
-        NODE_ENV: development
-        POSTGRES_USER: stsweng_user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-      working-directory: ./server
+      - name: Insert Data 🔖
+        run: yarn db-insert
+        env:
+          NODE_ENV: development
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        working-directory: ./server
 
-    - name: Migrate Down 🔻
-      run: yarn migrate-down
-      env:
-        NODE_ENV: development
-        POSTGRES_USER: stsweng_user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: stsweng_db
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-      working-directory: ./server
+      # Automation testing
+      - name: Install Python 🐍
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x" # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
+
+      - name: Install Robot Framework Packages 🤖
+        run: |
+          pip install robotframework
+          pip install --upgrade robotframework-seleniumlibrary
+          pip install webdriver-manager
+          pip install chromedriver
+        working-directory: ./e2e
+
+      - name: Install Chrome Browser 🥽
+        run: |
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt install ./google-chrome-stable_current_amd64.deb
+
+      - name: Install chromedriver 🥽
+        run: |
+          wget https://chromedriver.storage.googleapis.com/87.0.4280.88/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo cp chromedriver /usr/bin/chromedriver
+          sudo chown root /usr/bin/chromedriver
+          sudo chmod +x /usr/bin/chromedriver
+          sudo chmod 755 /usr/bin/chromedriver
+
+      - name: Status Docker Compose
+        run: docker-compose ps
+
+      - name: Automated E2E test with Robot 🤖
+        run: robot *.robot
+        working-directory: ./e2e
+
+      - name: Stop Docker 📤
+        run: |
+          docker-compose down
+
+      - name: Delete Data ❌
+        run: yarn db-delete
+        env:
+          NODE_ENV: development
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        working-directory: ./server
+
+      - name: Migrate Down 🔻
+        run: yarn migrate-down
+        env:
+          NODE_ENV: development
+          POSTGRES_USER: stsweng_user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: stsweng_db
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+        working-directory: ./server
