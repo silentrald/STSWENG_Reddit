@@ -9,6 +9,7 @@
 :root {
   --red: #FF3232;
   --black: #01021E;
+  --green: #
 }
 
 body {
@@ -57,8 +58,14 @@ input:focus {
   color: #C4C4C4;
 }
 
+.success {
+  color: #99ff99;
+  font-size: 14px;
+  font-style: italic;
+}
+
 .error {
-  color: red;
+  color: var(--red);
   font-size: 14px;
   font-style: italic;
 }
