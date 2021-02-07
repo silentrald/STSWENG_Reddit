@@ -5,8 +5,8 @@ services:
     command: node app
     volumes:
       - ./opt/server:/server
-    ports:
-      - "5000:5000"
+    # ports:
+    #   - "5000:5000"
     environment:
       HOST: "0.0.0.0"
       NODE_ENV: development
@@ -16,7 +16,7 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_DB: stsweng_db
       JWT_SECRET: random_secret
-    # network_mode: host
+    network_mode: host
   client:
     build: ./client
     command: yarn dev
@@ -27,7 +27,3 @@ services:
     environment:
       HOST: "0.0.0.0"
       SERVER_URL: http://localhost:5000
-networks:
-  default:
-    external: true
-    name: container_network
