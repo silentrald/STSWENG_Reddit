@@ -26,3 +26,7 @@ services:
     environment:
       HOST: "0.0.0.0"
       SERVER_URL: http://localhost:5000
+networks:
+  default:
+    external: true
+    name: container_network
