@@ -4,6 +4,7 @@ Resource  ./Keywords/Common.robot
 Suite Setup     Open Chrome and Login   username=crewmate   password=password
 Test Setup      Join Station    station=SampleStation2
 Test Teardown   Leave Station   station=SampleStation2
+Suite Teardown   Close Browser
 *** Variables ***
 
 *** Test Cases ***

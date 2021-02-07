@@ -2,6 +2,7 @@
 Library  SeleniumLibrary
 Resource  ./Keywords/Common.robot
 Suite Setup     Open Chrome and Login  username=username   password=password
+
 *** Variables ***
 ${station}  SampleStation
 *** Test Cases ***

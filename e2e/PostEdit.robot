@@ -3,6 +3,7 @@ Library  SeleniumLibrary
 Resource  ./Keywords/Common.robot
 Suite Setup     Open Chrome and Login   username=crewmate   password=password
 Test Setup      Go To   http://localhost:3000/s/SampleStation
+Suite Teardown   Close Browser
 *** Variables ***
 
 *** Test Cases ***

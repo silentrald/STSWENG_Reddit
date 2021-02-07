@@ -2,6 +2,7 @@
 Library  SeleniumLibrary
 Resource  ./Keywords/Common.robot
 Suite Setup  Open Chrome
+Suite Teardown   Close Browser
 
 *** Variables ***
 
