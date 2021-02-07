@@ -11,7 +11,7 @@ ${station}  SampleStation
 
     Open Post
     Wait Until Page Contains Element  class:post-container
-    Page Should Contain     You must be part of the station to comment.
+    Page Should Not Contain Element     id:post
     
 10.22 Create Empty Comment - Member
     [documentation]  Test if error messages appear when a member makes an empty comment
