@@ -9,26 +9,13 @@ ${station}  SampleStation
     [documentation]  Test if error messages appear when a non-member adds a comment to a post in a station
 
     Open Post
-    Wait Until Page Contains Element  id:comment-text
-    Input Text  id:comment-text  Hello!
-    Click Element   id:post
-    #Page Should Contain     Post title is required
-
-10.21 Create Empty Comment - Non-member
-    [documentation]  Test if error messages appear when a non-member adds a comment to a post in a station
-
-    Open Post
-    Reload Page
-    Wait Until Page Contains Element  id:comment-text
-    Click Element  id:post
-    #Page Should Contain  Post text is required
+    Page Should Contain     You must be part of the station to comment.
     
 10.22 Create Empty Comment - Member
     [documentation]  Test if error messages appear when a member makes an empty comment
 
     Join Station and Open Post  ${station} 
-    Wait Until Page Contains Element  id:comment-text
-    Click Element  id:post
+    Element Should Be Disabled   id:post
     Leave Station  ${station}
     #Page Should Contain     Post title is required
 
@@ -74,16 +61,6 @@ ${station}  SampleStation
     Reload Page
     Wait Until Page Contains  Edited Subcomment
     Page Should Not Contain  Subcomment Test Automation
-
-#11.1 Create Subcomment - Non-Member
-    #[Setup]  Open Post
-    #Wait Until Page Contains Element  id:comment-text
-    #Input Text  id:text  Subcomment Test Automation
-    #Click Element   id:post
-    #Element Should Contain  
-    #//span[@class='select-all' and text()='Uncheck All']
-    #Page Should Contain     Post title is required
-    #[Teardown]  Reload Page
 
 13.1 Delete Comment
     [documentation]  Test if the author of a comment can delete their comment
