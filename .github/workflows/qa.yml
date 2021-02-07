@@ -225,6 +225,7 @@ jobs:
         run: |
           docker-compose build
           docker-compose up -d
+          docker run --rm -d --network host --name server server
 
       - name: Install Node Postgres
         run: yarn add pg
