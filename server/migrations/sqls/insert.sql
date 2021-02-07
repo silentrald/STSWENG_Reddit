@@ -7,6 +7,9 @@ INSERT INTO users(username, password, email) VALUES
     ('imposter', '$2b$10$uIugTkePCOSCvKw.jccpAeBZ.b1IatDqh.Qt.dnzfpQY.ABeRGwIS', 'impostor@station.org'),
     ('captain2', '$2b$10$uIugTkePCOSCvKw.jccpAeBZ.b1IatDqh.Qt.dnzfpQY.ABeRGwIS', 'captain2@station.org');
 
+INSERT INTO users(username, password, email, fname, lname, gender, birthday, bio) VALUES
+    ('userInfo', '$2b$10$uIugTkePCOSCvKw.jccpAeBZ.b1IatDqh.Qt.dnzfpQY.ABeRGwIS', 'userinfo@station.org', 'FNAME', 'LNAME', 'm', '10-06-1999', 'Test bio');
+
 /* stations */
 INSERT INTO stations(name, description, rules, members) VALUES
     ('SampleStation', 'This is a test station', '1. Do not delete this', 2); /* captain1, crewmate */
@@ -48,7 +51,11 @@ INSERT INTO posts(post_id, title, text, author, station_name) VALUES
     ('paaaaaaaaa13', 'Sample Title 13', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
     ('paaaaaaaaa14', 'Sample Title 14', 'Sample Post by captain', 'captain1', 'SampleStation'),
     ('paaaaaaaaa15', 'Sample Title 15', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
-    ('paaaaaaaaa16', 'Sample Title 16', 'Sample Post by crewmate', 'crewmate', 'SampleStation');
+    ('paaaaaaaaa16', 'Sample Title 16', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaa17', 'Sample Title 17', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaa18', 'Sample Title 18', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaa19', 'Sample Title 19', 'Sample Post by crewmate', 'crewmate', 'SampleStation'),
+    ('paaaaaaaaa20', 'Sample Title 20', 'Sample Post by crewmate', 'crewmate', 'SampleStation');
 
 /* comments */
 /* subposts */

@@ -162,6 +162,67 @@ describe('User API', () => {
         });
     });
 
+    describe(`GET: ${url}/profile/:username`, () => {
+        let username = 'crewmate';
+
+        test('GOOD: User exists', async () => {
+            const res = await request(server)
+                .get(`${url}/profile/${username}`);
+
+            expect(res.statusCode).toEqual(200);
+            expect(res.body).toMatchObject({
+                user: expect.objectContaining({
+                    username,
+                    fname: expect.any(String),
+                    lname: expect.any(String),
+                    bio: expect.any(String),
+                    fame: expect.any(Number)
+                })
+            });
+            expect(res.body.user.gender === null || res.body.user.gender instanceof Boolean).toBeTruthy();
+            expect(res.body.user.birthday === null || res.body.user.birthday instanceof Boolean).toBeTruthy();
+        });
+
+        test('ERROR: User does not exist', async () => {
+            username = 'missingPerson';
+
+            const res = await request(server)
+                .get(`${url}/profile/${username}`);
+
+            expect(res.statusCode).toEqual(404);
+        });
+
+        test('ERROR: Username supplied is too short', async () => {
+            username = 'short';
+            const res = await request(server)
+                .get(`${url}/profile/${username}`);
+
+            expect(res.statusCode).toEqual(400);
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    errors: {
+                        username: 'pattern'
+                    }
+                })
+            );
+        });
+
+        test('ERROR: Username supplied is too long', async () => {
+            username = 'aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa a';
+            const res = await request(server)
+                .get(`${url}/profile/${username}`);
+
+            expect(res.statusCode).toEqual(400);
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    errors: {
+                        username: 'pattern'
+                    }
+                })
+            );
+        });
+    });
+
     describe(`POST: ${url}/create`, () => {
         beforeEach(() => {
             failUser = {

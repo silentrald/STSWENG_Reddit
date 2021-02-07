@@ -63,6 +63,12 @@
           </div>
         </div>
         <div v-if="$auth.user && writeSubcomment">
+          <div
+            v-if="subcommentError !== undefined"
+            class="red"
+          >
+            {{ subcommentError }}
+          </div>
           <textarea
             v-model="tempSubcomment"
             class="subcomment-input"
@@ -141,7 +147,9 @@ export default {
       editting: false,
       saving: false,
       editText: '',
-      isDeleted: false
+      isDeleted: false,
+      sending: false,
+      subcommentError: undefined
     }
   },
 
@@ -194,7 +202,14 @@ export default {
 
     async postSubcomment () {
       this.tempSubcomment = this.tempSubcomment.trim()
-      if (!this.tempSubcomment) { return }
+      if (!this.tempSubcomment) {
+        this.subcommentError = 'Subcomment should not be empty'
+        return
+      }
+
+      if (this.sending) { return }
+      this.sending = true
+      this.subcommentError = undefined
 
       const { station, post } = this.$route.params
 
@@ -205,9 +220,11 @@ export default {
           station
         })
         const { subcomment } = res.data
-        // TODO: Fix mutation problem
         this.subcomments.push(subcomment)
+
+        this.tempSubcomment = ''
         this.writeSubcomment = false
+        this.sending = false
       } catch (err) {}
     }
   }

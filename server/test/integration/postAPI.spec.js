@@ -48,7 +48,7 @@ let post;
 let testPostIds = [];
 let crewmateToken, usernameToken;
 let startingPost;
-let failStation;
+let failStation, failUser;
 let testPostId;
 
 const POST_REGEX = /^p[A-Za-z0-9]{0,11}$/;
@@ -1065,6 +1065,266 @@ describe('Station API', () => {
         });
     });
 
+    describe(`GET ${url}/user/:username`, () => {
+        test('GOOD: without query', async () => {
+            const {
+                statusCode,
+                body
+            } = await request(server).get(`${url}/user/${crewmateUser.username}`);
+            
+            expect(statusCode).toEqual(200);
+            expect(body.posts).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        post_id: expect.stringMatching(POST_REGEX),
+                        title: expect.any(String),
+                        text: expect.any(String),
+                        author: expect.any(String),
+                        deleted: expect.any(Boolean),
+                        timestamp_created: expect.any(String)
+                    })
+                ])
+            );
+            expect(body.posts.length).toEqual(LIMIT);
+
+            startingPost = body.posts[0];
+        });
+
+        describe('GOOD: sanitize query offset', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        offset: 2
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).not.toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Invalid Type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        offset: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        offset: -2
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts[0]).toEqual(startingPost);
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+
+        describe('GOOD: sanitize query limit', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        limit: 3
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(3);
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Zero', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        limit: 0
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${crewmateUser.username}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.posts).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            post_id: expect.stringMatching(POST_REGEX),
+                            title: expect.any(String),
+                            text: expect.any(String),
+                            author: expect.any(String),
+                            deleted: expect.any(Boolean),
+                            timestamp_created: expect.any(String)
+                        })
+                    ])
+                );
+                expect(body.posts.length).toEqual(LIMIT);
+            });
+        });
+
+        test('BAD: User does not exist', async() => {
+            const {
+                statusCode
+            } = await request(server)
+                .get(`${url}/user/NotAUser`);
+            
+            expect(statusCode).toEqual(404);
+        });
+
+        describe('BAD: username params', () => {
+            test('Username too short', async() => {
+                failUser = 'fake';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${failUser}`);
+                
+                expect(statusCode).toEqual(400);
+                expect(body).toEqual({
+                    errors: {
+                        username: 'pattern'
+                    }
+                });
+            });
+
+            test('Username too long', async() => {
+                failUser = 'aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa a';
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}/user/${failUser}`);
+                
+                expect(statusCode).toEqual(400);
+                expect(body).toEqual({
+                    errors: {
+                        username: 'pattern'
+                    }
+                });
+            });
+        });
+    });
+
     describe(`POST ${url}/station/:station`, () => {
         beforeEach(() => {
             post = {
@@ -1100,8 +1360,7 @@ describe('Station API', () => {
 
             expect(statusCode).toEqual(403);
         });
-        // TODO: 
-        // test('ERROR: User is not part of station');
+        // TODO: test('ERROR: User is not part of station');
 
         describe('ERROR: Title field', () => {
             test('Title wrong type', async () => {
@@ -1290,7 +1549,7 @@ describe('Station API', () => {
             });
         });
 
-        afterAll(async () => {
+        afterEach(async () => {
             await db.query({
                 text: 'DELETE FROM posts WHERE post_id = ANY($1)',
                 values: [ testPostIds ]
@@ -1298,7 +1557,312 @@ describe('Station API', () => {
         });
     });
 
-    // TODO: 
+    describe(`PATCH ${url}/:post`, () => {
+        beforeEach(async () => {
+            post = {
+                postId: 'ptestpostid1',
+                title: 'Sample Title',
+                text: 'Sample Text'
+            };
+
+            console.log(post);
+            await db.query('BEGIN');
+            await db.query({
+                text: `
+                    DELETE FROM posts WHERE post_id=$1;
+                `,
+                values: [ post.postId ]
+            });
+            await db.query({
+                text: `
+                INSERT INTO posts(post_id, title, text, author, station_name) 
+                    VALUES($1, $2, $3, $4, $5);
+                `,
+                values: [ post.postId, post.title, post.text, crewmateUser.username, station ]
+            });
+            await db.query('COMMIT');
+            console.log(crewmateUser.username);
+        });
+
+        test('GOOD: Proper patch request', async () => {
+            const patchData = {
+                title: 'Edited Sample Title',
+                text: 'Edited Sample Text'
+            };
+
+            const res = await request(server)
+                .patch(`${url}/${post.postId}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send(patchData);
+
+            expect(res.statusCode).toEqual(200);
+            expect(res.body).toMatchObject({
+                post: {
+                    post_id: post.postId,
+                    title: patchData.title,
+                    text: patchData.text,
+                    score: expect.any(Number),
+                    author: crewmateUser.username,
+                    comment_count: expect.any(Number),
+                    timestamp_created: expect.any(String),
+                    station_name: station
+                }
+            });
+        });
+
+        test('ERROR: No body in request', async () => {
+            const res = await request(server)
+                .patch(`${url}/${post.postId}`)
+                .set('Authorization', `Bearer ${crewmateToken}`)
+                .send();
+
+            expect(res.statusCode).toEqual(401);
+        });
+
+        test('ERROR: Not logged in', async () => {
+            const patchData = {
+                title: 'Edited Sample Title',
+                text: 'Edited Sample Text'
+            };
+
+            const res = await request(server)
+                .patch(`${url}/${post.postId}`)
+                .send(patchData);
+
+            expect(res.statusCode).toEqual(403);
+        });
+
+        test('ERROR: User is not author', async () => {
+            const patchData = {
+                title: 'Edited Sample Title',
+                text: 'Edited Sample Text'
+            };
+
+            const res = await request(server)
+                .patch(`${url}/${post.postId}`)
+                .set('Authorization', `Bearer ${usernameToken}`)
+                .send(patchData);
+
+            expect(res.statusCode).toEqual(403);
+        });
+
+        describe('ERROR: Title field', () => {
+            test('Title wrong type', async () => {
+                const patchPost = {
+                    title: 0,
+                    text: 'Sample Text'
+                };
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .patch(`${url}/${post.postId}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(patchPost);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'type'
+                        }
+                    })
+                );
+            });
+
+            test('Empty string title', async () => {
+                const patchPost = {
+                    title: '',
+                    text: 'Sample Text'
+                };
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .patch(`${url}/${post.postId}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(patchPost);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'minLength'
+                        }
+                    })
+                );
+            });
+
+            test('Title is too long', async () => {
+                // 65 chars
+                const patchPost = {
+                    title: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+                    text: 'Sample Text'
+                };
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .patch(`${url}/${post.postId}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(patchPost);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'maxLength'
+                        }
+                    })
+                );
+            });
+
+            test('No title property', async () => {
+                const patchPost = {
+                    text: 'Sample Text'
+                };
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .patch(`${url}/${post.postId}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(patchPost);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            title: 'required'
+                        }
+                    })
+                );
+            });
+        });
+
+        describe('ERROR: Text field', () => {
+            test('Text wrong type', async () => {
+                const patchPost = {
+                    title: 'Sample Title',
+                    text: 0
+                };
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .patch(`${url}/${post.postId}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(patchPost);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            text: 'type'
+                        }
+                    })
+                );
+            });
+
+            test('Empty string text', async () => {
+                const patchPost = {
+                    title: 'Sample Title',
+                    text: ''
+                };
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .patch(`${url}/${post.postId}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(patchPost);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            text: 'minLength'
+                        }
+                    })
+                );
+            });
+
+            test('Text is too long', async () => {
+                const patchPost = {
+                    title: 'Sample Title',
+                    text: `
+                        According to all known laws of aviation, there is no way a bee should be 
+                        able to fly. Its wings are too small to get its fat little body off the 
+                        ground. The bee, of course, flies anyway because bees don't care what humans 
+                        think is impossible. Yellow, black. Yellow, black. Yellow, black. Yellow, black. 
+                        Ooh, black and yellow! Let's shake it up a little. Barry! Breakfast is ready! 
+                        Ooming! Hang on a second. Hello? - Barry? - Adam? - Oan you believe this is 
+                        happening? - I can't. I'll pick you up. Looking sharp. Use the stairs. Your father 
+                        paid good money for those. Sorry. I'm excited. Here's the graduate. We're very 
+                        proud of you, son. A perfect report card, all B's. Very proud. Ma! I got a thing 
+                        going here. - You got lint on your fuzz. - Ow! That's me! - Wave to us! We'll be in 
+                        row 118,000. - Bye! Barry, I told you, stop flying in the house! - Hey, Adam. - Hey, 
+                        Barry. - Is that fuzz gel? - A little. Special day, graduation. Never thought I'd make 
+                        it. Three days grade school, three days high school.
+                    `
+                };
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .patch(`${url}/${post.postId}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(patchPost);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            text: 'maxLength'
+                        }
+                    })
+                );
+            });
+
+            test('No text property', async () => {
+                const patchPost = {
+                    title: 'Sample Text'
+                };
+
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .patch(`${url}/${post.postId}`)
+                    .set('Authorization', `Bearer ${crewmateToken}`)
+                    .send(patchPost);
+                    
+                expect(statusCode).toEqual(401);
+                expect(body).toEqual(
+                    expect.objectContaining({
+                        errors: {
+                            text: 'required'
+                        }
+                    })
+                );
+            });
+        });
+
+        afterEach(async () => {
+            await db.query({
+                text: 'DELETE FROM posts WHERE post_id = $1',
+                values: [ testPostId ]
+            });
+        });
+    });
+
     describe(`DELETE ${url}/:post`, () => {
         beforeEach(async () => {
             post = {
