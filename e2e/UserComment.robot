@@ -10,12 +10,14 @@ ${station}  SampleStation
     [documentation]  Test if error messages appear when a non-member adds a comment to a post in a station
 
     Open Post
+    Wait Until Page Contains Element  class:post-container
     Page Should Contain     You must be part of the station to comment.
     
 10.22 Create Empty Comment - Member
     [documentation]  Test if error messages appear when a member makes an empty comment
 
     Join Station and Open Post  ${station} 
+    Wait Until Page Contains Element  id:post
     Element Should Be Disabled   id:post
     Leave Station  ${station}
     #Page Should Contain     Post title is required
