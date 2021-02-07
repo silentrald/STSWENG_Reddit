@@ -22,7 +22,7 @@
             <div class="col col-sm-6">
               <label>Preview</label>
               <!-- eslint-disable-next-line vue/no-v-html -->
-              <div class="md-preview" v-html="markdownDescription" />
+              <div class="md-preview break-text" v-html="markdownDescription" />
             </div>
           </div>
         </div>
@@ -45,7 +45,7 @@
             <div class="col col-sm-6">
               <label>Preview</label>
               <!-- eslint-disable-next-line vue/no-v-html -->
-              <div class="md-preview" v-html="markdownRules" />
+              <div class="md-preview break-text" v-html="markdownRules" />
             </div>
           </div>
         </div>
@@ -248,6 +248,10 @@ input:focus, textarea:focus {
   color: white;
   border: 2px solid #c4c4c4;
   border-radius: 0.5rem;
+}
+
+.break-text {
+  word-break: break-all;
 }
 
 </style>
