@@ -224,7 +224,7 @@ jobs:
       - name: Initialize Docker 📤
         run: |
           docker-compose build
-          docker-compose up -d
+          docker-compose up -d -H localhost
 
       - name: Install Node Postgres
         run: yarn add pg
