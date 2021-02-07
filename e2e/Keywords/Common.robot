@@ -18,7 +18,7 @@ Open Chrome and Login
     Input Text  id:username     ${username}
     Input Text  id:password     ${password}
     Click Element   css:form > #login
-    Wait Until Page Contains Element  id:logout
+    Wait Until Page Contains Element  id:logout  10
 
 Logout
     Click Element  id:logout
