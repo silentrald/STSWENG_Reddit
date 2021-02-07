@@ -25,7 +25,7 @@
                 <div v-if="emailFail" class="error">
                   Email could not be sent
                 </div>
-                <button v-if="!$auth.user.verified" id="verify-btn" @click="verify">
+                <button v-if="$auth.user.username === $route.params.user && !$auth.user.verified" id="verify-btn" @click="verify">
                   Verify Account
                 </button>
               </div>
