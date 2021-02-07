@@ -281,9 +281,6 @@ jobs:
           sudo chmod +x /usr/bin/chromedriver
           sudo chmod 755 /usr/bin/chromedriver
 
-      - name: Status Docker Compose
-        run: docker-compose ps
-
       - name: Automated E2E test with Robot 🤖
         run: robot *.robot
         working-directory: ./e2e

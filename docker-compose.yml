@@ -12,7 +12,7 @@ services:
       NODE_ENV: development
       POSTGRES_USER: stsweng_user
       POSTGRES_PASSWORD: password
-      POSTGRES_HOST: localhost
+      POSTGRES_HOST: db
       POSTGRES_PORT: 5432
       POSTGRES_DB: stsweng_db
       JWT_SECRET: random_secret
@@ -25,4 +25,4 @@ services:
       - "3000:3000"
     environment:
       HOST: "0.0.0.0"
-      SERVER_URL: http://localhost:5000
+      SERVER_URL: http://server:5000
