@@ -17,6 +17,7 @@ Suite Teardown   Close Browser
     Location Should Be  http://localhost:3000/s/StationQA
 
 6.2 Station Name Already in Use
+    [Documentation]  Test if creating a station with a duplicate name is allowed
     Wait Until Page Contains Element  id:name
     Input Text  id:name     SampleStation
     Input Text  id:description  desc
@@ -26,6 +27,7 @@ Suite Teardown   Close Browser
     Element Text Should Be  css:.form-group:nth-child(4)>.error  Station name is already used
     
 6.3 Station Name Too Short
+    [Documentation]  Test if creating a station with less than minimum amount of hcaracters is allowed
     Wait Until Page Contains Element  id:name
     Input Text  id:name     sa
     Input Text  id:description  desc

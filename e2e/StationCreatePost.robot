@@ -9,6 +9,7 @@ Suite Teardown   Close Browser
 
 *** Test Cases ***
 7.1 Invalid Add Post (Empty Title)
+    [Documentation]  Test if adding a post allows an empty title
     Wait Until Page Contains Element  id:add-post
     Click Element   id:add-post
     Wait Until Page Contains Element  id:text
@@ -17,6 +18,7 @@ Suite Teardown   Close Browser
     Wait Until Page Contains     Post title is required
 
 7.2 Invalid Add Post (Empty Post Body)
+    [Documentation]  Test if adding a post allows no/empty post body
     Wait Until Page Contains Element  id:add-post
     Click Element   id:add-post
     Wait Until Page Contains Element  id:title
