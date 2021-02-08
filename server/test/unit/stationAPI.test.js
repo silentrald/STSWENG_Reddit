@@ -1,7 +1,11 @@
 process.env.JWT_SECRET = 'test-value'; // set the jwt token
 
 const {
-    getStation, getStationCaptains, postCreateStation
+    getStation,
+    getStationNames,
+    getTopStations,
+    getStationCaptains,
+    postCreateStation
 } = require('../../api/stationAPI');
 
 /**
@@ -80,7 +84,10 @@ const mockQuery = query => {
             }
         ];
         result.rowCount = 1;
-    } 
+    } else if (query.text === 'SELECT name FROM stations WHERE name ILIKE $1 OFFSET $2 LIMIT $3;') {
+        result.rows = [{}];
+        result.rowCount = 1;
+    }
 
     return result;
 };
@@ -97,6 +104,8 @@ jest.mock('../../db', () => {
         end: jest.fn(),
     };
 });
+
+const db = require('../../db');
 
 const mockRequest = (data) => {
     return data;
@@ -136,7 +145,8 @@ describe('Unit test: stationAPI.js', () => {
                     description: 'This is a test station',
                     rules: 'There are no rules'
                 }),
-                joined: false
+                joined: false,
+                isCaptain: false
             });
         });
         
@@ -156,7 +166,8 @@ describe('Unit test: stationAPI.js', () => {
                     description: 'This is a test station',
                     rules: 'There are no rules'
                 }),
-                joined: true
+                joined: true,
+                isCaptain: false
             });
         });
         
@@ -172,6 +183,50 @@ describe('Unit test: stationAPI.js', () => {
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.send).toHaveBeenCalledWith();
+        });
+    });
+
+    describe('API: getStationNames', () => {
+        let query = {};
+
+        beforeEach(() => {
+            query = {};
+        });
+
+        test('GOOD', async () => {
+            const req = mockRequest({ query });
+            const res = mockResponse();
+
+            await getStationNames(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        test('GOOD: search', async () => {
+            query.search = 'valid';
+            const req = mockRequest({ query });
+            const res = mockResponse();
+
+            await getStationNames(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+    });
+
+    describe('API: getTopStations', async () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+        });
+
+        test('GOOD', async () => {
+            const req = mockRequest({});
+            const res = mockResponse();
+            
+            await getTopStations(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledTimes(1);
+            expect(db.query).toHaveBeenCalledTimes(1);
         });
     });
 

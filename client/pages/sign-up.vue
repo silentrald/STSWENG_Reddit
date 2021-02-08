@@ -8,6 +8,7 @@
         <img id="image" src="https://picsum.photos/100/100" width="100" height="100">
         <br>
         <div class="form-group">
+          <label for="username">Username</label>
           <div v-if="errors.username" class="error">
             {{ errors.username }}
           </div>
@@ -21,6 +22,7 @@
           >
         </div>
         <div class="form-group">
+          <label for="email">Email</label>
           <div v-if="errors.email" class="error">
             {{ errors.email }}
           </div>
@@ -34,6 +36,7 @@
           >
         </div>
         <div class="form-group">
+          <label for="password">Password</label>
           <div v-if="errors.password" class="error">
             {{ errors.password }}
           </div>
@@ -47,6 +50,7 @@
           >
         </div>
         <div class="form-group">
+          <label for="cpassword">Confirm Password</label>
           <input
             id="cpassword"
             v-model="user.cpassword"
@@ -124,13 +128,12 @@ const customErrorMsg = {
   email: {
     maxLength: 'Email is too long (max 256)',
     minLength: 'Email is too short (min 8)',
-    format: 'Email is invalid',
-    used: 'Username is already used'
+    format: 'Email is invalid'
   },
   password: {
     maxLength: 'Password is too long (max 256)',
     minLength: 'Password is too short (min 8)',
-    pattern: 'Password is too weak'
+    pattern: 'Password must contain atleast 1 uppercase, lowercase and number characters.'
   }
 }
 

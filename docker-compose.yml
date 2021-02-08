@@ -1,16 +1,15 @@
-version: '3'
+version: "3"
 services:
   server:
     build: ./server
     command: node app
     volumes:
       - ./opt/server:/server
-    ports:
-      - "5000:5000"
+    # ports:
+    #   - "5000:5000"
     environment:
-      HOST: '0.0.0.0'
+      HOST: "0.0.0.0"
       NODE_ENV: development
-      # DATABASE_URL: postgres://stsweng_user:password@db:5432/stsweng_db
       POSTGRES_USER: stsweng_user
       POSTGRES_PASSWORD: password
       POSTGRES_HOST: localhost
@@ -26,5 +25,5 @@ services:
     ports:
       - "3000:3000"
     environment:
-      HOST: '0.0.0.0'
+      HOST: "0.0.0.0"
       SERVER_URL: http://localhost:5000

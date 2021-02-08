@@ -2,8 +2,10 @@ process.env.JWT_SECRET = 'test-value'; // set the jwt token
 
 const {
     getAuth,
+    getUserNames,
     postLogin,
-    postRegisterUser
+    postRegisterUser,
+    getUser
 } = require('../../api/userAPI');
 
 jest.mock('../../db', () => {
@@ -24,9 +26,7 @@ jest.mock('../../db', () => {
 
             query.text = oneLineQuery(query.text);
 
-            console.log(query.text);
-
-            if (query.text === 'SELECT * FROM users WHERE username=$1;' && query.values[0] && query.values[0] === 'username') {
+            if (query.text === 'SELECT * FROM users WHERE username=$1 LIMIT 1;' && query.values[0] && query.values[0] === 'username') {
                 result.rows = [
                     {
                         username: 'username',
@@ -48,6 +48,9 @@ jest.mock('../../db', () => {
                     };
                 }
                 result.rowCount = 1;
+            } else if (query.text === 'SELECT username FROM users WHERE username ILIKE $1 OFFSET $2 LIMIT $3;') {
+                result.rows = [{}];
+                result.rowCount = 1;
             }
 
             return result;
@@ -55,6 +58,7 @@ jest.mock('../../db', () => {
         end: jest.fn(),
     };
 });
+const db = require('../../db');
 
 const mockRequest = (data) => {
     return data;
@@ -93,6 +97,54 @@ describe('Unit test: userAPI.js', () => {
 
             expect(res.status).toHaveBeenCalledWith(403);
             expect(res.send).toHaveBeenCalledWith();
+        });
+    });
+
+    describe('API: getUserNames', () => {
+        let query = {};
+
+        beforeEach(() => {
+            query = {};
+        });
+
+        test('GOOD: no search', async () => {
+            const req = mockRequest({ query });
+            const res = mockResponse();
+
+            await getUserNames(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        test('GOOD: search', async () => {
+            query.search = 'valid';
+            const req = mockRequest({ query });
+            const res = mockResponse();
+
+            await getUserNames(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        
+    });
+
+    describe('API: getUser', () => {
+        let params;
+
+        beforeEach(() => {
+            params = {
+                username: 'crewmate'
+            };
+        });
+
+        test('GOOD', async () => {
+            const req = mockRequest({ params });
+            const res = mockResponse();
+            
+            await getUser(req, res);
+
+            expect(res.status).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -157,46 +209,13 @@ describe('Unit test: userAPI.js', () => {
                 })
             );
         });
-
-        test('BAD: Existing email', async () => {
-            body.email = 'username@gmail.com';
-            const req = mockRequest({ body });
-            const res = mockResponse();
-
-            await postRegisterUser(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(401);
-            expect(res.send).toHaveBeenCalledWith({ 
-                errors: { 
-                    email: 'used'
-                }
-            });
-
-            expect(db.query).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    text: queryText,
-                    values: expect.arrayContaining([
-                        body.username,
-                        body.email
-                    ])
-                })
-            );
-        });
     });
 
     describe('API: postLogin', () => {
-        let body, db, queryText;
-
-        beforeAll(() => {
-            queryText = oneLineQuery(`
-                SELECT  *
-                FROM    users
-                WHERE   username=$1;
-            `);
-        });
+        let body;
 
         beforeEach(() => {
-            db = require('../../db');
+            jest.clearAllMocks();
             body = {
                 username: 'username',
                 password: 'password'
@@ -216,10 +235,7 @@ describe('Unit test: userAPI.js', () => {
                 })
             );
 
-            expect(db.query).toHaveBeenCalledWith({
-                text: queryText,
-                values: [ body.username ]
-            });
+            expect(db.query).toHaveBeenCalledTimes(1);
         });
 
         test('BAD: wrong username', async () => {
@@ -231,10 +247,7 @@ describe('Unit test: userAPI.js', () => {
             
             expect(res.status).toHaveBeenCalledWith(401);
 
-            expect(db.query).toHaveBeenCalledWith({
-                text: queryText,
-                values: [ body.username ]
-            });
+            expect(db.query).toHaveBeenCalledTimes(1);
         });
 
         test('BAD: Existing username, wrong password', async () => {
@@ -246,10 +259,7 @@ describe('Unit test: userAPI.js', () => {
             
             expect(res.status).toHaveBeenCalledWith(401);
 
-            expect(db.query).toHaveBeenCalledWith({
-                text: queryText,
-                values: [ body.username ]
-            });
+            expect(db.query).toHaveBeenCalledTimes(1);
         });
     });
 });

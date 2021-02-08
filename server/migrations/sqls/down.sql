@@ -1,30 +1,31 @@
 /* PURGE */
-DROP TABLE user_reports;
-DROP TABLE station_reports;
-DROP TABLE comment_reports;
-DROP TABLE post_reports;
-DROP TABLE reports;
-DROP TABLE comment_votes;
-DROP TABLE post_votes;
-DROP TABLE votes;
-DROP TABLE subposts;
-DROP TABLE subcomments;
-DROP TABLE comments;
-DROP TABLE posts;
-DROP TABLE crewmates;
-DROP TABLE captains;
-DROP TABLE passengers;
-DROP TABLE stations;
-DROP TABLE users;
-DROP TABLE admins;
+DROP TABLE IF EXISTS verifications;
+DROP TABLE IF EXISTS user_reports;
+DROP TABLE IF EXISTS station_reports;
+DROP TABLE IF EXISTS comment_reports;
+DROP TABLE IF EXISTS post_reports;
+DROP TABLE IF EXISTS reports;
+DROP TABLE IF EXISTS comment_votes;
+DROP TABLE IF EXISTS post_votes;
+DROP TABLE IF EXISTS votes;
+DROP TABLE IF EXISTS subposts;
+DROP TABLE IF EXISTS subcomments;
+DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS crewmates;
+DROP TABLE IF EXISTS captains;
+DROP TABLE IF EXISTS passengers;
+DROP TABLE IF EXISTS stations;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS admins;
 
-DROP FUNCTION comment_id;
-DROP SEQUENCE comment_id_seq;
-DROP FUNCTION post_id;
-DROP SEQUENCE post_id_seq;
+DROP FUNCTION IF EXISTS comment_id;
+DROP SEQUENCE IF EXISTS comment_id_seq;
+DROP FUNCTION IF EXISTS post_id;
+DROP SEQUENCE IF EXISTS post_id_seq;
 
-DROP TYPE report_status_enum;
-DROP TYPE gender_enum;
+DROP TYPE IF EXISTS report_status_enum;
+DROP TYPE IF EXISTS gender_enum;
 
-DROP FUNCTION stringify_bigint;
-DROP FUNCTION pseudo_encrypt;
+DROP FUNCTION IF EXISTS stringify_bigint;
+DROP FUNCTION IF EXISTS pseudo_encrypt;

@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 3.2.2 (Python 3.8.6 on win32)" generated="20210207 19:09:18.311" rpa="false">
+<suite id="s1" name="E2E" source="D:\Repositories\STSWENG_Reddit\e2e">
+<suite id="s1-s1" name="CommentsLikeDislike" source="D:\Repositories\STSWENG_Reddit\e2e\CommentsLikeDislike.robot">
+<kw name="Open Chrome and Login" library="Common" type="setup">
+<arguments>
+<arg>username=crewmate</arg>
+<arg>password=password</arg>
+</arguments>
+<kw name="Open Chrome" library="Common">
+<kw name="Open Browser" library="SeleniumLibrary">
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<arguments>
+<arg>http://localhost:3000</arg>
+<arg>headlesschrome</arg>
+</arguments>
+<msg timestamp="20210207 19:09:18.629" level="INFO">Opening browser 'headlesschrome' to base url 'http://localhost:3000'.</msg>
+<kw name="Capture Page Screenshot" library="SeleniumLibrary">
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<msg timestamp="20210207 19:09:26.566" level="INFO" html="yes">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-1.png"&gt;&lt;img src="selenium-screenshot-1.png" width="800px"&gt;&lt;/a&gt;</msg>
+<status status="PASS" starttime="20210207 19:09:26.335" endtime="20210207 19:09:26.567"></status>
+</kw>
+<msg timestamp="20210207 19:09:26.597" level="FAIL">WebDriverException: Message: unknown error: net::ERR_CONNECTION_REFUSED
+  (Session info: headless chrome=88.0.4324.146)
+</msg>
+<status status="FAIL" starttime="20210207 19:09:18.629" endtime="20210207 19:09:26.597"></status>
+</kw>
+<status status="FAIL" starttime="20210207 19:09:18.629" endtime="20210207 19:09:26.597"></status>
+</kw>
+<status status="FAIL" starttime="20210207 19:09:18.629" endtime="20210207 19:09:26.597"></status>
+</kw>
+<test id="s1-s1-t1" name="14.1 Post like and unlike">
+<status status="FAIL" starttime="20210207 19:09:26.597" endtime="20210207 19:09:26.598" critical="yes">Parent suite setup failed:
+WebDriverException: Message: unknown error: net::ERR_CONNECTION_REFUSED
+  (Session info: headless chrome=88.0.4324.146)
+</status>
+</test>
+<test id="s1-s1-t2" name="14.2 Post dislike and undislike">
+<status status="FAIL" starttime="20210207 19:09:26.602" endtime="20210207 19:09:26.603" critical="yes">Parent suite setup failed:
+WebDriverException: Message: unknown error: net::ERR_CONNECTION_REFUSED
+  (Session info: headless chrome=88.0.4324.146)
+</status>
+</test>
+<status status="FAIL" starttime="20210207 19:09:18.342" endtime="20210207 19:09:26.605">Suite setup failed:
+WebDriverException: Message: unknown error: net::ERR_CONNECTION_REFUSED
+  (Session info: headless chrome=88.0.4324.146)
+</status>
+</suite>
+<suite id="s1-s2" name="PostEdit" source="D:\Repositories\STSWENG_Reddit\e2e\PostEdit.robot">
+<kw name="Open Chrome and Login" library="Common" type="setup">
+<arguments>
+<arg>username=crewmate</arg>
+<arg>password=password</arg>
+</arguments>
+<kw name="Open Chrome" library="Common">
+<kw name="Open Browser" library="SeleniumLibrary">
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<arguments>
+<arg>http://localhost:3000</arg>
+<arg>headlesschrome</arg>
+</arguments>
+<msg timestamp="20210207 19:09:26.626" level="INFO">Opening browser 'headlesschrome' to base url 'http://localhost:3000'.</msg>
+<kw name="Capture Page Screenshot" library="SeleniumLibrary">
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="FAIL" starttime="20210207 19:09:29.930" endtime="20210207 19:09:29.931"></status>
+</kw>
+<msg timestamp="20210207 19:09:29.931" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: Execution terminated by signal</msg>
+<status status="FAIL" starttime="20210207 19:09:26.626" endtime="20210207 19:09:29.932"></status>
+</kw>
+<status status="FAIL" starttime="20210207 19:09:26.625" endtime="20210207 19:09:29.932"></status>
+</kw>
+<status status="FAIL" starttime="20210207 19:09:26.623" endtime="20210207 19:09:29.932"></status>
+</kw>
+<test id="s1-s2-t1" name="8.1 Invalid edit post (empty post text)">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:29.932" endtime="20210207 19:09:29.933" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s2-t2" name="8.2 Invalid edit post (empty post title)">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:29.938" endtime="20210207 19:09:29.940" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s2-t3" name="8.3 Valid edit post">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:29.942" endtime="20210207 19:09:29.942" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20210207 19:09:26.609" endtime="20210207 19:09:29.958">Suite setup failed:
+Execution terminated by signal</status>
+</suite>
+<suite id="s1-s3" name="PostsLikeDislike" source="D:\Repositories\STSWENG_Reddit\e2e\PostsLikeDislike.robot">
+<test id="s1-s3-t1" name="14.1 Post like and unlike">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:29.974" endtime="20210207 19:09:29.974" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s3-t2" name="14.2 Post dislike and undislike">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:29.976" endtime="20210207 19:09:29.976" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20210207 19:09:29.971" endtime="20210207 19:09:29.986"></status>
+</suite>
+<suite id="s1-s4" name="StationCreatePost" source="D:\Repositories\STSWENG_Reddit\e2e\StationCreatePost.robot">
+<test id="s1-s4-t1" name="7.1 Invalid Add Post (Empty Title)">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:29.990" endtime="20210207 19:09:29.990" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s4-t2" name="7.2 Invalid Add Post (Empty Post Body)">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:29.992" endtime="20210207 19:09:29.993" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s4-t3" name="7.3 Valid Add Post">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.000" endtime="20210207 19:09:30.001" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20210207 19:09:29.989" endtime="20210207 19:09:30.004"></status>
+</suite>
+<suite id="s1-s5" name="StationCreateStation" source="D:\Repositories\STSWENG_Reddit\e2e\StationCreateStation.robot">
+<test id="s1-s5-t1" name="6.1 Successful Create Station">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.007" endtime="20210207 19:09:30.008" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s5-t2" name="6.2 Station Name Already in Use">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.009" endtime="20210207 19:09:30.009" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s5-t3" name="6.3 Station Name Too Short">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.017" endtime="20210207 19:09:30.018" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20210207 19:09:30.006" endtime="20210207 19:09:30.020"></status>
+</suite>
+<suite id="s1-s6" name="StationDeletePost" source="D:\Repositories\STSWENG_Reddit\e2e\StationDeletePost.robot">
+<test id="s1-s6-t1" name="9.1 Post deletion canceled">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.023" endtime="20210207 19:09:30.024" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s6-t2" name="9.2 Post deletion confirmed">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.025" endtime="20210207 19:09:30.025" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20210207 19:09:30.022" endtime="20210207 19:09:30.033"></status>
+</suite>
+<suite id="s1-s7" name="StationJoinLeave" source="D:\Repositories\STSWENG_Reddit\e2e\StationJoinLeave.robot">
+<test id="s1-s7-t1" name="5.1 Joining Station">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.037" endtime="20210207 19:09:30.038" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s7-t2" name="5.2 Leaving Station">
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.039" endtime="20210207 19:09:30.040" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20210207 19:09:30.036" endtime="20210207 19:09:30.041"></status>
+</suite>
+<suite id="s1-s8" name="UserComment" source="D:\Repositories\STSWENG_Reddit\e2e\UserComment.robot">
+<test id="s1-s8-t1" name="10.1 Create Comment - Non-member">
+<doc>Test if error messages appear when a non-member adds a comment to a post in a station</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.052" endtime="20210207 19:09:30.053" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s8-t2" name="10.21 Create Empty Comment - Non-member">
+<doc>Test if error messages appear when a non-member adds a comment to a post in a station</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.055" endtime="20210207 19:09:30.055" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s8-t3" name="10.22 Create Empty Comment - Member">
+<doc>Test if error messages appear when a member makes an empty comment</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.059" endtime="20210207 19:09:30.059" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s8-t4" name="10.23 Create Comment - Member">
+<doc>Test if a member can succesfully add a comment</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.092" endtime="20210207 19:09:30.102" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s8-t5" name="11.1 Create Subcomment - Member">
+<doc>Test if a member can successfully add a subcomment</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.105" endtime="20210207 19:09:30.105" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s8-t6" name="12.1 Edit Comment">
+<doc>Test if the author of a comment can edit their comment</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.107" endtime="20210207 19:09:30.108" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s8-t7" name="12.2 Edit Subcomment">
+<doc>Test if the author of a subcomment can edit their subcomment</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.109" endtime="20210207 19:09:30.110" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s8-t8" name="13.1 Delete Comment">
+<doc>Test if the author of a comment can delete their comment</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.117" endtime="20210207 19:09:30.119" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s8-t9" name="13.2 Delete Subcomment">
+<doc>Test if the author of a subcomment can delete their subcomment</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.121" endtime="20210207 19:09:30.121" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20210207 19:09:30.049" endtime="20210207 19:09:30.123"></status>
+</suite>
+<suite id="s1-s9" name="UserLogin" source="D:\Repositories\STSWENG_Reddit\e2e\UserLogin.robot">
+<test id="s1-s9-t1" name="2.1 Login Fail - Invalid Credentials">
+<doc>Test if login fails if the username is not registered in the database</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.125" endtime="20210207 19:09:30.126" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s9-t2" name="2.2 Login Success - Valid Credentials">
+<doc>Test if login succeeds if the username is registered in the database</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.134" endtime="20210207 19:09:30.135" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s9-t3" name="2.3 Logout">
+<doc>Test if logout works properly</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.137" endtime="20210207 19:09:30.138" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s9-t4" name="2.4 Login with a fresh registration">
+<doc>Test if login will work for a freshly registered username</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.139" endtime="20210207 19:09:30.140" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20210207 19:09:30.125" endtime="20210207 19:09:30.142"></status>
+</suite>
+<suite id="s1-s10" name="UserRegistration" source="D:\Repositories\STSWENG_Reddit\e2e\UserRegistration.robot">
+<test id="s1-s10-t1" name="1.1 Successful registration">
+<doc>Test if valid inputs successfully register</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.153" endtime="20210207 19:09:30.154" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s10-t2" name="1.21 Password too weak - No uppercase and number">
+<doc>Test if error messages appear for weak passwords</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.156" endtime="20210207 19:09:30.156" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s10-t3" name="1.22 Password too weak - No number">
+<doc>Test if error messages appear for weak passwords</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.158" endtime="20210207 19:09:30.158" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s10-t4" name="1.23 Password too weak - No uppercase">
+<doc>Test if error messages appear for weak passwords</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.160" endtime="20210207 19:09:30.160" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s10-t5" name="1.24 Password too weak - Has uppercase and number, but &lt;8 characters">
+<doc>Test if error messages appear for short passwords (less than 8 characters)</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.167" endtime="20210207 19:09:30.169" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s10-t6" name="1.3 Username too short">
+<doc>Test if error messages appear for short usernames (less than 7 characters)</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.171" endtime="20210207 19:09:30.171" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s10-t7" name="1.41 Invalid email - [string]">
+<doc>Test if error messages appear for invalid email (ex: rocket)</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.173" endtime="20210207 19:09:30.173" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s10-t8" name="1.42 Invalid email - [string]@[string]">
+<doc>Test if error messages appear for invalid email (ex: rocket@sweng)</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.175" endtime="20210207 19:09:30.175" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s10-t9" name="1.43 Invalid email - [string]@[string].">
+<doc>Test if error messages appear for invalid email (ex: rocket@sweng.)</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.185" endtime="20210207 19:09:30.187" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s10-t10" name="1.5 Username already taken">
+<doc>Test if error messages appear for username input if username is already in the database</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.189" endtime="20210207 19:09:30.190" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s10-t11" name="1.6 Password do not match">
+<doc>Test if error messages appear for unmatching passwords</doc>
+<tags>
+<tag>robot:exit</tag>
+</tags>
+<status status="FAIL" starttime="20210207 19:09:30.191" endtime="20210207 19:09:30.192" critical="yes">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20210207 19:09:30.151" endtime="20210207 19:09:30.194"></status>
+</suite>
+<status status="FAIL" starttime="20210207 19:09:18.313" endtime="20210207 19:09:30.204"></status>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="41">Critical Tests</stat>
+<stat pass="0" fail="41">All Tests</stat>
+</total>
+<tag>
+<stat pass="0" fail="2" info="combined" combined="NOT robot:exit">NOT robot:exit</stat>
+<stat pass="0" fail="39">robot:exit</stat>
+</tag>
+<suite>
+<stat pass="0" fail="41" id="s1" name="E2E">E2E</stat>
+<stat pass="0" fail="2" id="s1-s1" name="CommentsLikeDislike">E2E.CommentsLikeDislike</stat>
+<stat pass="0" fail="3" id="s1-s2" name="PostEdit">E2E.PostEdit</stat>
+<stat pass="0" fail="2" id="s1-s3" name="PostsLikeDislike">E2E.PostsLikeDislike</stat>
+<stat pass="0" fail="3" id="s1-s4" name="StationCreatePost">E2E.StationCreatePost</stat>
+<stat pass="0" fail="3" id="s1-s5" name="StationCreateStation">E2E.StationCreateStation</stat>
+<stat pass="0" fail="2" id="s1-s6" name="StationDeletePost">E2E.StationDeletePost</stat>
+<stat pass="0" fail="2" id="s1-s7" name="StationJoinLeave">E2E.StationJoinLeave</stat>
+<stat pass="0" fail="9" id="s1-s8" name="UserComment">E2E.UserComment</stat>
+<stat pass="0" fail="4" id="s1-s9" name="UserLogin">E2E.UserLogin</stat>
+<stat pass="0" fail="11" id="s1-s10" name="UserRegistration">E2E.UserRegistration</stat>
+</suite>
+</statistics>
+<errors>
+<msg timestamp="20210207 19:09:29.931" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: Execution terminated by signal</msg>
+</errors>
+</robot>

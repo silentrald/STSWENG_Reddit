@@ -15,6 +15,81 @@ const userAPI = {
             : res.status(403).send();
     },
 
+    /**
+     * Gets the user depending on the search
+     * filter provided
+     */
+    getUserNames: async (req, res) => {
+        const {
+            search,
+            offset,
+            limit
+        } = req.query;
+
+        try {
+            const querySelUsers = {
+                text: `
+                    SELECT  username
+                    FROM    users
+                    WHERE   username ILIKE $1
+                    OFFSET  $2
+                    LIMIT   $3;
+                `,
+                values: [
+                    search ? search : '%',
+                    offset,
+                    limit
+                ]
+            };
+
+            const { rows: users, rowCount } = await db.query(querySelUsers);
+            if (rowCount < 1) {
+                return res.status(404).send();
+            }
+
+            return res.status(200).send({ users });
+        } catch (err) {
+            console.log(err);
+
+            return res.status(500).send();
+        }
+    },
+
+    /**
+     * Gets the details of the user specified in the params, including their total fame
+     */
+    getUser: async (req, res) => {
+        const { username } = req.params;
+
+        try {
+            // Get user details
+            const queryGetUser = {
+                text: `
+                    SELECT  username, fname, lname, gender, birthday, bio, fame
+                    FROM    users
+                    WHERE   username=$1
+                    LIMIT   1;
+                `,
+                values: [ username ]
+            };
+            const result = await db.query(queryGetUser);
+
+            // Check if user exists
+            if (!result.rowCount) {
+                return res.status(404).send();
+            }
+
+            console.log(result);
+
+            return res.status(200).send({
+                user: result.rows[0] 
+            });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).send();
+        }
+    },
+
     // POST
     /**
      * Create a user and responds with a status 201.
@@ -48,7 +123,8 @@ const userAPI = {
             };
 
             await db.query(queryInsUser);
-
+            
+            // Send to the server that the account was created
             return res.status(201).send();
         } catch (err) {
             console.log(err);
@@ -60,13 +136,14 @@ const userAPI = {
                             username: 'used' // User is used
                         }
                     });
-                } else if (err.constraint === 'users_email_key') {
-                    return res.status(401).send({ 
-                        errors: {
-                            email: 'used' // Email is used
-                        }
-                    });
                 }
+                // else if (err.constraint === 'users_email_key') {
+                //     return res.status(401).send({ 
+                //         errors: {
+                //             email: 'used' // Email is used
+                //         }
+                //     });
+                // }
             }
 
             return res.status(500).send();
@@ -87,7 +164,8 @@ const userAPI = {
                 text: `
                     SELECT  *
                     FROM    users
-                    WHERE   username=$1;
+                    WHERE   username=$1
+                    LIMIT   1;
                 `,
                 values: [ username ]
             };

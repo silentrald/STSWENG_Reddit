@@ -1,6 +1,6 @@
 {
   "name": "stsweng-reddit",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "engines": {
     "node": "14.x"
   },
@@ -10,8 +10,8 @@
     "start": "node app",
     "dev": "npx nodemon app --exec \"npm run lint && node\"",
     "devtest": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent && node\"",
-    "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color test/integration/post && node\"",
-    "devstemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/post && node\"",
+    "devtemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color test/integration/commentAPI && node\"",
+    "devstemp": "npx nodemon app --exec \"npm run lint && jest --runInBand --color --silent test/integration/postVote test/unit/postVote && node\"",
     "lint": "eslint .",
     "test": "jest --runInBand --color --coverage",
     "stest": "jest --runInBand --color --coverage --silent",
@@ -21,6 +21,7 @@
     "migrate-down": "node migrations/down",
     "db-delete": "node migrations/delete",
     "db-insert": "node migrations/insert",
+    "db-reset": "(node migrations/delete && node migrations/insert) & npx nodemon app --exec \"npm run lint && node\"",
     "semantic-release": "semantic-release"
   },
   "repository": {
@@ -34,8 +35,9 @@
   },
   "homepage": "https://github.com/silentrald/STSWENG_Reddit#readme",
   "dependencies": {
-    "ajv": "^6.12.6",
-    "ajv-keywords": "^3.5.2",
+    "ajv": "^7.0.3",
+    "ajv-formats": "^1.5.1",
+    "ajv-keywords": "^4.0.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -43,6 +45,7 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "lru-cache": "^6.0.0",
+    "nodemailer": "^6.4.17",
     "pg": "^8.4.2"
   },
   "devDependencies": {

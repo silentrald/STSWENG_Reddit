@@ -22,6 +22,207 @@ let failUser;
 let token;
 
 describe('User API', () => {
+    describe(`GET: ${url}`, () => {
+        test('GOOD: no search', async () => {
+            const {
+                statusCode,
+                // body
+            } = await request(server)
+                .get(url);
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        test('GOOD: search', async () => {
+            const {
+                statusCode,
+                // body
+            } = await request(server)
+                .get(url)
+                .query({
+                    search: 's'
+                });
+            
+            expect(statusCode).toEqual(200);
+        });
+
+        test('GOOD: invalid search', async () => {
+            const {
+                statusCode,
+                // body
+            } = await request(server)
+                .get(url)
+                .query({
+                    search: 'SuP3R4Nd0m'
+                });
+            
+            expect(statusCode).toEqual(404);
+        });
+
+        test('GOOD: Invalid Type', async () => {
+            const {
+                statusCode
+            } = await request(server)
+                .get(url)
+                .query({
+                    'search[]': 'hello'
+                });
+
+            expect(statusCode).toEqual(200);
+        });
+
+        describe('GOOD: sanitize query offset', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        offset: 2
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('Invalid Type', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        offset: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        offset: -2
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+        });
+
+        describe('GOOD: sanitize query limit', () => {
+            test('Valid', async () => {
+                const {
+                    statusCode,
+                    body
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 3
+                    });
+                
+                expect(statusCode).toEqual(200);
+                expect(body.users.length).toEqual(3);
+            });
+
+            test('Invalid type', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('Zero', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 0
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+
+            test('Negative Number', async () => {
+                const {
+                    statusCode
+                } = await request(server)
+                    .get(`${url}`)
+                    .query({
+                        limit: 'NotGood'
+                    });
+                
+                expect(statusCode).toEqual(200);
+            });
+        });
+    });
+
+    describe(`GET: ${url}/profile/:username`, () => {
+        let username = 'crewmate';
+
+        test('GOOD: User exists', async () => {
+            const res = await request(server)
+                .get(`${url}/profile/${username}`);
+
+            expect(res.statusCode).toEqual(200);
+            expect(res.body).toMatchObject({
+                user: expect.objectContaining({
+                    username,
+                    fname: expect.any(String),
+                    lname: expect.any(String),
+                    bio: expect.any(String),
+                    fame: expect.any(Number)
+                })
+            });
+            expect(res.body.user.gender === null || res.body.user.gender instanceof Boolean).toBeTruthy();
+            expect(res.body.user.birthday === null || res.body.user.birthday instanceof Boolean).toBeTruthy();
+        });
+
+        test('ERROR: User does not exist', async () => {
+            username = 'missingPerson';
+
+            const res = await request(server)
+                .get(`${url}/profile/${username}`);
+
+            expect(res.statusCode).toEqual(404);
+        });
+
+        test('ERROR: Username supplied is too short', async () => {
+            username = 'short';
+            const res = await request(server)
+                .get(`${url}/profile/${username}`);
+
+            expect(res.statusCode).toEqual(400);
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    errors: {
+                        username: 'pattern'
+                    }
+                })
+            );
+        });
+
+        test('ERROR: Username supplied is too long', async () => {
+            username = 'aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa a';
+            const res = await request(server)
+                .get(`${url}/profile/${username}`);
+
+            expect(res.statusCode).toEqual(400);
+            expect(res.body).toEqual(
+                expect.objectContaining({
+                    errors: {
+                        username: 'pattern'
+                    }
+                })
+            );
+        });
+    });
+
     describe(`POST: ${url}/create`, () => {
         beforeEach(() => {
             failUser = {
@@ -392,24 +593,24 @@ describe('User API', () => {
                 );
             });
 
-            test('Register with an existing email', async () => {
-                failUser.email = user.email;
+            // test('Register with an existing email', async () => {
+            //     failUser.email = user.email;
 
-                const { 
-                    statusCode,
-                    body
-                } = await request(server).post(`${url}/create`)
-                    .send(failUser);
+            //     const { 
+            //         statusCode,
+            //         body
+            //     } = await request(server).post(`${url}/create`)
+            //         .send(failUser);
     
-                expect(statusCode).toEqual(401);
-                expect(body).toEqual(
-                    expect.objectContaining({
-                        errors: expect.objectContaining({
-                            email: 'used'
-                        })
-                    })
-                );
-            });
+            //     expect(statusCode).toEqual(401);
+            //     expect(body).toEqual(
+            //         expect.objectContaining({
+            //             errors: expect.objectContaining({
+            //                 email: 'used'
+            //             })
+            //         })
+            //     );
+            // });
 
             test('Register with an invalid email', async () => {
                 failUser.email = 'invalidemail';

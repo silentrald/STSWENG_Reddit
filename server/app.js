@@ -10,7 +10,6 @@ if (!process.env.CI) {
 
 const app = express();
 
-const HOST = process.env.HOST || 'localhost';
 const PORT = process.env.PORT || 5000;
 
 // MIDDLEWARES
@@ -18,6 +17,10 @@ if (process.env.NODE_ENV === 'development') {
     app.use(require('morgan')('dev')); // import morgan
 }
 
+// const corsOptions = {
+//     origin: process.env.CLIENT_URL,
+//     optionsSuccessStatus: 200
+// };
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -28,19 +31,23 @@ const loginMw = require('./middlewares/loginMw');
 app.use(loginMw.smartLogin);
 
 // API ROUTERS
+const commentRtr = require('./routers/commentRtr');
+const commentVoteRtr = require('./routers/commentVoteRtr');
 const postRtr = require('./routers/postRtr');
 const postVoteRtr = require('./routers/postVoteRtr');
-const subcommentRtr = require('./routers/subcommentRtr');
 const stationRtr = require('./routers/stationRtr');
 const userRtr = require('./routers/userRtr');
+const verficationRtr = require('./routers/verificationRtr');
 
+app.use('/api/comment', commentRtr);
+app.use('/api/comment-vote', commentVoteRtr);
 app.use('/api/post', postRtr);
 app.use('/api/post-vote', postVoteRtr);
-app.use('/api/subcomment', subcommentRtr);
 app.use('/api/station', stationRtr);
 app.use('/api/user', userRtr);
+app.use('/api/verification', verficationRtr);
 
-const server = app.listen(PORT, HOST, () => {
+const server = app.listen(PORT, () => {
     console.log(`Listening to port ${PORT}`);
 });
 

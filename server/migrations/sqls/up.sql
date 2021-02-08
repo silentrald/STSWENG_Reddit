@@ -37,34 +37,36 @@ BEGIN
 END $$;
 
 /* TABLES */
-CREATE TABLE admins (
+CREATE TABLE IF NOT EXISTS admins (
     username    VARCHAR(64)     PRIMARY KEY,
     password    VARCHAR(60)     NOT NULL
 );
 
 CREATE TYPE gender_enum AS ENUM ('f', 'm', 'o', 'p');
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     username    VARCHAR(64)     PRIMARY KEY,
     password    VARCHAR(60)     NOT NULL,
-    email       VARCHAR(256)    NOT NULL UNIQUE,
+    email       VARCHAR(256)    NOT NULL,
     fname       VARCHAR(50)     DEFAULT '' NOT NULL,
     lname       VARCHAR(50)     DEFAULT '' NOT NULL,
     gender      gender_enum,
     birthday    DATE,
     bio         VARCHAR(200)    DEFAULT '' NOT NULL,
     fame        INT             DEFAULT 0 NOT NULL,
+    verified    BOOLEAN         DEFAULT false NOT NULL,
     banned      BOOLEAN         DEFAULT false NOT NULL
 );
 
-CREATE TABLE stations (
+CREATE TABLE IF NOT EXISTS stations (
     name            VARCHAR(64)     PRIMARY KEY,
     description     VARCHAR(250),
     rules           VARCHAR(1000),
     date_created    DATE            DEFAULT now() NOT NULL,
+    members         BIGINT          DEFAULT 1 NOT NULL,
     archived        BOOLEAN         DEFAULT false NOT NULL
 );
 
-CREATE TABLE passengers (
+CREATE TABLE IF NOT EXISTS passengers (
     username                    VARCHAR(64)     NOT NULL,
     FOREIGN KEY(username)       REFERENCES      users(username),
     station_name                VARCHAR(64)     NOT NULL,
@@ -74,21 +76,22 @@ CREATE TABLE passengers (
     CONSTRAINT pk_passengers PRIMARY KEY (username, station_name)
 );
 
-CREATE TABLE captains() INHERITS (passengers);
-CREATE TABLE crewmates() INHERITS (passengers);
+CREATE TABLE IF NOT EXISTS captains() INHERITS (passengers);
+CREATE TABLE IF NOT EXISTS crewmates() INHERITS (passengers);
 
 CREATE SEQUENCE post_id_seq MINVALUE -9223372036854775808 START WITH 0;
 CREATE OR REPLACE FUNCTION post_id() RETURNS text LANGUAGE plpgsql IMMUTABLE STRICT AS $$
 BEGIN
     RETURN 'p' || stringify_bigint(pseudo_encrypt(nextval('post_id_seq')));
 END $$;
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS posts (
     post_id                     VARCHAR(12)     PRIMARY KEY,
     title                       VARCHAR(64),
     text                        VARCHAR(1000),
     score                       INT             DEFAULT 0 NOT NULL,
     author                      VARCHAR(64),
     FOREIGN KEY(author)         REFERENCES      users(username),
+    comment_count               INT             DEFAULT 0 NOT NULL,
     timestamp_created           TIMESTAMP       DEFAULT now() NOT NULL,
     deleted                     BOOLEAN         DEFAULT false NOT NULL,
     station_name                VARCHAR(64)     NOT NULL,
@@ -100,7 +103,7 @@ CREATE OR REPLACE FUNCTION comment_id() RETURNS text LANGUAGE plpgsql IMMUTABLE 
 BEGIN
     RETURN 'c' || stringify_bigint(pseudo_encrypt(nextval('comment_id_seq')));
 END $$;
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
     comment_id                  VARCHAR(12)     PRIMARY KEY,
     text                        VARCHAR(1000),
     score                       INT             DEFAULT 0 NOT NULL,
@@ -112,7 +115,7 @@ CREATE TABLE comments (
     deleted                     BOOLEAN         DEFAULT false NOT NULL
 );
 
-CREATE TABLE subposts (
+CREATE TABLE IF NOT EXISTS subposts (
     comment_id                  VARCHAR(12) NOT NULL,
     parent_post                 VARCHAR(12) NOT NULL,
     FOREIGN KEY(parent_post)    REFERENCES  posts(post_id),
@@ -120,28 +123,30 @@ CREATE TABLE subposts (
     CONSTRAINT pk_subposts PRIMARY KEY (comment_id, parent_post)
 );
 
-CREATE TABLE subcomments (
+CREATE TABLE IF NOT EXISTS subcomments (
     comment_id                  VARCHAR(12) NOT NULL,
+    parent_post                 VARCHAR(12) NOT NULL,
+    FOREIGN KEY(parent_post)    REFERENCES  posts(post_id),
     parent_comment              VARCHAR(12) NOT NULL,
     FOREIGN KEY(parent_comment) REFERENCES  comments(comment_id),
 
     CONSTRAINT pk_subcomments PRIMARY KEY (comment_id, parent_comment)
 );
 
-CREATE TABLE votes (
+CREATE TABLE IF NOT EXISTS votes (
     username                    VARCHAR(64) NOT NULL,
     FOREIGN KEY(username)       REFERENCES  users(username),
     upvote                      BOOLEAN     NOT NULL
 );
 
-CREATE TABLE post_votes (
+CREATE TABLE IF NOT EXISTS post_votes (
     post_id                VARCHAR(12)  NOT NULL,
     FOREIGN KEY(post_id)   REFERENCES   posts(post_id),
 
     CONSTRAINT pk_post_votes PRIMARY KEY(post_id, username)
 ) INHERITS (votes);
 
-CREATE TABLE comment_votes (
+CREATE TABLE IF NOT EXISTS comment_votes (
     comment_id              VARCHAR(12) NOT NULL,
     FOREIGN KEY(comment_id) REFERENCES  comments(comment_id),
 
@@ -151,7 +156,7 @@ CREATE TABLE comment_votes (
 /* p: Pend; r: Resolved */
 CREATE TYPE report_status_enum AS ENUM ('p', 'r');
 
-CREATE TABLE reports (
+CREATE TABLE IF NOT EXISTS reports (
     report_id               SERIAL              PRIMARY KEY,
     reporter                VARCHAR(64)         NOT NULL,
     FOREIGN KEY(reporter)   REFERENCES          users(username),
@@ -160,22 +165,29 @@ CREATE TABLE reports (
     status                  report_status_enum  DEFAULT 'p' NOT NULL
 );
 
-CREATE TABLE post_reports (
+CREATE TABLE IF NOT EXISTS post_reports (
     post_id                 VARCHAR(12)     NOT NULL,
     FOREIGN KEY(post_id)    REFERENCES      posts(post_id)
 ) INHERITS (reports);
 
-CREATE TABLE comment_reports (
+CREATE TABLE IF NOT EXISTS comment_reports (
     comment_id              VARCHAR(12)     NOT NULL,
     FOREIGN KEY(comment_id) REFERENCES      comments(comment_id)
 ) INHERITS (reports);
 
-CREATE TABLE station_reports (
+CREATE TABLE IF NOT EXISTS station_reports (
     station_name                VARCHAR(64)     NOT NULL,
     FOREIGN KEY(station_name)   REFERENCES      stations(name)
 ) INHERITS (reports);
 
-CREATE TABLE user_reports (
+CREATE TABLE IF NOT EXISTS user_reports (
     username                VARCHAR(64) NOT NULL,
     FOREIGN KEY(username)   REFERENCES  users(username)
 ) INHERITS (reports);
+
+CREATE TABLE IF NOT EXISTS verifications (
+    username                VARCHAR(64) PRIMARY KEY,
+    FOREIGN KEY(username)   REFERENCES  users(username),
+    token                   VARCHAR(16) NOT NULL,
+    expires_at              TIMESTAMP   DEFAULT now() + interval '15 mins' NOT NULL
+);

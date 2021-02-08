@@ -1,7 +1,9 @@
-const Ajv = require('ajv');
+// const db = require('../db');
+
+const Ajv = require('ajv').default;
 const { ajvErrors } = require('./ajvHelper');
 
-const ajv = new Ajv({ allErrors: true, jsonPointers: true });
+const ajv = new Ajv({ allErrors: true });
 require('ajv-keywords')(ajv, [ 'transform' ]);
 
 const STATION_S_SCHEMA = 'ss';
@@ -51,6 +53,39 @@ ajv.addSchema({
     ]
 }, STATION_V_SCHEMA);
 
+const USERROLES_S_SCHEMA = 'urs';
+const USERROLES_V_SCHEMA = 'urv';
+
+ajv.addSchema({
+    type: 'object',
+    properties: {
+        type: {
+            transform: [ 'trim' ]
+        },
+        username: {
+            transform: [ 'trim' ]
+        }
+    }
+}, USERROLES_S_SCHEMA);
+
+ajv.addSchema({
+    type: 'object',
+    properties: {
+        username: {
+            type: 'string',
+            minLength: 8,
+            maxLength: 64
+        },
+        type: {
+            type: 'string'
+        }
+    },
+    required: [
+        'username',
+        'type'
+    ]
+}, USERROLES_V_SCHEMA);
+
 const stationMw = {
     validateStationParam: (req, res, next) => {
         const { stationName } = req.params;
@@ -73,6 +108,26 @@ const stationMw = {
         if (!validate) {
             const errors = ajvErrors(ajv);
             return res.status(401).send({ errors });
+        }
+
+        next();
+    },
+
+    validateRoles: (req, res, next) => {
+        ajv.validate(USERROLES_S_SCHEMA, req.body); // sanitize
+        const validate = ajv.validate(USERROLES_V_SCHEMA, req.body);
+
+        if (!validate) {
+            const errors = ajvErrors(ajv);
+            return res.status(403).send({ errors });
+        }
+
+        if (req.body.type !== 'grant' && req.body.type !== 'revoke') {
+            return res.status(403).send({
+                errors: {
+                    type: 'invalid'
+                }
+            });
         }
 
         next();
