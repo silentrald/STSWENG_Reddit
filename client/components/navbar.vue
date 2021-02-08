@@ -87,12 +87,6 @@ export default {
     }
   },
 
-  created () {
-    if (this.$route.path === '/search') {
-      this.$set(this, 'searchInput', this.$route.query.s)
-    }
-  },
-
   methods: {
     search () {
       this.$router.push({
