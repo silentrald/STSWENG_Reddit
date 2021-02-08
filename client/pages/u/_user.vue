@@ -19,7 +19,13 @@
                 <small>{{ user.fame }} fame</small>
               </div>
               <div class="mt-2 text-center">
-                <button id="verify-btn" @click="verify">
+                <div v-if="emailSuccess" class="success">
+                  Email was sent
+                </div>
+                <div v-if="emailFail" class="error">
+                  Email could not be sent
+                </div>
+                <button v-if="$auth.user.username === $route.params.user && !$auth.user.verified" id="verify-btn" @click="verify">
                   Verify Account
                 </button>
               </div>
@@ -112,7 +118,9 @@ export default {
       user: {},
       posts: [],
       loading: true,
-      end: false
+      end: false,
+      emailSuccess: false,
+      emailFail: false
     }
   },
   beforeMount () {
@@ -175,13 +183,18 @@ export default {
     },
 
     async verify () {
+      this.$set(this, 'emailSuccess', false)
+      this.$set(this, 'emailFail', false)
+
       try {
         await this.$axios.post('/api/verification')
+        this.$set(this, 'emailSuccess', true)
       } catch (err) {
         const { data } = err.response
         switch (data) {
           case 'VRFD':
             // account already verified
+            this.$set(this, 'emailFail', true)
             break
         }
       }

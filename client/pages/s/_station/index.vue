@@ -76,12 +76,12 @@
               </div>
               <h3>s/{{ name }}</h3>
               <!-- eslint-disable-next-line vue/no-v-html -->
-              <div v-html="markdownDescription" />
+              <div class="break-text" v-html="markdownDescription" />
             </div>
           </div>
           <div id="station-rules" class="mt-2">
             <h4>Rules</h4>
-            <div class="box">
+            <div class="box break-text">
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div v-html="markdownRules" />
             </div>
@@ -371,6 +371,10 @@ export default {
   position: absolute;
   top: 0;
   right: 0;
+}
+
+.break-text {
+  word-break: break-all;
 }
 
 </style>
